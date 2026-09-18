@@ -1,0 +1,54 @@
+
+
+/* ========================================================================= */
+/* FILE LOCATION: public/css/customer.css                                   */
+/* PURPOSE: Custom CSS for Customer Portal & Status Timeline                */
+/* ========================================================================= */
+
+.extra-small {
+    font-size: 0.75rem;
+}
+
+.pointer-none {
+    pointer-events: none;
+}
+
+/* Vertical Timeline Styling */
+.timeline-container {
+    position: relative;
+    padding-left: 10px;
+}
+
+.timeline-step {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 24px;
+}
+
+.timeline-step:last-child {
+    padding-bottom: 0;
+}
+
+/* Connecting Line Between Steps */
+.timeline-step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 28px;
+    width: 2px;
+    height: calc(100% - 20px);
+    background-color: #e5e7eb;
+    z-index: 1;
+}
+
+.timeline-step.completed:not(:last-child)::before {
+    background-color: #198754; /* Green line when step is completed */
+}
+
+.timeline-icon {
+    z-index: 2;
+    background-color: #ffffff;
+    border-radius: 50%;
+}

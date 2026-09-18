@@ -1,0 +1,190 @@
+/* ==========================================================================
+   1. CORE LAYOUT & GLOBAL SETTINGS
+   ========================================================================== */
+body {
+    /* Soft off-white/light-blue background tint matching your Figma canvas */
+    background-color: #f6f9ff; 
+    /* Clean, modern sans-serif typography stack */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Ensures the body takes up at least the full height of the browser screen */
+    min-height: 100vh;
+}
+
+/* ==========================================================================
+   2. NAVIGATION BAR & BRAND LOGO
+   ========================================================================== */
+/* The blue square box housing the car icon in your navbar */
+.logo-icon {
+    background-color: #1a66ff; /* SpeedLane Royal Blue */
+    padding: 6px 10px;
+    border-radius: 10px;       /* Smooth, rounded corners */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Branding text style next to the icon */
+.logo-text {
+    font-size: 24px;
+    font-weight: 700;          /* Ultra bold */
+    color: #1a66ff;            /* Matching Royal Blue */
+}
+
+/* Forces the active menu link to stay blue and distinct */
+.active-link {
+    color: #1a66ff !important;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   3. HERO SECTION (WITH HERO BACKGROUND IMAGE)
+   ========================================================================== */
+.hero-section {
+    /* Generates vertical spacing so elements don't hug the navbar or card edges */
+    padding: 120px 0; 
+    
+    /**
+     * BACKGROUND IMAGE IMPLEMENTATION:
+     * We layer a linear-gradient overlay *on top* of your actual image asset.
+     * 'rgba(246, 249, 255, 0.88)' matches your body background color.
+     * The '0.88' is the opacity (88% solid color, 12% transparent).
+     * This keeps the car photo beautifully subtle so your text remains perfectly readable!
+     */
+    /*background-image: linear-gradient(rgba(246, 249, 255, 0.20), rgba(246, 249, 255, 0.20)), 
+                      url('../images/734298762_1064067099279929_6494912549832651571_n.jpg');
+    
+    /* Dynamically stretches and crops the image to fill the screen space cleanly */
+    background-size: cover;
+    /* Keeps the focus locked directly on the center of the picture */
+    background-position: center;
+    /* Prevents the image from tiling or repeating if viewed on massive displays */
+    background-repeat: no-repeat;
+    
+    /* Calculates viewport height minus estimated navbar height so everything fits perfectly */
+    min-height: calc(100vh - 88px); 
+}
+
+/* Big high-contrast headline from your Figma mockup */
+.hero-title {
+    font-size: 2.85rem;
+    line-height: 1.25;
+    color: #0f172a !important; /* Deep dark slate grey */
+}
+
+/* Sub-headline phrase beneath the main title */
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: #64748b !important; /* Muted slate grey text color */
+}
+
+/* ==========================================================================
+   4. FLOATING VEHICLE TRACKING CARD
+   ========================================================================== */
+/* The main white card shell containing the form */
+.tracking-card {
+    border-radius: 16px;       /* Premium curved framing */
+    /* Extremely soft, wide drop shadow to make the card appear floating */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    padding: 35px;             /* Interior breathing room */
+}
+
+/* Title container inside the card ("Track Your Vehicle") */
+.tracking-card-title {
+    font-size: 1.35rem;
+    color: #0f172a;
+}
+
+/* Form input descriptive label text */
+.tracking-label {
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+/* Input entry bar styling */
+.tracking-input {
+    background-color: #f1f5f9; /* Soft grey background fill instead of classic borders */
+    border: none;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 1rem;
+    color: #334155;
+}
+
+/* Modifies the background color slightly when a customer clicks inside the field */
+.tracking-input:focus {
+    background-color: #e2e8f0;
+    box-shadow: none;
+    outline: none;
+}
+
+/* ==========================================================================
+   5. INTERACTIVE CTA BUTTONS
+   ========================================================================== */
+/* The full-width blue action button */
+.btn-primary.tracking-btn {
+    background-color: #1a66ff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-weight: 600;
+    font-size: 1rem;
+    /* Smooth hover effect transition timing */
+    transition: background-color 0.2s ease;
+}
+
+/* Darkens the blue color button slightly when hovered over with a cursor */
+.btn-primary.tracking-btn:hover {
+    background-color: #0052cc;
+}
+/* ==========================================================================
+   6. TRACK PAGE SPECIFIC COMPONENTS
+   ========================================================================== */
+
+/* Gives smooth color changes to your back navigation arrow on cursor hover */
+.back-arrow-btn i {
+    transition: color 0.2s ease;
+}
+.back-arrow-btn:hover i {
+    color: #1a66ff !important; /* Highlights royal blue when hovering */
+}
+
+/* Page titles layout adjustments */
+.tracking-main-title {
+    font-size: 2.3rem;
+    color: #0f172a; /* Deep dark slate grey */
+}
+
+.tracking-main-subtitle {
+    font-size: 1.15rem;
+    line-height: 1.5;
+}
+
+/* Figma specific light-blue/periwinkle status action button style */
+.btn-status-check {
+    background-color: #82a5ff; /* Softer pastel blue variant used in your Figma file */
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+/* Soft transition to a deeper corporate blue on hover states */
+.btn-status-check:hover {
+    background-color: #1a66ff;
+    color: #ffffff;
+}
+
+/* Figma Info Notification Alert Box at the bottom of the card container */
+.info-alert-banner {
+    background-color: #ebf2ff; /* Extremely soft pastel tint fill background color */
+    border: 1px solid #cfe2ff;   /* Soft borderline accent framing */
+}
+
+/* Tracking information message text formatting metrics */
+.info-alert-text {
+    font-size: 0.92rem;
+    color: #1a66ff !important;  /* Locks font color to match system branding rule */
+}

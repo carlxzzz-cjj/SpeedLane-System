@@ -1,0 +1,306 @@
+/* ========================================================================= */
+/* FILE: public/css/admin.css                                                */
+/* PURPOSE: SpeedLane Admin Panel Styles                                    */
+/* ========================================================================= */
+
+
+/* ========================================================================= */
+/* ADMIN LOGIN                                                               */
+/* ========================================================================= */
+
+/* Background canvas color matching your Figma design */
+body {
+    background-color: #f8fafc;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* SpeedLane brand blue color */
+.text-brand {
+    color: #0d6efd;
+}
+
+/* Circle badge background for the top lock icon */
+.icon-circle {
+    width: 64px;
+    height: 64px;
+    background-color: #0d6efd;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+}
+
+/* Form input styling overrides */
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+}
+
+.form-control {
+    background-color: #f8f9fa;
+    border-left: none;
+}
+
+.form-control:focus {
+    background-color: #ffffff;
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+/* Primary Admin Login Button */
+.btn-admin-submit {
+    background-color: #0d6efd;
+    border: none;
+    color: #ffffff;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-admin-submit:hover {
+    background-color: #709ee6;
+    color: #ffffff;
+}
+
+
+/* ========================================================================= */
+/* ADMIN REGISTER / AUTHORIZATION                                            */
+/* ========================================================================= */
+
+/* Amber Warning Box Styling */
+.auth-warning-box {
+    background-color: #fffbeb;
+    border: 1px solid #fde68a;
+}
+
+/* Form input focus state clean-up */
+.input-group .form-control:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+/* Extra small text helper */
+.extra-small {
+    font-size: 0.825rem;
+    line-height: 1.35;
+}
+
+
+/* ========================================================================= */
+/* ADMIN DASHBOARD                                                           */
+/* ========================================================================= */
+
+/* Sidebar navigation links formatting */
+.admin-nav-link {
+    color: #475569;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.admin-nav-link:hover {
+    background-color: #f1f5f9;
+    color: #0d6efd;
+}
+
+/* Sidebar active navigation button state */
+.admin-nav-link.active {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+/* Custom Purple accent color for Total Transactions icon */
+.text-purple {
+    color: #a855f7 !important;
+}
+
+/* Dashboard Quick Action Large Buttons */
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08) !important;
+}
+
+
+/* ========================================================================= */
+/* REGISTER SERVICE                                                          */
+/* ========================================================================= */
+
+/* Register Service Form Inputs */
+.form-control-figma,
+.form-select-figma {
+    background-color: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.9rem;
+}
+
+.form-control-figma:focus,
+.form-select-figma:focus {
+    background-color: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Register Service Cards */
+.card-figma {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Individual Service Card */
+.service-card-item {
+    border: 1px solid #e3e6f0;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    background-color: #ffffff;
+}
+
+/* Selected Service Card */
+.service-card-item.selected {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 1px #0d6efd;
+}
+
+/* Service Options Panel */
+.service-options-panel {
+    background-color: #fafafa;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Vehicle Number Badge */
+.badge-vehicle-num {
+    background-color: #2563eb;
+    color: #ffffff;
+    font-weight: 600;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.85rem;
+}
+/* Generate Code */
+.tracking-code-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-generate {
+  background-color: #16a34a; /* Green */
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-generate:hover {
+  background-color: #15803d;
+}
+
+.code-box {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  color: #2563eb;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 8px;
+  outline: none;
+}
+/* Save Order Button */
+.btn-save-order {
+    background-color: #10b981;
+    border: none;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+}
+
+.btn-save-order:hover {
+    background-color: #059669;
+    color: #ffffff;
+}
+
+.btn-save-order:disabled {
+    background-color: #a7f3d0;
+    cursor: not-allowed;
+}
+
+/* Cursor Helper */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+
+/* ========================================================================= */
+/* ADMIN UPDATE SERVICE                                                      */
+/* ========================================================================= */
+
+/* Table Layout & Headers */
+.custom-admin-table thead th {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1f2937;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 12px;
+}
+
+.custom-admin-table tbody td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+/* Custom Status Badges */
+.status-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.78rem;
+}
+
+/* Blue Status Badge */
+.badge-blue {
+    background-color: #2563eb !important;
+    color: #ffffff;
+}
+
+/* Green Status Badge */
+.badge-green {
+    background-color: #10b981 !important;
+    color: #ffffff;
+}
+
+
+/* ========================================================================= */
+/* TRANSACTION                                                               */
+/* ========================================================================= */
+
+/* Stat Summary Card Icon Badges */
+.stat-icon-box {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
