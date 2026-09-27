@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Technician;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,7 +13,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create or Update Super Admin Account
+        // 1. Fallback Super Admin (Ensures login access no matter what)
         User::updateOrCreate(
             ['email' => 'superadmin@speedlane.com'],
             [
@@ -27,10 +26,14 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Seed Sample Technicians
-        $technicians = ['John Doe', 'Alex Smith', 'Robert Johnson'];
-        foreach ($technicians as $tech) {
-            Technician::firstOrCreate(['name' => $tech]);
-        }
+        // 2. Load all local database data exported by iseed (in correct dependency order)
+        $this->call([
+            UsersTableSeeder::class,
+            ServicesTableSeeder::class,
+            ServiceOptionsTableSeeder::class,
+            TechniciansTableSeeder::class,
+            VehicleModelsTableSeeder::class,
+            ServiceRecordsTableSeeder::class,
+        ]);
     }
 }
