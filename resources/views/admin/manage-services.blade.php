@@ -28,16 +28,21 @@
         .extra-small {
             font-size: 11px;
         }
+        .letter-spacing-otp {
+            letter-spacing: 0.5rem;
+        }
     </style>
 </head>
 <body class="bg-light">
 
-    <!-- Header Navigation -->
+    <!-- TOP NAVIGATION HEADER BAR -->
     <header class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-2 sticky-top shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('admin.dashboard') }}">
-                <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width:36px; height:36px;">
-                    <i class="bi bi-car-front-fill"></i>
+            
+            <!-- Brand Logo & App Subtitle -->
+            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('admin.dashboard') }}">
+                <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                    <i class="bi bi-car-front-fill fs-6"></i>
                 </div>
                 <div>
                     <span class="fw-bold text-primary fs-5 d-block lh-1">SpeedLane</span>
@@ -45,22 +50,30 @@
                 </div>
             </a>
 
-            <div class="d-flex align-items-center gap-3">
-                <div class="d-flex align-items-center gap-2 px-3 py-1 border rounded-3 bg-light">
-                    <i class="bi bi-shield-check text-primary fs-5"></i>
-                    <div class="lh-1 text-start">
-                        <small class="d-block text-primary fw-bold" style="font-size: 10px;">Super Admin</small>
-                        <span class="fw-semibold text-primary" style="font-size: 12px;">Super Admin</span>
-                    </div>
-                </div>
+            <!-- Right Nav Alignment -->
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                
+                {{-- ROLE BADGE --}}
+                @if(auth()->check() && auth()->user()->isSuperAdmin())
+                    <span class="badge bg-light text-primary border border-primary px-3 py-2 rounded-pill">
+                        <i class="bi bi-shield-check me-1"></i> Super Admin
+                    </span>
+                @else
+                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                        <i class="bi bi-person-badge text-primary me-1"></i> Admin
+                    </span>
+                @endif
 
-                <form action="{{ route('admin.logout') }}" method="POST">
+                <!-- Logout Action Form -->
+                <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
                     @csrf
-                    <button class="btn btn-outline-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-1">
+                    <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-1">
                         <i class="bi bi-box-arrow-right"></i> Logout
                     </button>
                 </form>
+
             </div>
+
         </div>
     </header>
 
@@ -106,6 +119,13 @@
                     </div>
                 @endif
 
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4 shadow-sm" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ $errors->first() }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
                 <!-- Navigation Tabs -->
                 <div class="d-flex align-items-center gap-2 mb-4">
                     <ul class="nav nav-pills gap-2 mb-0" id="manageTab" role="tablist">
@@ -130,7 +150,7 @@
                 <div class="tab-content" id="manageTabContent">
                     <!-- TAB 1: SERVICE CATALOG -->
                     <div class="tab-pane fade show active" id="services-panel">
-                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
                             <div>
                                 <h4 class="fw-bold text-dark mb-1">
                                     <i class="bi bi-tools text-primary me-2"></i>Service Catalog
@@ -142,9 +162,33 @@
                             </button>
                         </div>
 
-                        <div class="d-flex flex-column gap-4 mb-5">
+                        <!-- SEARCH & VEHICLE FILTER BAR -->
+                        <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+                            <div class="row g-2">
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 rounded-start-3 text-muted">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                        <input type="text" id="serviceSearchInput" class="form-control bg-light border-start-0 rounded-end-3" placeholder="Search service name, sub-services, or price (e.g. Wash, Sedan, 500)...">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="vehicleFilterSelect" class="form-select bg-light rounded-3">
+                                        <option value="">Filter by Vehicle: All Types</option>
+                                        <option value="Sedan">Sedan</option>
+                                        <option value="SUV">SUV</option>
+                                        <option value="Pickup Truck">Pickup Truck</option>
+                                        <option value="Van">Van</option>
+                                        <option value="All">All Vehicles Only</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column gap-4 mb-5" id="servicesContainer">
                             @forelse($services as $service)
-                                <div class="card service-card border-0 shadow-sm rounded-4 p-4 bg-white">
+                                <div class="card service-card service-item border-0 shadow-sm rounded-4 p-4 bg-white" data-vehicle="{{ strtolower($service->vehicle_type ?? 'all') }}">
                                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-3 pb-3 border-bottom">
                                         <div class="flex-grow-1">
                                             <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
@@ -320,6 +364,13 @@
                                     <p class="text-muted fw-semibold mb-0">No services configured yet. Click "Add New Service" above to populate your catalog.</p>
                                 </div>
                             @endforelse
+
+                            <!-- Dynamic No Results Message for Search -->
+                            <div id="noSearchResults" class="text-center py-5 bg-white rounded-4 shadow-sm border d-none">
+                                <i class="bi bi-search text-muted fs-1 d-block mb-2"></i>
+                                <h5 class="fw-bold text-dark mb-1">No services matched your search</h5>
+                                <p class="text-muted small mb-0">Try searching for a different keyword or change the vehicle filter.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -404,13 +455,13 @@
                         </div>
                     </div>
 
-                    <!-- TAB 3: STAFF ROSTER -->
+                    <!-- TAB 3: STAFF & ADMIN ROSTER -->
                     <div class="tab-pane fade" id="staff-panel">
                         <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
                             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
                                 <div>
-                                    <h5 class="fw-bold text-dark mb-0">Staff Roster</h5>
-                                    <small class="text-muted">Manage registered staff accounts.</small>
+                                    <h5 class="fw-bold text-dark mb-0">Staff & Admin Roster</h5>
+                                    <small class="text-muted">Manage registered staff and edit passwords for Super Admin & Admin accounts via Gmail OTP.</small>
                                 </div>
                                 <button type="button" class="btn btn-sm btn-primary rounded-3 px-3 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#createStaffModal">
                                     <i class="bi bi-person-plus-fill"></i> Add Staff
@@ -446,12 +497,24 @@
                                                         </span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $staff->email }}</td>
+                                                <td class="font-monospace text-primary small">{{ $staff->email }}</td>
                                                 <td>{{ $staff->contact_number }}</td>
                                                 <td class="text-muted small">{{ $staff->created_at->format('M d, Y') }}</td>
                                                 <td class="text-end">
-                                                    @if(!method_exists($staff, 'isSuperAdmin') || !$staff->isSuperAdmin())
-                                                        <div class="d-inline-flex gap-1">
+                                                    <div class="d-inline-flex gap-1 align-items-center">
+                                                        
+                                                        <!-- Edit Password via Gmail OTP Button for Super Admin and Admin -->
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-outline-warning rounded-3 fw-semibold d-flex align-items-center gap-1" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#resetPasswordModal"
+                                                                data-user-id="{{ $staff->id }}"
+                                                                data-user-name="{{ $staff->name }}"
+                                                                data-user-email="{{ $staff->email }}">
+                                                            <i class="bi bi-key-fill"></i> Reset Password
+                                                        </button>
+
+                                                        @if(!method_exists($staff, 'isSuperAdmin') || !$staff->isSuperAdmin())
                                                             <button class="btn btn-sm btn-outline-primary rounded-3" data-bs-toggle="modal" data-bs-target="#editStaffModal{{ $staff->id }}">
                                                                 <i class="bi bi-pencil me-1"></i> Edit
                                                             </button>
@@ -460,8 +523,10 @@
                                                                 @method('DELETE')
                                                                 <button class="btn btn-sm btn-outline-danger rounded-3"><i class="bi bi-trash me-1"></i> Delete</button>
                                                             </form>
-                                                        </div>
+                                                        @endif
+                                                    </div>
 
+                                                    @if(!method_exists($staff, 'isSuperAdmin') || !$staff->isSuperAdmin())
                                                         <!-- EDIT STAFF MODAL -->
                                                         <div class="modal fade" id="editStaffModal{{ $staff->id }}" tabindex="-1">
                                                             <div class="modal-dialog modal-dialog-centered">
@@ -499,14 +564,12 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    @else
-                                                        <span class="text-muted small italic">Protected</span>
                                                     @endif
                                                 </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="text-center py-4 text-muted">No staff accounts registered yet.</td>
+                                                <td colspan="7" class="text-center py-4 text-muted">No staff or admin accounts registered yet.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
@@ -600,49 +663,116 @@
         </div>
     </div>
 
-    <!-- CREATE STAFF MODAL -->
-    <div class="modal fade" id="createStaffModal" tabindex="-1">
+    <!-- CREATE ADMIN MODAL -->
+<div class="modal fade" id="createStaffModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <form action="{{ route('admin.manage-services.store-staff') }}" method="POST">
+                @csrf
+                
+                <!-- FORCE ROLE TO ADMIN -->
+                <input type="hidden" name="role" value="admin">
+
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold text-dark"><i class="bi bi-person-plus text-primary me-2"></i>Add Admin Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Full Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Username <span class="text-danger">*</span></label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Email Address <span class="text-danger">*</span></label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Contact Number <span class="text-danger">*</span></label>
+                        <input type="text" name="contact_number" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Password <span class="text-danger">*</span></label>
+                        <input type="password" name="password" class="form-control" required minlength="8">
+                    </div>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold">Create Admin Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+    <!-- GMAIL OTP PASSWORD RESET MODAL -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border-0 shadow">
-                <form action="{{ route('admin.manage-services.store-staff') }}" method="POST">
+            <div class="modal-content border-0 rounded-4 shadow">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-lock-fill text-primary"></i> Edit Admin Password
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <form action="{{ route('admin.reset-password-otp') }}" method="POST">
                     @csrf
-                    <div class="modal-header border-bottom">
-                        <h5 class="modal-title fw-bold text-dark"><i class="bi bi-person-plus text-primary me-2"></i>Add Staff Account</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
+                    <input type="hidden" name="user_id" id="reset_user_id">
+
                     <div class="modal-body p-4">
-                        <div class="mb-3">
-                            <label class="form-label small fw-semibold">Full Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control" required>
+                        <div class="alert alert-light border rounded-3 p-3 mb-3">
+                            <span class="text-muted small d-block mb-1">Target Account:</span>
+                            <strong id="reset_user_name" class="text-dark d-block fs-6"></strong>
+                            <span id="reset_user_email" class="text-primary small font-monospace"></span>
                         </div>
+
+                        <!-- Step 1: Send OTP -->
                         <div class="mb-3">
-                            <label class="form-label small fw-semibold">Username <span class="text-danger">*</span></label>
-                            <input type="text" name="username" class="form-control" required>
+                            <button type="button" id="sendOtpBtn" class="btn btn-outline-primary btn-sm w-100 rounded-3 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                                <i class="bi bi-envelope-at-fill"></i> Send Verification Code to Gmail
+                            </button>
+                            <div id="otpStatusMessage" class="mt-2 text-center small fw-semibold"></div>
                         </div>
+
+                        <hr class="my-3">
+
+                        <!-- Step 2: Enter Code & Password -->
                         <div class="mb-3">
-                            <label class="form-label small fw-semibold">Email Address <span class="text-danger">*</span></label>
-                            <input type="email" name="email" class="form-control" required>
+                            <label class="form-label small fw-semibold">6-Digit Gmail OTP Code</label>
+                            <input type="text" name="otp" class="form-control font-monospace text-center letter-spacing-otp fs-5" maxlength="6" placeholder="000000" required autocomplete="off">
                         </div>
+
                         <div class="mb-3">
-                            <label class="form-label small fw-semibold">Contact Number <span class="text-danger">*</span></label>
-                            <input type="text" name="contact_number" class="form-control" required>
+                            <label class="form-label small fw-semibold">New Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Minimum 8 characters" required>
                         </div>
+
                         <div class="mb-3">
-                            <label class="form-label small fw-semibold">Password <span class="text-danger">*</span></label>
-                            <input type="password" name="password" class="form-control" required minlength="8">
+                            <label class="form-label small fw-semibold">Confirm New Password</label>
+                            <input type="password" name="password_confirmation" class="form-control" placeholder="Re-enter new password" required>
                         </div>
                     </div>
+
                     <div class="modal-footer border-top">
                         <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold">Create Staff Account</button>
+                        <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold">
+                            <i class="bi bi-check-circle me-1"></i> Update Password
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
+        // Form field dynamic toggling
         function toggleAddServiceFields(value) {
             const flatBox = document.getElementById('flatPriceBox');
             const optionsBox = document.getElementById('optionsBox');
@@ -692,6 +822,113 @@
             const row = btn.closest('.option-row');
             if (row) row.remove();
         }
+
+        // Service Search, Vehicle Filtering, and Gmail OTP Logic
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // --- Service Search & Filter ---
+            const searchInput = document.getElementById('serviceSearchInput');
+            const vehicleFilter = document.getElementById('vehicleFilterSelect');
+            const serviceItems = document.querySelectorAll('.service-item');
+            const noResultsMsg = document.getElementById('noSearchResults');
+
+            function filterServices() {
+                const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+                const selectedVehicle = vehicleFilter ? vehicleFilter.value.toLowerCase().trim() : '';
+                let visibleCount = 0;
+
+                serviceItems.forEach(card => {
+                    const cardText = card.textContent.toLowerCase();
+                    const cardVehicle = (card.getAttribute('data-vehicle') || 'all').toLowerCase();
+
+                    const matchesQuery = !query || cardText.includes(query);
+                    const matchesVehicle = !selectedVehicle || 
+                                           cardVehicle === selectedVehicle || 
+                                           cardVehicle === 'all' || 
+                                           selectedVehicle === 'all';
+
+                    if (matchesQuery && matchesVehicle) {
+                        card.classList.remove('d-none');
+                        visibleCount++;
+                    } else {
+                        card.classList.add('d-none');
+                    }
+                });
+
+                if (noResultsMsg) {
+                    if (visibleCount === 0 && serviceItems.length > 0) {
+                        noResultsMsg.classList.remove('d-none');
+                    } else {
+                        noResultsMsg.classList.add('d-none');
+                    }
+                }
+            }
+
+            if (searchInput) searchInput.addEventListener('input', filterServices);
+            if (vehicleFilter) vehicleFilter.addEventListener('change', filterServices);
+
+            // --- Gmail OTP AJAX Logic ---
+            const resetPasswordModal = document.getElementById('resetPasswordModal');
+            const sendOtpBtn = document.getElementById('sendOtpBtn');
+            const otpStatusMessage = document.getElementById('otpStatusMessage');
+
+            if (resetPasswordModal && sendOtpBtn) {
+                
+                // Populate Modal details on show
+                resetPasswordModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const userId = button.getAttribute('data-user-id');
+                    const userName = button.getAttribute('data-user-name');
+                    const userEmail = button.getAttribute('data-user-email');
+
+                    document.getElementById('reset_user_id').value = userId;
+                    document.getElementById('reset_user_name').textContent = userName;
+                    document.getElementById('reset_user_email').textContent = userEmail;
+                    
+                    otpStatusMessage.textContent = '';
+                    otpStatusMessage.className = 'mt-2 text-center small fw-semibold';
+                    sendOtpBtn.disabled = false;
+                    sendOtpBtn.innerHTML = `<i class="bi bi-envelope-at-fill me-1"></i> Send Verification Code to Gmail`;
+                });
+
+                // Trigger AJAX OTP mail request
+sendOtpBtn.addEventListener('click', function () {
+    const userId = document.getElementById('reset_user_id').value;
+    
+    sendOtpBtn.disabled = true;
+    sendOtpBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending Code...`;
+    otpStatusMessage.textContent = '';
+
+    fetch("{{ route('admin.send-otp') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ user_id: userId })
+    })
+    .then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || `Server Error (${response.status})`);
+        }
+        return data;
+    })
+    .then(data => {
+        otpStatusMessage.className = "mt-2 text-center small fw-semibold text-success";
+        otpStatusMessage.textContent = "✓ " + data.message;
+        sendOtpBtn.innerHTML = `<i class="bi bi-arrow-clockwise me-1"></i> Resend Verification Code`;
+    })
+    .catch(error => {
+        otpStatusMessage.className = "mt-2 text-center small fw-semibold text-danger";
+        otpStatusMessage.textContent = "✕ " + error.message;
+        sendOtpBtn.disabled = false;
+        sendOtpBtn.innerHTML = `<i class="bi bi-envelope-at-fill me-1"></i> Send Verification Code to Gmail`;
+    });
+});
+            }
+        });
     </script>
 </body>
 </html>

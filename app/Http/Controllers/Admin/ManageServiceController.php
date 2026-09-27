@@ -186,7 +186,7 @@ class ManageServiceController extends Controller
     }
 
     /**
-     * Register a new staff account.
+     * Register a new user account (Admin/Staff).
      */
     public function storeStaff(Request $request)
     {
@@ -196,7 +196,10 @@ class ManageServiceController extends Controller
             'email'          => 'required|email|max:255|unique:users,email',
             'contact_number' => 'required|string|max:50',
             'password'       => 'required|string|min:8',
+            'role'           => 'nullable|string|in:admin,staff',
         ]);
+
+        $role = $request->input('role', 'admin');
 
         User::create([
             'name'           => $request->name,
@@ -204,14 +207,15 @@ class ManageServiceController extends Controller
             'email'          => $request->email,
             'contact_number' => $request->contact_number,
             'password'       => Hash::make($request->password),
-            'role'           => 'staff',
+            'role'           => $role,
         ]);
 
-        return back()->with('success', "Staff account for '{$request->name}' created successfully!");
+        $roleLabel = ucfirst($role);
+        return back()->with('success', "{$roleLabel} account for '{$request->name}' created successfully!");
     }
 
     /**
-     * Update an existing staff account's details.
+     * Update an existing account's details.
      */
     public function updateStaff(Request $request, $id)
     {
@@ -222,20 +226,27 @@ class ManageServiceController extends Controller
             'username'       => 'required|string|max:255|unique:users,username,' . $staff->id,
             'email'          => 'required|email|max:255|unique:users,email,' . $staff->id,
             'contact_number' => 'required|string|max:50',
+            'role'           => 'nullable|string|in:admin,staff',
         ]);
 
-        $staff->update([
+        $updateData = [
             'name'           => $request->name,
             'username'       => $request->username,
             'email'          => $request->email,
             'contact_number' => $request->contact_number,
-        ]);
+        ];
 
-        return back()->with('success', "Staff account '{$staff->name}' updated successfully!");
+        if ($request->filled('role')) {
+            $updateData['role'] = $request->role;
+        }
+
+        $staff->update($updateData);
+
+        return back()->with('success', "Account '{$staff->name}' updated successfully!");
     }
 
     /**
-     * Delete a staff account.
+     * Delete an account.
      */
     public function destroyStaff($id)
     {
@@ -247,6 +258,6 @@ class ManageServiceController extends Controller
 
         $staff->delete();
 
-        return back()->with('success', 'Staff account deleted successfully!');
+        return back()->with('success', 'Account deleted successfully!');
     }
 }

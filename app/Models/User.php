@@ -23,6 +23,8 @@ class User extends Authenticatable
         'password',
         'role',
         'is_super_admin',
+        'otp',
+        'otp_expires_at',
     ];
 
     /**
@@ -46,6 +48,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_super_admin' => 'boolean',
+            'otp_expires_at' => 'datetime',
         ];
     }
 
@@ -54,7 +57,17 @@ class User extends Authenticatable
      */
     public function isSuperAdmin(): bool
     {
-        return (bool) $this->is_super_admin || $this->role === 'super_admin';
+        $role = strtolower(trim($this->role ?? ''));
+        return (bool) $this->is_super_admin || in_array($role, ['super_admin', 'superadmin']);
+    }
+
+    /**
+     * Check if the user is an Admin or Super Admin.
+     */
+    public function isAdmin(): bool
+    {
+        $role = strtolower(trim($this->role ?? ''));
+        return $this->isSuperAdmin() || $role === 'admin';
     }
 
     /**
@@ -62,6 +75,6 @@ class User extends Authenticatable
      */
     public function hasRole(string $role): bool
     {
-        return $this->role === $role;
+        return strtolower(trim($this->role ?? '')) === strtolower(trim($role));
     }
 }

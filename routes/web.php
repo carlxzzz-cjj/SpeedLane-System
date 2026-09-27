@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ManageServiceController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Customer\TrackController;  
+use App\Http\Controllers\AdminPasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,12 +19,16 @@ Route::get('/track', [TrackController::class, 'track'])->name('customer.track');
 
 /*
 |--------------------------------------------------------------------------
-| 2. ADMIN AUTHENTICATION ROUTES (PUBLIC)
+| 2. ADMIN AUTHENTICATION & PASSWORD RESET ROUTES (PUBLIC)
 |--------------------------------------------------------------------------
 */
 Route::get('/admin/login', [AuthController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
 Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
+
+// Unauthenticated Password Reset Routes (Gmail OTP)
+Route::post('/admin/send-otp', [AdminPasswordResetController::class, 'sendOtp'])->name('admin.send-otp');
+Route::post('/admin/reset-password-otp', [AdminPasswordResetController::class, 'resetPasswordWithOtp'])->name('admin.reset-password-otp');
 
 /*
 |--------------------------------------------------------------------------

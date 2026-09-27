@@ -17,44 +17,46 @@
 <body class="bg-light">
 
     <!-- TOP NAVIGATION HEADER BAR -->
-    <header class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-2 sticky-top shadow-sm">
-        <div class="container-fluid">
-            
-            <!-- Brand Logo & App Subtitle -->
-            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('admin.dashboard') }}">
-                <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                    <i class="bi bi-car-front-fill fs-6"></i>
-                </div>
-                <div>
-                    <span class="fw-bold text-primary fs-5 d-block lh-1">SpeedLane</span>
-                    <span class="text-muted extra-small">Admin Overview</span>
-                </div>
-            </a>
-
-            <!-- Right Nav Alignment -->
-            <div class="d-flex align-items-center gap-3 ms-auto">
-                
-                {{-- SUPER ADMIN BADGE OR ADD STAFF BUTTON --}}
-                @if(auth()->user()->isSuperAdmin())
-                    
-                @else
-                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill small">
-                        <i class="bi bi-person-badge text-primary me-1"></i> Admin
-                    </span>
-                @endif
-
-                <!-- Logout Action Form -->
-                <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-1">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </button>
-                </form>
-
+<header class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-2 sticky-top shadow-sm">
+    <div class="container-fluid">
+        
+        <!-- Brand Logo & App Subtitle -->
+        <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('admin.dashboard') }}">
+            <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                <i class="bi bi-car-front-fill fs-6"></i>
             </div>
+            <div>
+                <span class="fw-bold text-primary fs-5 d-block lh-1">SpeedLane</span>
+                <span class="text-muted extra-small">Admin Overview</span>
+            </div>
+        </a>
+
+        <!-- Right Nav Alignment -->
+        <div class="d-flex align-items-center gap-3 ms-auto">
+            
+            {{-- ROLE BADGE --}}
+            @if(auth()->check() && auth()->user()->isSuperAdmin())
+                <span class="badge bg-light text-primary border border-primary px-3 py-2 rounded-pill">
+                    <i class="bi bi-shield-check me-1"></i> Super Admin
+                </span>
+            @else
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                    <i class="bi bi-person-badge text-primary me-1"></i> Admin
+                </span>
+            @endif
+
+            <!-- Logout Action Form -->
+            <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
+                @csrf
+                <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-1">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </form>
 
         </div>
-    </header>
+
+    </div>
+</header>
 
     <!-- MAIN LAYOUT WRAPPER -->
     <div class="container-fluid">

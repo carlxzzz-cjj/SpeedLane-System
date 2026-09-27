@@ -30,10 +30,17 @@
                 </div>
             </a>
 
-            <div class="d-flex align-items-center gap-3">
-                <span class="badge bg-light text-primary border border-primary px-3 py-2 rounded-pill">
-                    <i class="bi bi-shield-check me-1"></i> Super Admin
-                </span>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                @if(auth()->check() && auth()->user()->isSuperAdmin())
+                    <span class="badge bg-light text-primary border border-primary px-3 py-2 rounded-pill">
+                        <i class="bi bi-shield-check me-1"></i> Super Admin
+                    </span>
+                @else
+                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                        <i class="bi bi-person-badge text-primary me-1"></i> Admin
+                    </span>
+                @endif
+
                 <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
                     @csrf
                     <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-1">
@@ -298,15 +305,15 @@
                                         <td class="font-monospace text-uppercase small text-secondary">{{ $plates }}</td>
 
                                         <!-- Service Types -->
-<td class="small text-truncate" style="max-width: 200px;">
-    @php
-        $serviceNames = array_map(function($item) {
-            return is_array($item) ? ($item['name'] ?? '') : $item;
-        }, $servicesArr ?? []);
-        $serviceNames = array_filter($serviceNames);
-    @endphp
-    {{ count($serviceNames) > 0 ? implode(', ', $serviceNames) : 'N/A' }}
-</td>
+                                        <td class="small text-truncate" style="max-width: 200px;">
+                                            @php
+                                                $serviceNames = array_map(function($item) {
+                                                    return is_array($item) ? ($item['name'] ?? '') : $item;
+                                                }, $servicesArr ?? []);
+                                                $serviceNames = array_filter($serviceNames);
+                                            @endphp
+                                            {{ count($serviceNames) > 0 ? implode(', ', $serviceNames) : 'N/A' }}
+                                        </td>
 
                                         <!-- Date Registered -->
                                         <td class="small text-muted">

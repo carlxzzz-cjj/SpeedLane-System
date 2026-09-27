@@ -118,27 +118,40 @@
 
 <body class="bg-light">
 
-    <!-- Header Navigation -->
-    <header class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-2 sticky-top shadow-sm" style="z-index: 1020;">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('admin.dashboard') }}">
-                <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                    <i class="bi bi-car-front-fill fs-6"></i>
-                </div>
-                <div>
-                    <span class="fw-bold text-primary fs-5 d-block lh-1">SpeedLane</span>
-                    <span class="text-muted small">Admin Overview</span>
-                </div>
-            </a>
+   <!-- Header Navigation -->
+<header class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-2 sticky-top shadow-sm" style="z-index: 1020;">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('admin.dashboard') }}">
+            <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                <i class="bi bi-car-front-fill fs-6"></i>
+            </div>
+            <div>
+                <span class="fw-bold text-primary fs-5 d-block lh-1">SpeedLane</span>
+                <span class="text-muted small">Admin Overview</span>
+            </div>
+        </a>
 
-            <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
+        <!-- Right Nav Alignment -->
+        <div class="d-flex align-items-center gap-3 ms-auto">
+            @if(auth()->check() && auth()->user()->isSuperAdmin())
+                <span class="badge bg-light text-primary border border-primary px-3 py-2 rounded-pill">
+                    <i class="bi bi-shield-check me-1"></i> Super Admin
+                </span>
+            @else
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                    <i class="bi bi-person-badge text-primary me-1"></i> Admin
+                </span>
+            @endif
+
+            <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
                 @csrf
                 <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-1">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </button>
             </form>
         </div>
-    </header>
+    </div>
+</header>
 
     <div class="container-fluid">
         <div class="row">
@@ -408,8 +421,12 @@
                                                                 </span>
                                                                 <div class="d-flex flex-column gap-2">
                                                                     @foreach($service->options as $option)
+                                                                        @php
+                                                                            // Fallback to parent service vehicle type if option vehicle type is null or empty
+                                                                            $optVehicleType = !empty($option->vehicle_type) ? $option->vehicle_type : (!empty($service->vehicle_type) ? $service->vehicle_type : 'All');
+                                                                        @endphp
                                                                         <label class="d-flex justify-content-between align-items-center cursor-pointer subservice-option-item" 
-                                                                               data-vehicle-type="{{ $option->vehicle_type ?? 'All' }}">
+                                                                               data-vehicle-type="{{ $optVehicleType }}">
                                                                             <div class="d-flex align-items-center gap-2">
                                                                                 @if($service->selection_type === 'single')
                                                                                     <input type="radio" 
@@ -418,7 +435,7 @@
                                                                                            class="service-option-input form-check-input mt-0" 
                                                                                            data-price="{{ $option->price }}"
                                                                                            data-label="{{ $option->name }}"
-                                                                                           data-vehicle-type="{{ $option->vehicle_type ?? 'All' }}">
+                                                                                           data-vehicle-type="{{ $optVehicleType }}">
                                                                                 @else
                                                                                     <input type="checkbox" 
                                                                                            name="vehicles[0][services][{{ $service->id }}][options][]" 
@@ -426,12 +443,12 @@
                                                                                            class="service-option-input form-check-input mt-0" 
                                                                                            data-price="{{ $option->price }}"
                                                                                            data-label="{{ $option->name }}"
-                                                                                           data-vehicle-type="{{ $option->vehicle_type ?? 'All' }}">
+                                                                                           data-vehicle-type="{{ $optVehicleType }}">
                                                                                 @endif
                                                                                 <div>
                                                                                     <span class="fw-medium text-dark d-block lh-1">{{ $option->name }}</span>
                                                                                     <span class="badge bg-secondary-subtle text-secondary mt-1" style="font-size: 10px;">
-                                                                                        <i class="bi bi-car-front me-1"></i>{{ $option->vehicle_type ?? 'All' }}
+                                                                                        <i class="bi bi-car-front me-1"></i>{{ $optVehicleType }}
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
@@ -592,7 +609,11 @@
                         const optionType = (optionItem.getAttribute('data-vehicle-type') || 'all').toLowerCase().trim();
                         const input = optionItem.querySelector('.service-option-input');
 
-                        const isOptionMatch = optionType === 'all' || optionType === selectedType;
+                        // Match option if option matches type, OR if option is 'all', OR if parent service matches
+                        const isOptionMatch = optionType === 'all' || 
+                                              optionType === selectedType || 
+                                              serviceType === 'all' || 
+                                              serviceType === selectedType;
 
                         if (isOptionMatch) {
                             optionItem.style.setProperty('display', 'flex', 'important');
