@@ -54,6 +54,7 @@
                 });
                 $highestStep = $transactions->max('current_step') ?? 1;
                 $allCompleted = $transactions->every(fn($t) => $t->status === 'Completed');
+                $contactNum = $customerInfo->contact_number ?? $customerInfo->phone_number ?? null;
             @endphp
 
             <!-- Customer & Order Overview -->
@@ -79,7 +80,13 @@
 
                             <div class="col-6">
                                 <span class="text-muted extra-small d-block">Contact Number</span>
-                                <span class="fw-bold text-dark fs-6">{{ $customerInfo->contact_number ?? $customerInfo->phone_number ?? 'N/A' }}</span>
+                                @if($contactNum)
+                                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contactNum) }}" class="fw-bold text-primary text-decoration-none fs-6">
+                                        <i class="bi bi-telephone me-1"></i>{{ $contactNum }}
+                                    </a>
+                                @else
+                                    <span class="fw-bold text-dark fs-6">N/A</span>
+                                @endif
                             </div>
                             <div class="col-6">
                                 <span class="text-muted extra-small d-block">Date Received</span>
@@ -162,79 +169,77 @@
                         </div>
                     </div>
 
-                  <!-- Timeline -->
-<h6 class="fw-bold text-secondary small mb-3">Service Timeline</h6>
-<div class="timeline-container ms-2">
-    @php
-        // Timezone configuration (Change 'Asia/Manila' to your target timezone if different)
-        $timezone = 'Asia/Manila';
+                    <!-- Timeline -->
+                    <h6 class="fw-bold text-secondary small mb-3">Service Timeline</h6>
+                    <div class="timeline-container ms-2">
+                        @php
+                            $timezone = 'Asia/Manila';
 
-        $steps = [
-            [
-                'number' => 1,
-                'title' => 'Step 1: Vehicle Received',
-                'timestamp' => $item->received_at ?? $item->created_at,
-            ],
-            [
-                'number' => 2,
-                'title' => 'Step 2: Inspection',
-                'timestamp' => $item->inspected_at ?? ($step >= 2 ? $item->updated_at : null),
-            ],
-            [
-                'number' => 3,
-                'title' => 'Step 3: Repair / Coating In Progress',
-                'timestamp' => $item->in_progress_at ?? ($step >= 3 ? $item->updated_at : null),
-            ],
-            [
-                'number' => 4,
-                'title' => 'Step 4: Quality Check / Ready for Pickup',
-                'timestamp' => $item->ready_at ?? ($step >= 4 ? $item->updated_at : null),
-            ],
-            [
-                'number' => 5,
-                'title' => 'Step 5: Released / Completed',
-                'timestamp' => $item->completed_at ?? ($step == 5 ? $item->updated_at : null),
-            ],
-        ];
-    @endphp
+                            $steps = [
+                                [
+                                    'number' => 1,
+                                    'title' => 'Step 1: Vehicle Received',
+                                    'timestamp' => $item->received_at ?? $item->created_at,
+                                ],
+                                [
+                                    'number' => 2,
+                                    'title' => 'Step 2: Inspection',
+                                    'timestamp' => $item->inspected_at ?? ($step >= 2 ? $item->updated_at : null),
+                                ],
+                                [
+                                    'number' => 3,
+                                    'title' => 'Step 3: Repair / Coating In Progress',
+                                    'timestamp' => $item->in_progress_at ?? ($step >= 3 ? $item->updated_at : null),
+                                ],
+                                [
+                                    'number' => 4,
+                                    'title' => 'Step 4: Quality Check / Ready for Pickup',
+                                    'timestamp' => $item->ready_at ?? ($step >= 4 ? $item->updated_at : null),
+                                ],
+                                [
+                                    'number' => 5,
+                                    'title' => 'Step 5: Released / Completed',
+                                    'timestamp' => $item->completed_at ?? ($step == 5 ? $item->updated_at : null),
+                                ],
+                            ];
+                        @endphp
 
-    @foreach($steps as $s)
-        @php
-            $isDone = $step >= $s['number'];
-            $isCurrent = $step == $s['number'];
-            
-            // Format time with explicit local timezone conversion
-            $ts = ($isDone && $s['timestamp']) 
-                ? \Carbon\Carbon::parse($s['timestamp'])->setTimezone($timezone)->format('M d, Y · h:i A') 
-                : null;
-        @endphp
+                        @foreach($steps as $s)
+                            @php
+                                $isDone = $step >= $s['number'];
+                                $isCurrent = $step == $s['number'];
+                                
+                                $ts = ($isDone && $s['timestamp']) 
+                                    ? \Carbon\Carbon::parse($s['timestamp'])->setTimezone($timezone)->format('M d, Y · h:i A') 
+                                    : null;
+                            @endphp
 
-        <div class="timeline-step mb-3">
-            <div class="d-flex align-items-center justify-content-between gap-3">
-                <div class="d-flex align-items-center gap-3">
-                    <i class="bi {{ $isDone ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted' }} fs-5"></i>
-                    <div>
-                        <span class="fw-semibold small {{ $isDone ? 'text-dark' : 'text-muted' }}">
-                            {{ $s['title'] }}
-                        </span>
-                        @if($isCurrent && $step < 5)
-                            <span class="badge bg-primary ms-2 extra-small">Current Stage</span>
-                        @elseif($step == 5 && $s['number'] == 5)
-                            <span class="badge bg-success ms-2 extra-small">Completed</span>
-                        @endif
+                            <div class="timeline-step mb-3">
+                                <div class="d-flex align-items-center justify-content-between gap-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <i class="bi {{ $isDone ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted' }} fs-5"></i>
+                                        <div>
+                                            <span class="fw-semibold small {{ $isDone ? 'text-dark' : 'text-muted' }}">
+                                                {{ $s['title'] }}
+                                            </span>
+                                            @if($isCurrent && $step < 5)
+                                                <span class="badge bg-primary ms-2 extra-small">Current Stage</span>
+                                            @elseif($step == 5 && $s['number'] == 5)
+                                                <span class="badge bg-success ms-2 extra-small">Completed</span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    @if($isDone && $ts)
+                                        <span class="badge bg-light text-secondary border font-monospace fw-normal extra-small">
+                                            <i class="bi bi-clock me-1"></i>{{ $ts }}
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
-
-                <!-- Timestamp Badge -->
-                @if($isDone && $ts)
-                    <span class="badge bg-light text-secondary border font-monospace fw-normal extra-small">
-                        <i class="bi bi-clock me-1"></i>{{ $ts }}
-                    </span>
-                @endif
-            </div>
-        </div>
-    @endforeach
-</div>
             @endforeach
 
             <!-- Action Navigation -->
@@ -262,30 +267,36 @@
             </div>
         @endif
 
-        <!-- Support Card -->
+        <!-- Support Card with Clickable Contacts -->
         <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
             <h6 class="fw-bold text-dark mb-1">Need Immediate Assistance?</h6>
             <p class="text-muted small mb-3">Reach out to our customer support team for live updates regarding your vehicle's status.</p>
 
             <div class="row g-3">
+                <!-- Phone Link -->
                 <div class="col-md-6">
-                    <div class="bg-light rounded-3 p-3 d-flex align-items-center gap-3">
-                        <i class="bi bi-telephone-fill text-primary fs-5"></i>
-                        <div>
-                            <span class="extra-small text-muted d-block">Phone Support</span>
-                            <span class="fw-bold text-dark small">+63 917 123 4567</span>
+                    <a href="tel:+639171234567" class="text-decoration-none">
+                        <div class="bg-light rounded-3 p-3 d-flex align-items-center gap-3 border border-transparent hover-shadow">
+                            <i class="bi bi-telephone-fill text-primary fs-5"></i>
+                            <div>
+                                <span class="extra-small text-muted d-block">Phone Support</span>
+                                <span class="fw-bold text-dark small">+63 917 123 4567</span>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
+                <!-- Email Link (Opens Gmail directly on web, or native mail app on mobile) -->
                 <div class="col-md-6">
-                    <div class="bg-light rounded-3 p-3 d-flex align-items-center gap-3">
-                        <i class="bi bi-envelope-fill text-primary fs-5"></i>
-                        <div>
-                            <span class="extra-small text-muted d-block">Email Support</span>
-                            <span class="fw-bold text-dark small">support@speedlane.com</span>
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@speedlane.com" target="_blank" class="text-decoration-none">
+                        <div class="bg-light rounded-3 p-3 d-flex align-items-center gap-3 border border-transparent hover-shadow">
+                            <i class="bi bi-envelope-fill text-primary fs-5"></i>
+                            <div>
+                                <span class="extra-small text-muted d-block">Email Support</span>
+                                <span class="fw-bold text-dark small">support@speedlane.com</span>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>

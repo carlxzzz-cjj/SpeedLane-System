@@ -41,3 +41,4 @@ class VehicleModelSeeder extends Seeder
         }
     }
 }
+    

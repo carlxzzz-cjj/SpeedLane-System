@@ -2,14 +2,24 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Service extends Model
 {
-    protected $fillable = ['name', 'description', 'notice', 'selection_type', 'flat_price', 'is_active'];
+    use HasFactory;
 
-    public function options(): HasMany
+    protected $fillable = [
+        'name',
+        'description',
+        'notice',
+        'vehicle_type', // <-- Added
+        'selection_type',
+        'flat_price',
+        'is_active',
+    ];
+
+    public function options()
     {
         return $this->hasMany(ServiceOption::class);
     }

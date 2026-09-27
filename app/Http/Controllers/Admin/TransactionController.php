@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ServiceRecord;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class TransactionController extends Controller
 {
     /**
-     * Master pricing matrix synced with register-services JS
+     * Master pricing matrix
      */
     private array $speedlanePrices = [
         "ceramic_coating" => [
@@ -81,35 +83,161 @@ class TransactionController extends Controller
     ];
 
     /**
-     * Display the Transaction Records overview page
+     * Display Transactions Overview & Unified Multi-field Search
      */
-   public function index()
-{
-    // Fetch only completed transactions
-    $transactions = ServiceRecord::where('status', 'Completed')
-        ->latest()
-        ->get();
+    public function index(Request $request)
+    {
+        $query = ServiceRecord::where('status', 'Completed');
 
-    // SELF-HEALING: Calculate missing service prices and total costs
-    foreach ($transactions as $trx) {
-        $this->repairTransactionPrices($trx);
+        // 1. Keyword Search across Name, Tracking Code, Vehicle, Model, Plate, Service & Date
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('customer_name', 'like', "%{$search}%")
+                  ->orWhere('tracking_code', 'like', "%{$search}%")
+                  ->orWhere('vehicle_type', 'like', "%{$search}%")
+                  ->orWhere('vehicle_model', 'like', "%{$search}%")
+                  ->orWhere('plate_number', 'like', "%{$search}%")
+                  ->orWhere('selected_services', 'like', "%{$search}%")
+                  ->orWhereRaw("DATE_FORMAT(created_at, '%Y-%m-%d') LIKE ?", ["%{$search}%"])
+                  ->orWhereRaw("DATE_FORMAT(created_at, '%M %d, %Y') LIKE ?", ["%{$search}%"]);
+            });
+        }
+
+        // 2. Specific Vehicle Type Dropdown
+        if ($request->filled('vehicle_type')) {
+            $query->where('vehicle_type', 'like', "%{$request->vehicle_type}%");
+        }
+
+        // 3. Specific Service Dropdown
+        if ($request->filled('service_type')) {
+            $query->where('selected_services', 'like', "%{$request->service_type}%");
+        }
+
+        // 4. Specific Date Picker Filter
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        $transactions = $query->latest()->get();
+
+        // Self-Healing: Repair missing/zero prices
+        foreach ($transactions as $trx) {
+            $this->repairTransactionPrices($trx);
+        }
+
+        // Global KPI Metrics
+        $totalTransactions     = ServiceRecord::count();
+        $completedTransactions = $transactions->count();
+        $completedCount        = $completedTransactions;
+        $totalRevenue          = $transactions->sum('total_cost');
+
+        // Report Statistics Metrics
+        $now = Carbon::now();
+
+        // Weekly metrics
+        $weeklyQuery = ServiceRecord::where('status', 'Completed')
+            ->whereBetween('created_at', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()]);
+        $weeklyCount   = $weeklyQuery->count();
+        $weeklyRevenue = $weeklyQuery->sum('total_cost');
+
+        // Monthly metrics
+        $monthlyQuery = ServiceRecord::where('status', 'Completed')
+            ->whereYear('created_at', $now->year)
+            ->whereMonth('created_at', $now->month);
+        $monthlyCount   = $monthlyQuery->count();
+        $monthlyRevenue = $monthlyQuery->sum('total_cost');
+
+        // Yearly metrics
+        $yearlyQuery = ServiceRecord::where('status', 'Completed')
+            ->whereYear('created_at', $now->year);
+        $yearlyCount   = $yearlyQuery->count();
+        $yearlyRevenue = $yearlyQuery->sum('total_cost');
+
+        $availableServices = [
+            'Ceramic Coating',
+            'Graphene Coating',
+            'Paint Protection Film',
+            'Interior Detailing',
+            'Exterior Detailing',
+            'Washover',
+            'Undercoat'
+        ];
+
+        return view('admin.transactions', compact(
+            'totalTransactions',
+            'completedTransactions',
+            'completedCount',
+            'totalRevenue',
+            'transactions',
+            'weeklyCount',
+            'weeklyRevenue',
+            'monthlyCount',
+            'monthlyRevenue',
+            'yearlyCount',
+            'yearlyRevenue',
+            'availableServices'
+        ));
     }
 
-    $totalTransactions     = ServiceRecord::count();
-    $completedTransactions = $transactions->count();
-    $completedCount        = $completedTransactions;
-    
-    // Sum revenue directly from collection after price repair runs
-    $totalRevenue          = $transactions->sum('total_cost');
+    /**
+     * Download Weekly, Monthly, or Yearly Report PDF
+     */
+    public function downloadReport(Request $request)
+    {
+        $type = $request->input('type', 'weekly');
+        $query = ServiceRecord::where('status', 'Completed');
 
-    return view('admin.transactions', compact(
-        'totalTransactions',
-        'completedTransactions',
-        'completedCount',
-        'totalRevenue',
-        'transactions'
-    ));
-}
+        $title = "Transaction Report";
+        $periodLabel = "";
+
+        if ($type === 'weekly') {
+            $startDate = $request->filled('start_date') 
+                ? Carbon::parse($request->start_date)->startOfDay() 
+                : Carbon::now()->startOfWeek();
+            $endDate = $startDate->copy()->endOfWeek();
+
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+            $title = "Weekly Transaction Report";
+            $periodLabel = $startDate->format('M d, Y') . ' - ' . $endDate->format('M d, Y');
+
+        } elseif ($type === 'monthly') {
+            $monthYear = $request->input('month_year', date('Y-m'));
+            $date = Carbon::parse($monthYear . '-01');
+
+            $query->whereYear('created_at', $date->year)
+                  ->whereMonth('created_at', $date->month);
+            $title = "Monthly Transaction Report";
+            $periodLabel = $date->format('F Y');
+
+        } elseif ($type === 'yearly') {
+            $year = $request->input('year', date('Y'));
+
+            $query->whereYear('created_at', $year);
+            $title = "Yearly Transaction Report";
+            $periodLabel = "Year " . $year;
+        }
+
+        $transactions = $query->latest()->get();
+
+        foreach ($transactions as $trx) {
+            $this->repairTransactionPrices($trx);
+        }
+
+        $totalRevenue = $transactions->sum('total_cost');
+        $totalCount   = $transactions->count();
+
+        $pdf = Pdf::loadView('admin.report-pdf', compact(
+            'transactions',
+            'title',
+            'periodLabel',
+            'totalRevenue',
+            'totalCount',
+            'type'
+        ));
+
+        return $pdf->download("{$type}-report-" . date('Y-m-d') . ".pdf");
+    }
 
     /**
      * Generate and download PDF receipt for a specific transaction
@@ -118,7 +246,6 @@ class TransactionController extends Controller
     {
         $service = ServiceRecord::findOrFail($id);
 
-        // Self-healing check prior to rendering receipt
         $this->repairTransactionPrices($service);
 
         $pdf = Pdf::loadView('admin.receipt-pdf', compact('service'));
@@ -148,7 +275,7 @@ class TransactionController extends Controller
         }
 
         $vehicleType = $this->normalizeVehicleType(
-            $trx->vehicle_body_type ?? $trx->vehicle_type ?? $trx->vehicle_model ?? 'Sedan'
+            $trx->vehicle_type ?? $trx->vehicle_model ?? 'Sedan'
         );
 
         $totalCalculated = 0.00;
@@ -207,7 +334,6 @@ class TransactionController extends Controller
         $s = strtolower($serviceName);
         $matrix = $this->speedlanePrices;
 
-        // Interior / Exterior Detailing
         if (str_contains($s, 'interior detailing')) {
             return (float) ($matrix['interior_detailing'][$vType] ?? 6500);
         }
@@ -215,13 +341,11 @@ class TransactionController extends Controller
             return (float) ($matrix['exterior_detailing'][$vType] ?? 6500);
         }
 
-        // Undercoat / Rustproof
         if (str_contains($s, 'undercoat') || str_contains($s, 'rustproof')) {
             $sub = str_contains($s, 'rubberized') ? 'rubberized' : 'epoxy';
             return (float) ($matrix['undercoat'][$vType][$sub] ?? 6000);
         }
 
-        // Ceramic Coating
         if (str_contains($s, 'ceramic')) {
             $sub = 'full_body';
             if (str_contains($s, 'front half')) $sub = 'front_half';
@@ -233,7 +357,6 @@ class TransactionController extends Controller
             return (float) ($matrix['ceramic_coating'][$vType][$sub] ?? 11000);
         }
 
-        // Graphene Coating
         if (str_contains($s, 'graphene')) {
             $sub = 'full_body';
             if (str_contains($s, 'front half')) $sub = 'front_half';
@@ -245,7 +368,6 @@ class TransactionController extends Controller
             return (float) ($matrix['graphene_coating'][$vType][$sub] ?? 15000);
         }
 
-        // Paint Protection Film (PPF)
         if (str_contains($s, 'ppf') || str_contains($s, 'film')) {
             $sub = 'full_front';
             if (str_contains($s, 'hood only')) $sub = 'hood_only';
@@ -259,7 +381,6 @@ class TransactionController extends Controller
             return (float) ($matrix['ppf'][$vType][$sub] ?? 25000);
         }
 
-        // Washover / Repaint
         if (str_contains($s, 'washover') || str_contains($s, 'repaint')) {
             $sub = 'spot_repair';
             if (str_contains($s, 'hood')) $sub = 'hood';

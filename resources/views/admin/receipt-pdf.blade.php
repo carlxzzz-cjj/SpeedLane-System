@@ -141,7 +141,7 @@
     </table>
 
     <div class="total-box">
-        Grand Total Paid: PHP {{ number_format((float)($service->total_cost ?? 0), 2) }}
+        Grand Total Estimated Cost: PHP {{ number_format((float)($service->total_cost ?? 0), 2) }}
     </div>
 
 </body>

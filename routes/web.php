@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function () {
     // Admin Dashboard
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    // Register Staff Accounts (Legacy / Alternative)
+    // Register Staff Accounts
     Route::post('/admin/create-staff', [AuthController::class, 'register'])->name('admin.register.store');
 
     // Vehicle Service Registration
@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
 
     // Transactions History & PDF Export
     Route::get('/admin/transactions', [TransactionController::class, 'index'])->name('admin.transactions');
+    Route::get('/admin/transactions/report/download', [TransactionController::class, 'downloadReport'])->name('admin.transactions.reports.download');
     Route::get('/admin/transactions/{id}/pdf', [TransactionController::class, 'downloadPdf'])->name('admin.transactions.pdf');
 
     /*

@@ -1,3 +1,7 @@
+<!-- ========================================================================= -->
+<!-- FILE LOCATION: resources/views/admin/manage-service.blade.php            -->
+<!-- ========================================================================= -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +11,24 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <style>
+        .service-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .service-option-card {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+        }
+        .service-option-card:hover {
+            background-color: #ffffff;
+            border-color: #0d6efd;
+            box-shadow: 0 0.125rem 0.25rem rgba(13, 110, 253, 0.08);
+        }
+        .extra-small {
+            font-size: 11px;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
@@ -89,7 +111,7 @@
                     <ul class="nav nav-pills gap-2 mb-0" id="manageTab" role="tablist">
                         <li class="nav-item">
                             <button class="nav-link active rounded-pill border px-3 py-1 fw-semibold small" id="services-tab" data-bs-toggle="pill" data-bs-target="#services-panel" type="button">
-                                <i class="bi bi-tag me-1"></i> Service Types ({{ $services->count() }})
+                                <i class="bi bi-tag me-1"></i> Service Catalog ({{ $services->count() }})
                             </button>
                         </li>
                         <li class="nav-item">
@@ -106,66 +128,105 @@
                 </div>
 
                 <div class="tab-content" id="manageTabContent">
-                    <!-- TAB 1: SERVICE TYPES -->
+                    <!-- TAB 1: SERVICE CATALOG -->
                     <div class="tab-pane fade show active" id="services-panel">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
                             <div>
-                                <h5 class="fw-bold text-dark mb-0">Service Catalog</h5>
-                                <small class="text-muted">These services appear in the Register Service form for admins.</small>
+                                <h4 class="fw-bold text-dark mb-1">
+                                    <i class="bi bi-tools text-primary me-2"></i>Service Catalog
+                                </h4>
+                                <p class="text-secondary mb-0 fs-6">Manage service packages, pricing structures, and vehicle classifications.</p>
                             </div>
-                            <button class="btn btn-primary rounded-3 px-3 fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#addServiceModal">
-                                <i class="bi bi-plus-lg me-1"></i> Add Service
+                            <button class="btn btn-primary rounded-3 px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2 text-nowrap" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                                <i class="bi bi-plus-lg fs-6"></i> Add New Service
                             </button>
                         </div>
 
-                        <div class="d-flex flex-column gap-3 mb-5">
+                        <div class="d-flex flex-column gap-4 mb-5">
                             @forelse($services as $service)
-                                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <div class="d-flex align-items-center gap-2 mb-1">
-                                                <h5 class="fw-bold mb-0 text-dark">{{ $service->name }}</h5>
+                                <div class="card service-card border-0 shadow-sm rounded-4 p-4 bg-white">
+                                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-3 pb-3 border-bottom">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                                                <h3 class="fw-bold text-dark mb-0 fs-4">{{ $service->name }}</h3>
+                                                
+                                                <!-- Main Service Vehicle Type Badge -->
+                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill fw-semibold fs-6">
+                                                    <i class="bi bi-car-front me-1"></i>{{ $service->vehicle_type ?? 'All Vehicles' }}
+                                                </span>
+
+                                                <!-- Selection Type Badge -->
                                                 @if($service->selection_type === 'multi')
-                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Multi-select</span>
+                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold fs-6">
+                                                        <i class="bi bi-check2-square me-1"></i> Multi-Select
+                                                    </span>
                                                 @elseif($service->selection_type === 'single')
-                                                    <span class="badge bg-light text-secondary border rounded-pill">Single-select</span>
+                                                    <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle px-3 py-2 rounded-pill fw-semibold fs-6">
+                                                        <i class="bi bi-ui-radios me-1"></i> Single-Select
+                                                    </span>
                                                 @else
-                                                    <span class="badge bg-light text-secondary border rounded-pill">Flat-rate</span>
+                                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill fw-semibold fs-6">
+                                                        <i class="bi bi-tag-fill me-1"></i> Flat-Rate
+                                                    </span>
                                                 @endif
                                             </div>
-                                            <p class="text-muted small mb-2">{{ $service->description }}</p>
+
+                                            @if($service->description)
+                                                <p class="text-dark opacity-75 mb-2 fs-6 lh-base">{{ $service->description }}</p>
+                                            @endif
+
                                             @if($service->notice)
-                                                <div class="text-warning-emphasis small mb-3">
-                                                    <i class="bi bi-info-circle me-1 text-warning"></i> <em>{{ $service->notice }}</em>
+                                                <div class="p-2.5 px-3 bg-warning-subtle border border-warning-subtle text-warning-emphasis rounded-3 fs-6 d-inline-flex align-items-center gap-2 mt-1">
+                                                    <i class="bi bi-exclamation-circle-fill text-warning fs-5"></i>
+                                                    <span>{{ $service->notice }}</span>
                                                 </div>
                                             @endif
                                         </div>
 
-                                        <div class="d-flex gap-2">
-                                            <button class="btn btn-sm btn-outline-primary rounded-3 px-3" data-bs-toggle="modal" data-bs-target="#editServiceModal{{ $service->id }}">
-                                                <i class="bi bi-pencil me-1"></i> Edit
+                                        <!-- Action Buttons -->
+                                        <div class="d-flex align-items-center gap-2 self-md-start">
+                                            <button class="btn btn-outline-primary rounded-3 px-3 py-1.5 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#editServiceModal{{ $service->id }}">
+                                                <i class="bi bi-pencil-square"></i> Edit
                                             </button>
-                                            <form action="{{ route('admin.manage-services.destroy-service', $service->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this service?');">
+                                            <form action="{{ route('admin.manage-services.destroy-service', $service->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this service?');" class="m-0">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-3 px-3">
-                                                    <i class="bi bi-trash me-1"></i> Delete
+                                                <button type="submit" class="btn btn-outline-danger rounded-3 px-3 py-1.5 fw-semibold d-flex align-items-center gap-1">
+                                                    <i class="bi bi-trash"></i> Delete
                                                 </button>
                                             </form>
                                         </div>
                                     </div>
 
-                                    <div class="d-flex flex-wrap gap-2 pt-2 border-top">
+                                    <!-- Sub-services / Pricing Options Grid -->
+                                    <div>
+                                        <span class="text-uppercase fw-bold text-muted small tracking-wide mb-2 d-block">
+                                            <i class="bi bi-list-task me-1"></i> Available Sub-services & Pricing Options
+                                        </span>
+
                                         @if($service->selection_type === 'flat')
-                                            <span class="badge bg-light text-dark border px-3 py-2 fw-normal rounded-3">
-                                                Flat Price <strong class="text-primary ms-1">₱{{ number_format($service->flat_price, 2) }}</strong>
-                                            </span>
-                                        @else
-                                            @foreach($service->options as $opt)
-                                                <span class="badge bg-light text-dark border px-3 py-2 fw-normal rounded-3">
-                                                    {{ $opt->name }} <strong class="text-primary ms-1">₱{{ number_format($opt->price, 2) }}</strong>
+                                            <div class="p-3 rounded-3 bg-primary-subtle border border-primary-subtle d-flex justify-content-between align-items-center">
+                                                <span class="fw-bold text-primary-emphasis fs-6">
+                                                    <i class="bi bi-tag-fill me-2"></i>Standard Flat Rate
                                                 </span>
-                                            @endforeach
+                                                <span class="fw-bold text-primary fs-4 font-monospace">₱{{ number_format($service->flat_price, 2) }}</span>
+                                            </div>
+                                        @else
+                                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2.5">
+                                                @foreach($service->options as $opt)
+                                                    <div class="col">
+                                                        <div class="service-option-card p-3 rounded-3 d-flex justify-content-between align-items-center h-100">
+                                                            <div class="d-flex align-items-center gap-2 me-2">
+                                                                <i class="bi bi-circle-fill text-primary" style="font-size: 8px;"></i>
+                                                                <div>
+                                                                    <span class="fw-semibold text-dark fs-6 d-block">{{ $opt->name }}</span>
+                                                                </div>
+                                                            </div>
+                                                            <span class="fw-bold text-primary fs-5 font-monospace ms-auto">₱{{ number_format($opt->price, 2) }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         @endif
                                     </div>
                                 </div>
@@ -183,9 +244,22 @@
                                                 </div>
                                                 <div class="modal-body p-4">
                                                     <div class="mb-3">
-                                                        <label class="form-label small fw-semibold">Service Name</label>
+                                                        <label class="form-label small fw-semibold">Service Name <span class="text-danger">*</span></label>
                                                         <input type="text" name="name" class="form-control" value="{{ $service->name }}" required>
                                                     </div>
+                                                    
+                                                    <!-- Service Vehicle Type -->
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-semibold">Service Vehicle Type</label>
+                                                        <select name="vehicle_type" class="form-select">
+                                                            <option value="All" {{ ($service->vehicle_type ?? 'All') === 'All' ? 'selected' : '' }}>All Vehicle Types</option>
+                                                            <option value="Sedan" {{ ($service->vehicle_type ?? '') === 'Sedan' ? 'selected' : '' }}>Sedan</option>
+                                                            <option value="SUV" {{ ($service->vehicle_type ?? '') === 'SUV' ? 'selected' : '' }}>SUV</option>
+                                                            <option value="Pickup Truck" {{ ($service->vehicle_type ?? '') === 'Pickup Truck' ? 'selected' : '' }}>Pickup Truck</option>
+                                                            <option value="Van" {{ ($service->vehicle_type ?? '') === 'Van' ? 'selected' : '' }}>Van</option>
+                                                        </select>
+                                                    </div>
+
                                                     <div class="mb-3">
                                                         <label class="form-label small fw-semibold">Description</label>
                                                         <textarea name="description" class="form-control" rows="2">{{ $service->description }}</textarea>
@@ -210,19 +284,19 @@
 
                                                     <div class="mb-3" id="optionsBox{{ $service->id }}" style="display: {{ $service->selection_type !== 'flat' ? 'block' : 'none' }};">
                                                         <div class="d-flex justify-content-between align-items-center mb-2">
-                                                            <label class="form-label small fw-semibold mb-0">Service Options & Prices</label>
+                                                            <label class="form-label small fw-semibold mb-0">Pricing Options & Sub-services</label>
                                                             <button type="button" class="btn btn-sm btn-outline-primary rounded-3" onclick="addOptionRow('editOptionsContainer{{ $service->id }}')">
-                                                                <i class="bi bi-plus-lg me-1"></i> Add Option Price
+                                                                <i class="bi bi-plus-lg me-1"></i> Add Sub-service / Rate
                                                             </button>
                                                         </div>
                                                         <div id="editOptionsContainer{{ $service->id }}">
                                                             @foreach($service->options as $index => $option)
                                                                 <div class="row g-2 mb-2 option-row">
                                                                     <div class="col-7">
-                                                                        <input type="text" name="options[{{ $index }}][name]" class="form-control form-control-sm rounded-2" value="{{ $option->name }}" required>
+                                                                        <input type="text" name="options[{{ $index }}][name]" class="form-control form-control-sm rounded-2" value="{{ $option->name }}" placeholder="Option Name (e.g. Standard Package)" required>
                                                                     </div>
                                                                     <div class="col-4">
-                                                                        <input type="number" step="0.01" name="options[{{ $index }}][price]" class="form-control form-control-sm rounded-2" value="{{ $option->price }}" required>
+                                                                        <input type="number" step="0.01" name="options[{{ $index }}][price]" class="form-control form-control-sm rounded-2" value="{{ $option->price }}" placeholder="Price (₱)" required>
                                                                     </div>
                                                                     <div class="col-1 text-center">
                                                                         <button type="button" class="btn btn-sm btn-outline-danger w-100 rounded-2" onclick="removeOptionRow(this)"><i class="bi bi-trash"></i></button>
@@ -241,8 +315,9 @@
                                     </div>
                                 </div>
                             @empty
-                                <div class="text-center py-5 bg-white rounded-4 shadow-sm">
-                                    <p class="text-muted mb-0">No services configured. Click "Add Service" above to populate the catalog.</p>
+                                <div class="text-center py-5 bg-white rounded-4 shadow-sm border">
+                                    <i class="bi bi-inbox text-muted fs-1 d-block mb-2"></i>
+                                    <p class="text-muted fw-semibold mb-0">No services configured yet. Click "Add New Service" above to populate your catalog.</p>
                                 </div>
                             @endforelse
                         </div>
@@ -271,6 +346,7 @@
                                         <tr>
                                             <th>Technician Name</th>
                                             <th>Date Added</th>
+                                            <th>Date Disabled / Resigned</th>
                                             <th>Status</th>
                                             <th class="text-end">Actions</th>
                                         </tr>
@@ -286,6 +362,13 @@
                                                 </td>
                                                 <td class="align-middle text-muted">
                                                     {{ $technician->created_at ? $technician->created_at->format('M d, Y') : 'N/A' }}
+                                                </td>
+                                                <td class="align-middle text-muted small">
+                                                    @if(!$technician->is_active)
+                                                        {{ $technician->disabled_at ? \Carbon\Carbon::parse($technician->disabled_at)->format('M d, Y') : ($technician->updated_at ? $technician->updated_at->format('M d, Y') : 'N/A') }}
+                                                    @else
+                                                        <span class="text-muted">—</span>
+                                                    @endif
                                                 </td>
                                                 <td class="align-middle">
                                                     @if($technician->is_active)
@@ -312,7 +395,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="4" class="text-center py-4 text-muted">No technicians registered yet.</td>
+                                                <td colspan="5" class="text-center py-4 text-muted">No technicians registered yet.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
@@ -340,6 +423,7 @@
                                         <tr>
                                             <th>Full Name</th>
                                             <th>Username</th>
+                                            <th>Role</th>
                                             <th>Email</th>
                                             <th>Contact Number</th>
                                             <th>Date Registered</th>
@@ -351,11 +435,17 @@
                                             <tr>
                                                 <td class="fw-semibold text-dark">
                                                     <i class="bi bi-person-circle text-secondary me-2"></i> {{ $staff->name }}
-                                                    @if(method_exists($staff, 'isSuperAdmin') && $staff->isSuperAdmin())
-                                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill ms-1" style="font-size: 10px;">Super Admin</span>
-                                                    @endif
                                                 </td>
                                                 <td>{{ $staff->username }}</td>
+                                                <td>
+                                                    @if(method_exists($staff, 'isSuperAdmin') && $staff->isSuperAdmin())
+                                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Super Admin</span>
+                                                    @else
+                                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">
+                                                            {{ ucfirst($staff->role ?? 'Staff') }}
+                                                        </span>
+                                                    @endif
+                                                </td>
                                                 <td>{{ $staff->email }}</td>
                                                 <td>{{ $staff->contact_number }}</td>
                                                 <td class="text-muted small">{{ $staff->created_at->format('M d, Y') }}</td>
@@ -416,7 +506,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="6" class="text-center py-4 text-muted">No staff accounts registered yet.</td>
+                                                <td colspan="7" class="text-center py-4 text-muted">No staff accounts registered yet.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
@@ -444,13 +534,26 @@
                             <label class="form-label small fw-semibold">Service Name <span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control" placeholder="e.g., Ceramic Coating Treatment" required>
                         </div>
+
+                        <!-- Service Vehicle Type -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Service Vehicle Type <span class="text-danger">*</span></label>
+                            <select name="vehicle_type" class="form-select" required>
+                                <option value="All" selected>All Vehicle Types</option>
+                                <option value="Sedan">Sedan</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Pickup Truck">Pickup Truck</option>
+                                <option value="Van">Van</option>
+                            </select>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label small fw-semibold">Description</label>
                             <textarea name="description" class="form-control" rows="2" placeholder="Brief service description..."></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-semibold">Notice / Disclaimer Note</label>
-                            <input type="text" name="notice" class="form-control" placeholder="e.g., Prices shown are for standard sedan.">
+                            <input type="text" name="notice" class="form-control" placeholder="e.g., Select appropriate package for your vehicle.">
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-semibold">Selection Type <span class="text-danger">*</span></label>
@@ -468,15 +571,15 @@
 
                         <div class="mb-3" id="optionsBox">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="form-label small fw-semibold mb-0">Service Options & Prices <span class="text-danger">*</span></label>
+                                <label class="form-label small fw-semibold mb-0">Pricing Options & Sub-services <span class="text-danger">*</span></label>
                                 <button type="button" class="btn btn-sm btn-outline-primary rounded-3" onclick="addOptionRow('addOptionsContainer')">
-                                    <i class="bi bi-plus-lg me-1"></i> Add Option Price
+                                    <i class="bi bi-plus-lg me-1"></i> Add Sub-service / Rate
                                 </button>
                             </div>
                             <div id="addOptionsContainer">
                                 <div class="row g-2 mb-2 option-row">
                                     <div class="col-7">
-                                        <input type="text" name="options[0][name]" class="form-control form-control-sm rounded-2" placeholder="Option Name" required>
+                                        <input type="text" name="options[0][name]" class="form-control form-control-sm rounded-2" placeholder="Option Name (e.g. Basic Wash)" required>
                                     </div>
                                     <div class="col-4">
                                         <input type="number" step="0.01" name="options[0][price]" class="form-control form-control-sm rounded-2" placeholder="Price (₱)" required>
@@ -573,7 +676,7 @@
             row.className = 'row g-2 mb-2 option-row';
             row.innerHTML = `
                 <div class="col-7">
-                    <input type="text" name="options[${index}][name]" class="form-control form-control-sm rounded-2" placeholder="Option Name" required>
+                    <input type="text" name="options[${index}][name]" class="form-control form-control-sm rounded-2" placeholder="Option Name (e.g. Standard Package)" required>
                 </div>
                 <div class="col-4">
                     <input type="number" step="0.01" name="options[${index}][price]" class="form-control form-control-sm rounded-2" placeholder="Price (₱)" required>
