@@ -510,6 +510,7 @@
                                                                 data-bs-target="#resetPasswordModal"
                                                                 data-user-id="{{ $staff->id }}"
                                                                 data-user-name="{{ $staff->name }}"
+                                                                data-user-username="{{ $staff->username }}"
                                                                 data-user-email="{{ $staff->email }}">
                                                             <i class="bi bi-key-fill"></i> Reset Password
                                                         </button>
@@ -664,49 +665,49 @@
     </div>
 
     <!-- CREATE ADMIN MODAL -->
-<div class="modal fade" id="createStaffModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <form action="{{ route('admin.manage-services.store-staff') }}" method="POST">
-                @csrf
-                
-                <!-- FORCE ROLE TO ADMIN -->
-                <input type="hidden" name="role" value="admin">
+    <div class="modal fade" id="createStaffModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <form action="{{ route('admin.manage-services.store-staff') }}" method="POST">
+                    @csrf
+                    
+                    <!-- FORCE ROLE TO ADMIN -->
+                    <input type="hidden" name="role" value="admin">
 
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold text-dark"><i class="bi bi-person-plus text-primary me-2"></i>Add Admin Account</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Full Name <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" required>
+                    <div class="modal-header border-bottom">
+                        <h5 class="modal-title fw-bold text-dark"><i class="bi bi-person-plus text-primary me-2"></i>Add Admin Account</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Username <span class="text-danger">*</span></label>
-                        <input type="text" name="username" class="form-control" required>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Username <span class="text-danger">*</span></label>
+                            <input type="text" name="username" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Contact Number <span class="text-danger">*</span></label>
+                            <input type="text" name="contact_number" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Password <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control" required minlength="8">
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Email Address <span class="text-danger">*</span></label>
-                        <input type="email" name="email" class="form-control" required>
+                    <div class="modal-footer border-top">
+                        <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold">Create Admin Account</button>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Contact Number <span class="text-danger">*</span></label>
-                        <input type="text" name="contact_number" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Password <span class="text-danger">*</span></label>
-                        <input type="password" name="password" class="form-control" required minlength="8">
-                    </div>
-                </div>
-                <div class="modal-footer border-top">
-                    <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold">Create Admin Account</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
     <!-- GMAIL OTP PASSWORD RESET MODAL -->
     <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
@@ -722,6 +723,8 @@
                 <form action="{{ route('admin.reset-password-otp') }}" method="POST">
                     @csrf
                     <input type="hidden" name="user_id" id="reset_user_id">
+                    <input type="hidden" name="username" id="reset_user_username">
+                    <input type="hidden" name="email" id="reset_user_email_input">
 
                     <div class="modal-body p-4">
                         <div class="alert alert-light border rounded-3 p-3 mb-3">
@@ -879,11 +882,14 @@
                     const button = event.relatedTarget;
                     const userId = button.getAttribute('data-user-id');
                     const userName = button.getAttribute('data-user-name');
+                    const userUsername = button.getAttribute('data-user-username');
                     const userEmail = button.getAttribute('data-user-email');
 
-                    document.getElementById('reset_user_id').value = userId;
-                    document.getElementById('reset_user_name').textContent = userName;
-                    document.getElementById('reset_user_email').textContent = userEmail;
+                    document.getElementById('reset_user_id').value = userId || '';
+                    document.getElementById('reset_user_username').value = userUsername || '';
+                    document.getElementById('reset_user_email_input').value = userEmail || '';
+                    document.getElementById('reset_user_name').textContent = userName || '';
+                    document.getElementById('reset_user_email').textContent = userEmail || '';
                     
                     otpStatusMessage.textContent = '';
                     otpStatusMessage.className = 'mt-2 text-center small fw-semibold';
@@ -892,41 +898,48 @@
                 });
 
                 // Trigger AJAX OTP mail request
-sendOtpBtn.addEventListener('click', function () {
-    const userId = document.getElementById('reset_user_id').value;
-    
-    sendOtpBtn.disabled = true;
-    sendOtpBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending Code...`;
-    otpStatusMessage.textContent = '';
+                sendOtpBtn.addEventListener('click', function () {
+                    const userId = document.getElementById('reset_user_id').value;
+                    const username = document.getElementById('reset_user_username').value;
+                    const email = document.getElementById('reset_user_email_input').value;
+                    
+                    sendOtpBtn.disabled = true;
+                    sendOtpBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending Code...`;
+                    otpStatusMessage.textContent = '';
 
-    fetch("{{ route('admin.send-otp') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-        body: JSON.stringify({ user_id: userId })
-    })
-    .then(async response => {
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.message || `Server Error (${response.status})`);
-        }
-        return data;
-    })
-    .then(data => {
-        otpStatusMessage.className = "mt-2 text-center small fw-semibold text-success";
-        otpStatusMessage.textContent = "✓ " + data.message;
-        sendOtpBtn.innerHTML = `<i class="bi bi-arrow-clockwise me-1"></i> Resend Verification Code`;
-    })
-    .catch(error => {
-        otpStatusMessage.className = "mt-2 text-center small fw-semibold text-danger";
-        otpStatusMessage.textContent = "✕ " + error.message;
-        sendOtpBtn.disabled = false;
-        sendOtpBtn.innerHTML = `<i class="bi bi-envelope-at-fill me-1"></i> Send Verification Code to Gmail`;
-    });
-});
+                    fetch("{{ route('admin.send-otp') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({ 
+                            user_id: userId,
+                            username: username,
+                            email: email 
+                        })
+                    })
+                    .then(async response => {
+                        const data = await response.json();
+                        if (!response.ok) {
+                            throw new Error(data.message || `Server Error (${response.status})`);
+                        }
+                        return data;
+                    })
+                    .then(data => {
+                        otpStatusMessage.className = "mt-2 text-center small fw-semibold text-success";
+                        otpStatusMessage.textContent = "✓ " + (data.message || 'Verification code sent!');
+                        sendOtpBtn.innerHTML = `<i class="bi bi-arrow-clockwise me-1"></i> Resend Verification Code`;
+                        sendOtpBtn.disabled = false;
+                    })
+                    .catch(error => {
+                        otpStatusMessage.className = "mt-2 text-center small fw-semibold text-danger";
+                        otpStatusMessage.textContent = "✕ " + error.message;
+                        sendOtpBtn.disabled = false;
+                        sendOtpBtn.innerHTML = `<i class="bi bi-envelope-at-fill me-1"></i> Send Verification Code to Gmail`;
+                    });
+                });
             }
         });
     </script>

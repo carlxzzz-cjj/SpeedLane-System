@@ -88,19 +88,19 @@ class AdminPasswordResetController extends Controller
                     ->first();
 
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User account not found.'
-            ], 404);
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'User account not found.'], 404);
+            }
+            return back()->with('error', 'User account not found.');
         }
 
         $record = DB::table('password_reset_tokens')->where('email', $user->email)->first();
 
         if (!$record || !Hash::check($request->otp, $record->token)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid or expired OTP code.'
-            ], 422);
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Invalid or expired OTP code.'], 422);
+            }
+            return back()->with('error', 'Invalid or expired OTP code.');
         }
 
         // Update account password
@@ -110,9 +110,10 @@ class AdminPasswordResetController extends Controller
         // Delete token after successful update
         DB::table('password_reset_tokens')->where('email', $user->email)->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Password reset successfully! Reloading page...'
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Password reset successfully!']);
+        }
+
+        return back()->with('success', 'Password reset successfully!');
     }
 }
