@@ -4,20 +4,23 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
-    public function up(): void {
+return new class extends Migration
+{
+    public function up(): void
+    {
         Schema::create('service_options', function (Blueprint $table) {
             $table->id();
             $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
-            $table->string('name')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->string('vehicle_type')->nullable(); // <-- DIESE SPALTE HAT GEFEHLT
-            $table->string('pricing_matrix')->nullable(); // <-- ERGÄNZEN, FALLS IN LOKALER DB VORHANDEN
+            $table->string('name');
+            $table->string('vehicle_type')->nullable();
+            $table->decimal('price', 10, 2)->default(0.00);
+            $table->text('pricing_matrix')->nullable();
             $table->timestamps();
         });
     }
 
-    public function down(): void {
+    public function down(): void
+    {
         Schema::dropIfExists('service_options');
     }
 };
