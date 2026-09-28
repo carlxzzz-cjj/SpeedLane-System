@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;  
 use App\Http\Controllers\Admin\ServiceController;
@@ -8,6 +9,25 @@ use App\Http\Controllers\Admin\ManageServiceController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Customer\TrackController;  
 use App\Http\Controllers\AdminPasswordResetController;
+
+/*
+|--------------------------------------------------------------------------
+| TEMPORARY DATABASE SETUP ROUTE (RENDER FREE TIER)
+|--------------------------------------------------------------------------
+*/
+Route::get('/setup-db', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        Artisan::call('config:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('route:clear');
+        Artisan::call('view:clear');
+
+        return '<h1>Success!</h1><p>Database migrations executed and application cache cleared successfully.</p>';
+    } catch (\Exception $e) {
+        return '<h1>Setup Failed</h1><p>Error: ' . $e->getMessage() . '</p>';
+    }
+});
 
 /*
 |--------------------------------------------------------------------------
