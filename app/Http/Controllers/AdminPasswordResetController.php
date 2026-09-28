@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 class AdminPasswordResetController extends Controller
 {
@@ -47,38 +48,50 @@ class AdminPasswordResetController extends Controller
             ]
         );
 
-        // Send Email via Brevo HTTP API (Port 443 - Bypasses Render SMTP Port Blocks)
-        try {
-            $response = Http::withHeaders([
-                'api-key'      => env('BREVO_API_KEY'),
-                'accept'       => 'application/json',
-                'content-type' => 'application/json',
-            ])->post('https://api.brevo.com/v3/smtp/email', [
-                'sender' => [
-                    'name'  => 'SpeedLane Admin',
-                    'email' => env('MAIL_FROM_ADDRESS'),
-                ],
-                'to' => [
-                    ['email' => $user->email]
-                ],
-                'subject'     => 'SpeedLane Admin - Password Reset OTP',
-                'htmlContent' => "
-                    <div style='font-family: Arial, sans-serif; padding: 20px;'>
-                        <h2>SpeedLane Admin Password Reset</h2>
-                        <p>Your OTP code is:</p>
-                        <h1 style='color: #0d6efd; letter-spacing: 4px;'>{$otp}</h1>
-                        <p>This code is valid for password recovery. Do not share this code with anyone.</p>
-                    </div>
-                "
-            ]);
+        $htmlContent = "
+            <div style='font-family: Arial, sans-serif; padding: 20px;'>
+                <h2>SpeedLane Admin Password Reset</h2>
+                <p>Your OTP code is:</p>
+                <h1 style='color: #0d6efd; letter-spacing: 4px;'>{$otp}</h1>
+                <p>This code is valid for password recovery. Do not share this code with anyone.</p>
+            </div>
+        ";
 
-            if (!$response->successful()) {
-                $errorMsg = $response->json('message') ?? 'Brevo API request failed.';
-                throw new \Exception($errorMsg);
+        try {
+            $apiKey = env('BREVO_API_KEY');
+
+            // If BREVO_API_KEY is defined in .env (Render Production), use Brevo API
+            if (!empty($apiKey)) {
+                $response = Http::withHeaders([
+                    'api-key'      => $apiKey,
+                    'accept'       => 'application/json',
+                    'content-type' => 'application/json',
+                ])->post('https://api.brevo.com/v3/smtp/email', [
+                    'sender' => [
+                        'name'  => 'SpeedLane Admin',
+                        'email' => env('MAIL_FROM_ADDRESS', '2023_cete_malabarbascar@online.htcgsc.edu.ph'),
+                    ],
+                    'to' => [
+                        ['email' => $user->email]
+                    ],
+                    'subject'     => 'SpeedLane Admin - Password Reset OTP',
+                    'htmlContent' => $htmlContent
+                ]);
+
+                if (!$response->successful()) {
+                    $errorMsg = $response->json('message') ?? 'Brevo API request failed.';
+                    throw new \Exception($errorMsg);
+                }
+            } else {
+                // Local Development Fallback (Uses Gmail SMTP from .env)
+                Mail::html($htmlContent, function ($message) use ($user) {
+                    $message->to($user->email)
+                            ->subject('SpeedLane Admin - Password Reset OTP');
+                });
             }
 
         } catch (\Exception $e) {
-            Log::error('Brevo Mail Error: ' . $e->getMessage());
+            Log::error('Mail Error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
