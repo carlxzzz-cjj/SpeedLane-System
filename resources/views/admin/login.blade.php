@@ -265,7 +265,14 @@
                         body: JSON.stringify({ username: targetUsername })
                     });
 
-                    const data = await response.json();
+                    const contentType = response.headers.get("content-type");
+                    let data = {};
+
+                    if (contentType && contentType.includes("application/json")) {
+                        data = await response.json();
+                    } else {
+                        throw new Error(`Server returned error status (${response.status}). Check Render logs for details.`);
+                    }
 
                     if (response.ok && data.success) {
                         showAlert('success', '<i class="bi bi-check-circle-fill me-2"></i>' + data.message);
@@ -276,7 +283,7 @@
                         showAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + errMsg);
                     }
                 } catch (error) {
-                    showAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>An error occurred while reaching the server.');
+                    showAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + error.message);
                 } finally {
                     btnSendOtp.disabled = false;
                     btnSendOtpText.classList.remove('d-none');
@@ -318,7 +325,14 @@
                         })
                     });
 
-                    const data = await response.json();
+                    const contentType = response.headers.get("content-type");
+                    let data = {};
+
+                    if (contentType && contentType.includes("application/json")) {
+                        data = await response.json();
+                    } else {
+                        throw new Error(`Server returned error status (${response.status}). Check Render logs for details.`);
+                    }
 
                     if (response.ok && data.success) {
                         showAlert('success', '<i class="bi bi-check-circle-fill me-2"></i>' + data.message);
@@ -330,7 +344,7 @@
                         showAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + errMsg);
                     }
                 } catch (error) {
-                    showAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>An error occurred while updating password.');
+                    showAlert('danger', '<i class="bi bi-exclamation-triangle-fill me-2"></i>' + error.message);
                 } finally {
                     btnResetPassword.disabled = false;
                     btnResetText.classList.remove('d-none');
