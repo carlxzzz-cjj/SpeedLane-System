@@ -12,14 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vehicle_models', function (Blueprint $table) {
-            $table->id();
-            
-            // [ADDED] Columns for brand and model name
-            $table->string('brand');
-            $table->string('name');
-            
-            $table->timestamps();
-        });
+    $table->id();
+    $table->string('brand');
+    $table->string('name');
+    $table->string('year_model')->nullable(); // <-- Ensure this line exists!
+    $table->timestamps();
+});
     }
 
     /**
