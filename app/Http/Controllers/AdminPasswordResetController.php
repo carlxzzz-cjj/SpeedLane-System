@@ -56,7 +56,7 @@ class AdminPasswordResetController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to send email. Check your .env mail configuration. Error: ' . $e->getMessage()
-            ], 500);
+            ], 422);
         }
 
         // Mask email for display security (e.g. ma***ay@gmail.com)
