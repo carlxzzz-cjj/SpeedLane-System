@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('service_records', function (Blueprint $table) {
             $table->id();
             
+            // Foreign Key to Users table (replaces customer_name)
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            
             // Tracking Code (Indexed for fast lookups & grouping multiple vehicles under one transaction)
             $table->string('tracking_code')->index(); 
             
-            // Customer Details
-            $table->string('customer_name');
+            // Customer Contact Details (Name can now be retrieved dynamically via the user relationship)
             $table->string('contact_number')->nullable();
             
             // Vehicle Details
