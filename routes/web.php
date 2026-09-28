@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;  
 use App\Http\Controllers\Admin\ServiceController;
@@ -12,7 +13,7 @@ use App\Http\Controllers\AdminPasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
-| TEMPORARY DATABASE SETUP ROUTE (RENDER FREE TIER)
+| TEMPORARY DATABASE SETUP & DEBUG ROUTES (RENDER FREE TIER)
 |--------------------------------------------------------------------------
 */
 Route::get('/setup-db', function () {
@@ -26,6 +27,22 @@ Route::get('/setup-db', function () {
         return '<h1>Success!</h1><p>Database migrations executed and application cache cleared successfully.</p>';
     } catch (\Exception $e) {
         return '<h1>Setup Failed</h1><p>Error: ' . $e->getMessage() . '</p>';
+    }
+});
+
+Route::get('/debug-db', function () {
+    try {
+        return response()->json([
+            'default_connection'    => config('database.default'),
+            'database_name'         => DB::connection()->getDatabaseName(),
+            'database_host'         => config('database.connections.' . config('database.default') . '.host'),
+            'service_records_count' => \App\Models\ServiceRecord::count(),
+            'service_records_sample' => \App\Models\ServiceRecord::latest()->take(5)->get(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage()
+        ], 500);
     }
 });
 
