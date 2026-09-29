@@ -9,8 +9,8 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-php artisan migrate:fresh --force
-php artisan db:seed --force
+# CORRECT (Only applies new migrations without wiping existing data):
+php artisan migrate --force
 
 php-fpm -D
 nginx -g 'daemon off;'
