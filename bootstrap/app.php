@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -10,7 +11,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->trustProxies(at: '*'); // <--- ADD THIS LINE
+        $middleware->trustProxies(at: '*');
+
+        // Redirect unauthenticated guests to admin login
+        $middleware->redirectTo(
+            guests: '/admin/login',
+            users: '/admin/dashboard'
+        );
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
