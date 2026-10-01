@@ -39,27 +39,34 @@ class ServiceController extends Controller
     /**
      * Display service registration form.
      */
-    public function create()
-    {
-        // Fetch active services eager-loading their options
-        $services = Service::with('options')
-            ->where('is_active', 1)
-            ->get();
+   public function create()
+{
+    // Fetch active services eager-loading their options
+    $services = Service::with('options')
+        ->where('is_active', 1)
+        ->get();
 
-        // Fetch only active technicians for assignment
-        $technicians = Technician::where('is_active', 1)->get();
+    // Fetch only active technicians for assignment
+    $technicians = Technician::where('is_active', 1)->get();
 
-        // Fetch vehicle models and group by brand/make safely
-        $vehicleModels = VehicleModel::all()
-            ->groupBy(function ($model) {
-                return $model->brand ?? $model->make ?? 'Other';
-            }) 
-            ->map(function ($models) {
-                return $models->pluck('name')->filter()->values();
-            });
+    // Fetch vehicle models and include both name and type
+    $vehicleModels = VehicleModel::all()
+        ->groupBy(function ($model) {
+            return $model->brand ?? $model->make ?? 'Other';
+        }) 
+        ->map(function ($models) {
+            return $models->map(function ($model) {
+                return [
+                    'name' => $model->name,
+                    'type' => $model->type ?? $model->vehicle_type ?? '',
+                    'year_start' => $model->year_start ?? $model->start_year ?? 1990,
+                    'year_end'   => $model->year_end ?? $model->end_year ?? date('Y'),
+                ];
+            })->values();
+        });
 
-        return view('admin.register-service', compact('services', 'technicians', 'vehicleModels'));
-    }
+    return view('admin.register-service', compact('services', 'technicians', 'vehicleModels'));
+}
 
     /**
      * Store service registration record.
@@ -107,7 +114,6 @@ class ServiceController extends Controller
                         if ($isSelected) {
                             $service = Service::find($serviceId);
                             $baseName = $service ? $service->name : "Service #{$serviceId}";
-                            // Base flat price from the service model (if applicable)
                             $baseFlatPrice = floatval($service ? ($service->flat_price ?? 0) : 0);
 
                             $optionIds = [];
@@ -123,8 +129,9 @@ class ServiceController extends Controller
                                 $optionPriceSum = $options->sum('price');
 
                                 $itemTitle = $baseName . ' (' . implode(', ', $optionNames) . ')';
-                                // Fixed double counting: add option prices to the base flat price
-                                $itemPrice = $baseFlatPrice + $optionPriceSum;
+                                $itemPrice = isset($servicePayload['price']) && $servicePayload['price'] !== ''
+                                    ? floatval($servicePayload['price'])
+                                    : ($baseFlatPrice + $optionPriceSum);
 
                                 $selectedServices[] = [
                                     'name'   => $itemTitle,
@@ -134,7 +141,10 @@ class ServiceController extends Controller
                                 $servicePrices[$itemTitle] = $itemPrice;
                                 $vehicleCalculatedTotal += $itemPrice;
                             } else {
-                                $itemPrice = $baseFlatPrice > 0 ? $baseFlatPrice : floatval($servicePayload['price'] ?? 0);
+                                $itemPrice = isset($servicePayload['price']) && $servicePayload['price'] !== ''
+                                    ? floatval($servicePayload['price'])
+                                    : ($baseFlatPrice > 0 ? $baseFlatPrice : 0.00);
+
                                 $selectedServices[] = [
                                     'name'   => $baseName,
                                     'status' => 'Pending Queue',
@@ -165,22 +175,33 @@ class ServiceController extends Controller
 
                 $brandName = $vehicleData['brand'] ?? $vehicleData['vehicle_make'] ?? '';
 
-                ServiceRecord::create([
-                    'tracking_code'            => $trackingCode,
-                    'customer_name'            => $validated['customer_name'],
-                    'contact_number'           => $contactPhone,
-                    'vehicle_make'             => $brandName,
-                    'vehicle_model'            => $vehicleData['vehicle_model'] ?? '',
-                    'vehicle_type'             => $vehicleData['vehicle_type'] ?? '',
-                    'vehicle_year'             => $vehicleData['vehicle_year'] ?? '',
-                    'plate_number'             => strtoupper($vehicleData['plate_number']),
-                    'selected_services'        => $selectedServices,
-                    'selected_services_prices' => $servicePrices,
-                    'price_adjustment_note'    => $vehicleData['price_adjustment_note'] ?? null,
-                    'total_cost'               => $finalVehicleCost,
-                    'mechanic_assigned'        => $vehicleData['mechanic_assigned'],
-                    'status'                   => 'Pending Queue',
-                ]);
+                $record = new ServiceRecord();
+                $record->tracking_code            = $trackingCode;
+                $record->customer_name            = $validated['customer_name'];
+                $record->contact_number           = $contactPhone;
+                $record->vehicle_make             = $brandName;
+                $record->vehicle_model            = $vehicleData['vehicle_model'] ?? '';
+                $record->vehicle_type             = $vehicleData['vehicle_type'] ?? '';
+                $record->vehicle_year             = $vehicleData['vehicle_year'] ?? '';
+                $record->plate_number             = strtoupper($vehicleData['plate_number']);
+                $record->price_adjustment_note    = $vehicleData['price_adjustment_note'] ?? null;
+                $record->total_cost               = $finalVehicleCost;
+                $record->mechanic_assigned        = $vehicleData['mechanic_assigned'];
+                $record->status                   = 'Pending Queue';
+
+                if ($record->hasCast('selected_services')) {
+                    $record->selected_services = $selectedServices;
+                } else {
+                    $record->selected_services = json_encode($selectedServices);
+                }
+
+                if ($record->hasCast('selected_services_prices')) {
+                    $record->selected_services_prices = $servicePrices;
+                } else {
+                    $record->selected_services_prices = json_encode($servicePrices);
+                }
+
+                $record->save();
             }
 
             DB::commit();
@@ -194,42 +215,108 @@ class ServiceController extends Controller
     }
 
     /**
-     * Update Service Stages, Progress Notes, and completion status.
+     * Update Service Stages, Progress Notes, Prices, and Completion Status.
      */
     public function updateStatus(Request $request, $id)
     {
+        // Target the exact service record requested
         $service = ServiceRecord::findOrFail($id);
 
         $submittedServices = $request->input('services', []);
-        $updatedServiceItems = [];
+        $submittedVehicles = $request->input('vehicles', []);
+        $isCompleted = $request->has('mark_as_completed') && $request->input('mark_as_completed') == 1;
 
-        // Parse nested service options and stage status notes sent from the update modal
-        foreach ($submittedServices as $vServices) {
-            if (is_array($vServices)) {
-                foreach ($vServices as $sItem) {
-                    $updatedServiceItems[] = [
-                        'name'   => $sItem['name'] ?? 'Service',
-                        'status' => $sItem['status'] ?? 'Pending Queue',
-                        'note'   => $sItem['note'] ?? '',
-                    ];
+        // Safely extract the service array submitted for this modal
+        $vServices = isset($submittedServices[0]) ? $submittedServices[0] : $submittedServices;
+
+        $vPriceNote = $submittedVehicles[0]['price_adjustment_note'] 
+            ?? $request->input('price_adjustment_note');
+        
+        $vTotalOverride = isset($submittedVehicles[0]['total_cost']) && $submittedVehicles[0]['total_cost'] !== '' 
+            ? floatval($submittedVehicles[0]['total_cost']) 
+            : ($request->filled('total_cost') ? floatval($request->input('total_cost')) : null);
+
+        $rawPrices = $service->selected_services_prices;
+        $existingPrices = is_array($rawPrices) 
+            ? $rawPrices 
+            : (json_decode($rawPrices ?? '[]', true) ?? []);
+
+        $updatedServiceItems = [];
+        $updatedPricesMap = [];
+        $vehicleCalculatedTotal = 0.00;
+
+        if (is_array($vServices)) {
+            foreach ($vServices as $sItem) {
+                if (!is_array($sItem)) continue;
+
+                $sName   = trim($sItem['name'] ?? 'Service');
+                $sStatus = trim($sItem['status'] ?? 'Pending Queue');
+                $sNote   = trim($sItem['note'] ?? '');
+
+                if (isset($sItem['price']) && $sItem['price'] !== '') {
+                    $sPrice = floatval($sItem['price']);
+                } else {
+                    $sPrice = floatval($existingPrices[$sName] ?? 0.00);
                 }
+
+                $updatedServiceItems[] = [
+                    'name'   => $sName,
+                    'status' => $sStatus,
+                    'note'   => $sNote,
+                ];
+                $updatedPricesMap[$sName] = $sPrice;
+                $vehicleCalculatedTotal += $sPrice;
             }
         }
 
         if (!empty($updatedServiceItems)) {
-            $service->selected_services = $updatedServiceItems;
+            if ($service->hasCast('selected_services')) {
+                $service->selected_services = $updatedServiceItems;
+            } else {
+                $service->selected_services = json_encode($updatedServiceItems);
+            }
+
+            if ($service->hasCast('selected_services_prices')) {
+                $service->selected_services_prices = $updatedPricesMap;
+            } else {
+                $service->selected_services_prices = json_encode($updatedPricesMap);
+            }
+
+            $service->total_cost = $vTotalOverride ?? $vehicleCalculatedTotal;
         }
 
-        // Check if user toggled the "Mark as Completed" switch
-        if ($request->has('mark_as_completed') && $request->input('mark_as_completed') == 1) {
+        if ($vPriceNote !== null) {
+            $service->price_adjustment_note = $vPriceNote;
+        }
+
+        // Compute overarching record status based on service stage statuses
+        $itemStatuses = array_map(function($item) {
+            return strtolower($item['status']);
+        }, $updatedServiceItems);
+
+        $allCompleted = !empty($itemStatuses) && array_reduce($itemStatuses, function($carry, $st) {
+            return $carry && (str_contains($st, 'completed') || str_contains($st, 'ready'));
+        }, true);
+
+        $allPending = !empty($itemStatuses) && array_reduce($itemStatuses, function($carry, $st) {
+            return $carry && (str_contains($st, 'pending') || str_contains($st, 'queue'));
+        }, true);
+
+        if ($isCompleted || $allCompleted) {
             $service->status = 'Completed';
-            $message = "Service record #{$service->tracking_code} marked as completed and moved to Transaction Records!";
+        } elseif ($allPending) {
+            $service->status = 'Pending Queue';
         } else {
             $service->status = 'In Progress';
-            $message = "Service status for #{$service->tracking_code} updated successfully!";
         }
 
         $service->save();
+
+        if ($isCompleted) {
+            $message = "Service record #{$service->tracking_code} marked as completed and moved to Transaction Records!";
+        } else {
+            $message = "Service status and price for #{$service->tracking_code} updated successfully!";
+        }
 
         return back()->with('success', $message);
     }
@@ -248,7 +335,7 @@ class ServiceController extends Controller
 
         $currentServices = is_array($service->selected_services) 
             ? $service->selected_services 
-            : (json_decode($service->selected_services, true) ?? []);
+            : (json_decode($service->selected_services ?? '[]', true) ?? []);
 
         if (!is_array($currentServices)) {
             $currentServices = !empty($service->selected_services) ? [$service->selected_services] : [];
@@ -256,7 +343,7 @@ class ServiceController extends Controller
 
         $currentPrices = is_array($service->selected_services_prices)
             ? $service->selected_services_prices
-            : (json_decode($service->selected_services_prices, true) ?? []);
+            : (json_decode($service->selected_services_prices ?? '[]', true) ?? []);
 
         if (!is_array($currentPrices)) {
             $currentPrices = [];
@@ -272,10 +359,19 @@ class ServiceController extends Controller
         ];
         $currentPrices[$newService] = $addedPrice;
 
-        $service->selected_services        = $currentServices;
-        $service->selected_services_prices = $currentPrices;
-        $service->total_cost               = floatval($service->total_cost ?? 0) + $addedPrice;
+        if ($service->hasCast('selected_services')) {
+            $service->selected_services = $currentServices;
+        } else {
+            $service->selected_services = json_encode($currentServices);
+        }
 
+        if ($service->hasCast('selected_services_prices')) {
+            $service->selected_services_prices = $currentPrices;
+        } else {
+            $service->selected_services_prices = json_encode($currentPrices);
+        }
+
+        $service->total_cost = floatval($service->total_cost ?? 0) + $addedPrice;
         $service->save();
 
         return back()->with('success', "Additional service '{$newService}' added to vehicle '{$service->plate_number}'.");

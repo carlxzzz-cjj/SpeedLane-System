@@ -186,6 +186,15 @@ class ManageServiceController extends Controller
     }
 
     /**
+     * Download or export Technician Report.
+     */
+    public function downloadTechnicianReport()
+    {
+        $technicians = Technician::latest()->get();
+        return back()->with('success', 'Technician report download process initiated.');
+    }
+
+    /**
      * Register a new user account (Admin/Staff).
      */
     public function storeStaff(Request $request)
@@ -246,6 +255,31 @@ class ManageServiceController extends Controller
     }
 
     /**
+     * Toggle staff/admin account active status (Enable / Disable).
+     */
+    public function toggleStaffStatus($id)
+    {
+        $staff = User::findOrFail($id);
+
+        if (method_exists($staff, 'isSuperAdmin') && $staff->isSuperAdmin()) {
+            return back()->with('error', 'Super Admin status cannot be disabled.');
+        }
+
+        $staff->is_active = !$staff->is_active;
+
+        if (!$staff->is_active) {
+            $staff->disabled_at = now();
+        } else {
+            $staff->disabled_at = null;
+        }
+
+        $staff->save();
+
+        $statusLabel = $staff->is_active ? 'enabled' : 'disabled';
+        return back()->with('success', "Account '{$staff->name}' has been {$statusLabel}.");
+    }
+
+    /**
      * Delete an account.
      */
     public function destroyStaff($id)
@@ -259,5 +293,14 @@ class ManageServiceController extends Controller
         $staff->delete();
 
         return back()->with('success', 'Account deleted successfully!');
+    }
+
+    /**
+     * Download or export Staff Report.
+     */
+    public function downloadStaffReport()
+    {
+        $staffs = User::latest()->get();
+        return back()->with('success', 'Staff report download process initiated.');
     }
 }

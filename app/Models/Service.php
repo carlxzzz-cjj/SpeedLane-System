@@ -13,7 +13,7 @@ class Service extends Model
         'name',
         'description',
         'notice',
-        'vehicle_type', // <-- Added
+        'vehicle_type',
         'selection_type',
         'flat_price',
         'is_active',

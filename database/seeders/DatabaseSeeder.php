@@ -13,14 +13,12 @@ class DatabaseSeeder extends Seeder
             ServicesTableSeeder::class,
             ServiceOptionsTableSeeder::class,
             TechniciansTableSeeder::class,
-            VehicleModelsTableSeeder::class,
-            ServiceRecordsTableSeeder::class,
+            VehicleModelSeeder::class,
         ]);
         $this->call(UsersTableSeeder::class);
         $this->call(ServicesTableSeeder::class);
         $this->call(ServiceOptionsTableSeeder::class);
-        $this->call(ServiceRecordsTableSeeder::class);
         $this->call(TechniciansTableSeeder::class);
-        $this->call(VehicleModelsTableSeeder::class);
+        $this->call(VehicleModelSeeder::class);
     }
 }

@@ -14,7 +14,7 @@ class ServiceOption extends Model
     protected $fillable = [
         'service_id',
         'name',
-        'vehicle_type', // <-- MUST BE HERE
+        'vehicle_type',
         'price',
     ];
 

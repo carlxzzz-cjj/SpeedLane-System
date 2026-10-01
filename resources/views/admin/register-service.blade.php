@@ -18,34 +18,186 @@
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 
     <style>
-        .card-figma {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        :root {
+            --speed-pink: #f42582;
+            --speed-blue: #00a2ff;
+            --speed-dark-bg: #07090e;
+            --speed-card-bg: #0e111a;
+            --speed-card-border: rgba(255, 255, 255, 0.08);
+            --speed-sidebar-bg: #0a0d16;
         }
 
+        body {
+            background-color: var(--speed-dark-bg) !important;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%) !important;
+            background-attachment: fixed;
+        }
+
+        /* Color Utility Classes */
+        .text-speed-pink { color: var(--speed-pink) !important; }
+        .text-speed-blue { color: var(--speed-blue) !important; }
+        .bg-speed-pink { background-color: var(--speed-pink) !important; }
+        .bg-speed-blue { background-color: var(--speed-blue) !important; }
+
+        /* Role Badge Styling */
+        .badge-super-admin {
+            background-color: rgba(244, 37, 130, 0.18) !important;
+            color: #ffb3d9 !important;
+            border: 1px solid rgba(244, 37, 130, 0.5) !important;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-admin {
+            background-color: rgba(0, 162, 255, 0.18) !important;
+            color: #99dbff !important;
+            border: 1px solid rgba(0, 162, 255, 0.5) !important;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Top Navigation Header */
+        .navbar-speed {
+            background: rgba(7, 9, 14, 0.95);
+            border-bottom: 1px solid var(--speed-card-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .brand-logo-text {
+            font-size: 1.35rem;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            font-style: italic;
+            line-height: 1;
+        }
+
+        .brand-subtext {
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+
+        /* Sidebar Styling */
+        .admin-sidebar {
+            background-color: var(--speed-sidebar-bg) !important;
+            border-right: 1px solid var(--speed-card-border) !important;
+        }
+
+        .admin-nav-link {
+            color: #94a3b8 !important;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border: 1px solid transparent;
+        }
+
+        .admin-nav-link:hover {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .admin-nav-link.active {
+            background: linear-gradient(90deg, rgba(244, 37, 130, 0.15) 0%, rgba(0, 162, 255, 0.15) 100%) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(244, 37, 130, 0.3) !important;
+            box-shadow: 0 0 15px rgba(244, 37, 130, 0.15);
+        }
+
+        /* Speed Card Theme */
+        .speed-card {
+            background-color: var(--speed-card-bg) !important;
+            border: 1px solid var(--speed-card-border) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Gradient Action Buttons */
+        .btn-speed-gradient {
+            background: linear-gradient(90deg, var(--speed-pink) 0%, var(--speed-blue) 100%);
+            border: none;
+            color: #ffffff !important;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(244, 37, 130, 0.3);
+        }
+
+        .btn-speed-gradient:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
+        }
+
+        /* Inputs & Dropdowns */
+        .form-control-dark, .form-select-dark {
+            background-color: #06080d !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+            transition: all 0.25s ease;
+        }
+
+        .form-control-dark:focus, .form-select-dark:focus {
+            border-color: var(--speed-blue) !important;
+            box-shadow: 0 0 12px rgba(0, 162, 255, 0.25) !important;
+            color: #ffffff !important;
+        }
+
+        .form-control-dark::placeholder {
+            color: #475569 !important;
+        }
+
+        .input-group-text-dark {
+            background-color: #090c14 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-right: none !important;
+            color: #94a3b8 !important;
+        }
+
+        .input-group .form-control-dark {
+            border-left: none !important;
+        }
+
+        /* High Visibility Logout Button */
+        .btn-logout {
+            color: #ff6b81 !important;
+            border: 1px solid rgba(255, 107, 129, 0.4) !important;
+            background: rgba(255, 107, 129, 0.05);
+            transition: all 0.25s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 107, 129, 0.2) !important;
+            color: #ffffff !important;
+            border-color: #ff6b81 !important;
+        }
+
+        /* Service Registration Specific Styles */
         .service-card-item {
-            border: 1px solid #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             transition: all 0.2s ease-in-out;
+            background-color: rgba(6, 8, 13, 0.6);
         }
 
         .service-card-item:hover {
-            border-color: #cbd5e1;
+            border-color: rgba(0, 162, 255, 0.4);
         }
 
         .subservice-option-item {
             font-size: 0.925rem;
             padding: 0.65rem 0.85rem;
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
+            background-color: #06080d;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
+            color: #e2e8f0;
             transition: background-color 0.15s ease, border-color 0.15s ease;
         }
 
         .subservice-option-item:hover {
-            background-color: #f8fafc;
-            border-color: #cbd5e1;
+            background-color: #0f1322;
+            border-color: var(--speed-blue);
         }
 
         .subservice-title {
@@ -57,14 +209,14 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            background-color: #ffffff;
+            background-color: var(--speed-card-bg);
             padding: 1rem;
             border-radius: 12px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--speed-card-border);
         }
 
         .btn-generate {
-            background-color: #0d6efd;
+            background: linear-gradient(90deg, var(--speed-pink) 0%, var(--speed-blue) 100%);
             color: #ffffff;
             border: none;
             padding: 0.5rem 1.1rem;
@@ -72,37 +224,44 @@
             font-weight: 600;
             font-size: 0.875rem;
             white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(244, 37, 130, 0.3);
+            transition: all 0.3s ease;
         }
 
         .btn-generate:hover {
-            background-color: #0b5ed7;
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
         }
 
         .code-box {
             font-family: monospace;
             font-weight: 700;
             font-size: 1.05rem;
-            color: #0d6efd;
-            border: 1px solid #cbd5e1;
+            color: var(--speed-blue);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 0.4rem 0.75rem;
             border-radius: 8px;
-            background-color: #f8fafc;
+            background-color: #06080d;
             width: auto;
-            max-width: 180px;
+            max-width: 200px;
         }
 
-        .btn-save-order {
-            background-color: #0d6efd;
-            color: #fff;
-            font-weight: 700;
-            padding: 0.85rem;
-            border-radius: 10px;
-            border: none;
+        .vehicle-collapse-trigger {
+            cursor: pointer;
+            user-select: none;
         }
 
-        .btn-save-order:hover {
-            background-color: #0b5ed7;
-            color: #fff;
+        .vehicle-collapse-trigger .collapse-icon {
+            transition: transform 0.2s ease;
+        }
+
+        .vehicle-collapse-trigger[aria-expanded="true"] .collapse-icon {
+            transform: rotate(180deg);
+        }
+
+        .service-note-wrapper {
+            max-width: 480px;
         }
 
         @media (min-width: 992px) {
@@ -116,68 +275,70 @@
     </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-   <!-- Header Navigation -->
-<header class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-2 sticky-top shadow-sm" style="z-index: 1020;">
-    <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('admin.dashboard') }}">
-            <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                <i class="bi bi-car-front-fill fs-6"></i>
+    <!-- Header Navigation -->
+    <header class="navbar navbar-expand-lg navbar-dark navbar-speed px-4 py-2 sticky-top" style="z-index: 1020;">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('admin.dashboard') }}">
+                <div class="bg-speed-pink text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                    <i class="bi bi-car-front-fill fs-6"></i>
+                </div>
+                <div>
+                    <span class="brand-logo-text d-block">
+                        <span class="text-speed-pink">SPEED</span><span class="text-speed-blue">LANE</span>
+                    </span>
+                    <span class="brand-subtext d-block">ADMIN OVERVIEW</span>
+                </div>
+            </a>
+
+            <!-- Right Nav Alignment -->
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                @if(auth()->check() && auth()->user()->isSuperAdmin())
+                    <span class="badge badge-super-admin px-3 py-2 rounded-pill">
+                        <i class="bi bi-shield-check me-1"></i> Super Admin
+                    </span>
+                @else
+                    <span class="badge badge-admin px-3 py-2 rounded-pill">
+                        <i class="bi bi-person-badge me-1"></i> Admin
+                    </span>
+                @endif
+
+                <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
+                    @csrf
+                    <button type="submit" class="btn btn-logout btn-sm px-3 rounded-3 d-flex align-items-center gap-1">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </form>
             </div>
-            <div>
-                <span class="fw-bold text-primary fs-5 d-block lh-1">SpeedLane</span>
-                <span class="text-muted small">Admin Overview</span>
-            </div>
-        </a>
-
-        <!-- Right Nav Alignment -->
-        <div class="d-flex align-items-center gap-3 ms-auto">
-            @if(auth()->check() && auth()->user()->isSuperAdmin())
-                <span class="badge bg-light text-primary border border-primary px-3 py-2 rounded-pill">
-                    <i class="bi bi-shield-check me-1"></i> Super Admin
-                </span>
-            @else
-                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
-                    <i class="bi bi-person-badge text-primary me-1"></i> Admin
-                </span>
-            @endif
-
-            <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
-                @csrf
-                <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-1">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </button>
-            </form>
         </div>
-    </div>
-</header>
+    </header>
 
     <div class="container-fluid">
         <div class="row">
 
             <!-- Sidebar Navigation -->
-            <aside class="col-md-3 col-lg-2 bg-white border-end min-vh-100 p-3">
+            <aside class="col-md-3 col-lg-2 admin-sidebar min-vh-100 p-3">
                 <nav class="nav flex-column gap-2">
-                    <a class="nav-link admin-nav-link text-dark rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.dashboard') }}">
-                        <i class="bi bi-grid-fill"></i> Dashboard
+                    <a class="nav-link admin-nav-link rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.dashboard') }}">
+                        <i class="bi bi-grid-fill text-speed-pink"></i> Dashboard
                     </a>
 
                     <a class="nav-link admin-nav-link active rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.register-service') }}">
-                        <i class="bi bi-plus-circle"></i> Register Service
+                        <i class="bi bi-plus-circle text-speed-blue"></i> Register Service
                     </a>
 
-                    <a class="nav-link admin-nav-link text-dark rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.update') }}">
-                        <i class="bi bi-arrow-repeat"></i> Update Service Status
+                    <a class="nav-link admin-nav-link rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.update') }}">
+                        <i class="bi bi-arrow-repeat text-warning"></i> Update Service Status
                     </a>
 
-                    <a class="nav-link admin-nav-link text-dark rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.transactions') }}">
-                        <i class="bi bi-file-earmark-text"></i> Transaction Records
+                    <a class="nav-link admin-nav-link rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.transactions') }}">
+                        <i class="bi bi-file-earmark-text text-info"></i> Transaction Records
                     </a>
 
                     @if(auth()->check() && auth()->user()->isSuperAdmin())
-                        <a class="nav-link admin-nav-link text-dark rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.manage-services.index') }}">
-                            <i class="bi bi-gear-fill text-primary"></i> Manage Services
+                        <a class="nav-link admin-nav-link rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.manage-services.index') }}">
+                            <i class="bi bi-gear-fill text-speed-pink"></i> Manage Services
                         </a>
                     @endif
                 </nav>
@@ -187,21 +348,21 @@
             <main class="col-md-9 col-lg-10 p-4">
 
                 <div class="mb-4">
-                    <h3 class="fw-bold text-dark mb-1">Register Vehicle Service</h3>
-                    <p class="text-muted mb-0 small">
+                    <h3 class="fw-bold text-white mb-1">Register Vehicle Service</h3>
+                    <p class="text-secondary mb-0 small">
                         Select services and vehicle-specific options to dynamically update live service totals on the receipt.
                     </p>
                 </div>
 
                 @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4 bg-success bg-opacity-20 text-white border-success" role="alert">
                         <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
                 @if ($errors->any())
-                    <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4 bg-danger bg-opacity-20 text-white border-danger" role="alert">
                         <div class="fw-semibold mb-1">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i> Please review error details:
                         </div>
@@ -210,7 +371,7 @@
                                 <li>{{ $error }}</li>
                             @endforeach
                         </ul>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
@@ -223,20 +384,20 @@
                         <div class="col-lg-7 col-xl-8">
 
                             <!-- 1. Customer Information Card -->
-                            <div class="card card-figma p-4 mb-4 bg-white">
+                            <div class="card speed-card p-4 rounded-4 mb-4">
                                 <div class="d-flex align-items-center gap-2 mb-3">
-                                    <i class="bi bi-person-lines-fill text-primary fs-5"></i>
-                                    <h6 class="fw-bold mb-0 text-dark fs-6">Customer Information</h6>
+                                    <i class="bi bi-person-lines-fill text-speed-pink fs-5"></i>
+                                    <h6 class="fw-bold mb-0 text-white fs-6">Customer Information</h6>
                                 </div>
 
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label class="form-label small text-secondary fw-semibold">Customer Name <span class="text-danger">*</span></label>
-                                        <input type="text" name="customer_name" id="customer_name" class="form-control form-control-figma" placeholder="e.g., Juan Dela Cruz" value="{{ old('customer_name') }}" required>
+                                        <label class="form-label small text-secondary fw-semibold">Customer Name <span class="text-speed-pink">*</span></label>
+                                        <input type="text" name="customer_name" id="customer_name" class="form-control form-control-dark" placeholder="e.g., Juan Dela Cruz" value="{{ old('customer_name') }}" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label small text-secondary fw-semibold">Phone Number <span class="text-danger">*</span></label>
-                                        <input type="text" name="contact_number" id="customer_phone" class="form-control form-control-figma" placeholder="e.g., 09123456789" value="{{ old('contact_number') }}" required>
+                                        <label class="form-label small text-secondary fw-semibold">Phone Number <span class="text-speed-pink">*</span></label>
+                                        <input type="text" name="contact_number" id="customer_phone" class="form-control form-control-dark" placeholder="e.g., 09123456789" value="{{ old('contact_number') }}" required>
                                     </div>
                                 </div>
                             </div>
@@ -244,14 +405,14 @@
                             <!-- 2. Vehicles Container Header -->
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-car-front text-primary fs-5"></i>
-                                    <h5 class="fw-bold mb-0 text-dark fs-6">Vehicles</h5>
-                                    <span class="text-muted small" id="vehiclesHeaderSummary">
-                                        (1 vehicle · Grand Total: ₱0.00)
+                                    <i class="bi bi-car-front text-speed-blue fs-5"></i>
+                                    <h5 class="fw-bold mb-0 text-white fs-6">Vehicles</h5>
+                                    <span class="text-secondary small" id="vehiclesHeaderSummary">
+                                        (1 vehicle)
                                     </span>
                                 </div>
 
-                                <button type="button" class="btn btn-outline-primary btn-sm px-3 rounded-3 d-flex align-items-center gap-1 fw-semibold" id="addVehicleBtn">
+                                <button type="button" class="btn btn-outline-info btn-sm px-3 rounded-3 d-flex align-items-center gap-1 fw-semibold" id="addVehicleBtn">
                                     <i class="bi bi-plus-lg"></i> Add Vehicle
                                 </button>
                             </div>
@@ -260,221 +421,258 @@
                             <div id="vehiclesContainer">
 
                                 <!-- Vehicle Card Item #0 -->
-                                <div class="card card-figma p-4 mb-4 bg-white vehicle-card" data-vehicle-index="0">
+                                <div class="card speed-card p-3 p-md-4 mb-3 rounded-4 vehicle-card" data-vehicle-index="0">
 
                                     <input type="hidden" name="vehicles[0][total_cost]" class="vehicle-total-cost-input" value="0.00">
 
-                                    <div class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="badge bg-primary rounded-circle px-2.5 py-1.5 vehicle-number-badge">1</span>
+                                    <!-- Collapsible Header -->
+                                    <div class="d-flex justify-content-between align-items-center vehicle-header pb-2">
+                                        <div class="d-flex align-items-center gap-2 vehicle-collapse-trigger flex-grow-1" data-bs-toggle="collapse" data-bs-target="#vehicleCollapse_0" aria-expanded="true" aria-controls="vehicleCollapse_0">
+                                            <span class="badge bg-speed-pink rounded-circle px-2.5 py-1.5 vehicle-number-badge">1</span>
                                             <span class="fw-semibold text-secondary small vehicle-status-label">Not yet filled</span>
+                                            <i class="bi bi-chevron-down text-secondary small ms-1 collapse-icon"></i>
                                         </div>
 
-                                        <button type="button" class="btn btn-link text-danger text-decoration-none p-0 small remove-vehicle-btn d-none fw-semibold">
+                                        <button type="button" class="btn btn-link text-danger text-decoration-none p-0 small remove-vehicle-btn d-none fw-semibold ms-2">
                                             <i class="bi bi-trash me-1"></i> Remove Vehicle
                                         </button>
                                     </div>
 
-                                    <!-- Vehicle Form Fields -->
-                                    <div class="row g-3 mb-4">
-                                        <!-- Plate Number -->
-                                        <div class="col-md-6 col-xl-4">
-                                            <label class="form-label small text-secondary fw-semibold">Plate Number / CS No. <span class="text-danger">*</span></label>
-                                            <input type="text" name="vehicles[0][plate_number]" class="form-control form-control-figma text-uppercase plate-input" placeholder="e.g., ABC 1234" required>
+                                    <!-- Collapsible Card Content -->
+                                    <div class="collapse show vehicle-collapse-body pt-3 border-top border-secondary border-opacity-25 mt-2" id="vehicleCollapse_0">
+                                        
+                                        <!-- Vehicle Form Fields -->
+                                        <div class="row g-3 mb-4">
+                                            <!-- Plate Number -->
+                                            <div class="col-md-6 col-xl-4">
+                                                <label class="form-label small text-secondary fw-semibold">Plate Number / CS No. <span class="text-speed-pink">*</span></label>
+                                                <input type="text" name="vehicles[0][plate_number]" class="form-control form-control-dark text-uppercase plate-input" placeholder="e.g., ABC 1234" required>
+                                            </div>
+
+                                            <!-- Brand -->
+                                            <div class="col-md-6 col-xl-4">
+                                                <label class="form-label small text-secondary fw-semibold">Brand <span class="text-speed-pink">*</span></label>
+                                                <select name="vehicles[0][vehicle_make]" class="form-select form-select-dark brand-select" required>
+                                                    <option value="" disabled selected>Select Brand</option>
+                                                    <option value="Toyota">Toyota</option>
+                                                    <option value="Porsche">Porsche</option>
+                                                    <option value="Ford">Ford</option>
+                                                    <option value="Chevrolet">Chevrolet</option>
+                                                    <option value="Dodge">Dodge</option>
+                                                    <option value="Nissan">Nissan</option>
+                                                    <option value="Honda">Honda</option>
+                                                    <option value="Subaru">Subaru</option>
+                                                    <option value="Mazda">Mazda</option>
+                                                    <option value="BMW">BMW</option>
+                                                    <option value="Mercedes-Benz">Mercedes-Benz</option>
+                                                    <option value="Audi">Audi</option>
+                                                    <option value="Ferrari">Ferrari</option>
+                                                    <option value="Lamborghini">Lamborghini</option>
+                                                    <option value="Jeep">Jeep</option>
+                                                    <option value="Land Rover">Land Rover</option>
+                                                    <option value="BYD">BYD</option>
+                                                    <option value="Tesla">Tesla</option>
+                                                    <option value="Mitsubishi">Mitsubishi</option>
+                                                    <option value="Hyundai">Hyundai</option>
+                                                    <option value="Isuzu">Isuzu</option>
+                                                    <option value="Suzuki">Suzuki</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- Model -->
+                                            <div class="col-md-6 col-xl-4">
+                                                <label class="form-label small text-secondary fw-semibold">Model <span class="text-speed-pink">*</span></label>
+                                                <select name="vehicles[0][vehicle_model]" class="form-select form-select-dark model-select" required disabled>
+                                                    <option value="" disabled selected>Select Brand First</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- Vehicle Type -->
+                                            <div class="col-md-6 col-xl-4">
+                                                <label class="form-label small text-secondary fw-semibold">Vehicle Type <span class="text-speed-pink">*</span></label>
+                                                <select name="vehicles[0][vehicle_type]" class="form-select form-select-dark type-select" required>
+                                                    <option value="" disabled selected>Select Vehicle Type</option>
+                                                    <option value="Sedan">Sedan</option>
+                                                    <option value="Hatchback">Hatchback</option>
+                                                    <option value="Crossover">Crossover</option>
+                                                    <option value="SUV">SUV</option>
+                                                    <option value="MPV">MPV</option>
+                                                    <option value="Pickup">Pickup</option>
+                                                    <option value="Van">Van</option>
+                                                    <option value="Sports Car">Sports Car</option>
+                                                    <option value="Supercar">Supercar</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- Year -->
+                                            <div class="col-md-4 col-xl-3">
+                                                <label class="form-label small text-secondary fw-semibold">Year <span class="text-speed-pink">*</span></label>
+                                                <select name="vehicles[0][vehicle_year]" class="form-select form-select-dark year-select" required disabled>
+                                                    <option value="" disabled selected>Select Model First</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- Mechanic Assigned -->
+                                            <div class="col-md-8 col-xl-5">
+                                                <label class="form-label small text-secondary fw-semibold">Mechanic Assigned <span class="text-speed-pink">*</span></label>
+                                                <select name="vehicles[0][mechanic_assigned]" class="form-select form-select-dark mechanic-select" required>
+                                                    <option value="" disabled selected>Select technician</option>
+                                                    @if(isset($technicians) && count($technicians) > 0)
+                                                        @foreach($technicians as $tech)
+                                                            <option value="{{ $tech->name }}">{{ $tech->name }}</option>
+                                                        @endforeach
+                                                    @else
+                                                        <option value="John Mechanic">John Mechanic</option>
+                                                        <option value="Mike Technician">Mike Technician</option>
+                                                        <option value="Alex Senior Tech">Alex Senior Tech</option>
+                                                    @endif
+                                                </select>
+                                            </div>
                                         </div>
 
-                                        <!-- Brand -->
-                                        <div class="col-md-6 col-xl-4">
-                                            <label class="form-label small text-secondary fw-semibold">Brand <span class="text-danger">*</span></label>
-                                            <select name="vehicles[0][vehicle_make]" class="form-select form-select-figma brand-select" required>
-                                                <option value="" disabled selected>Select Brand</option>
-                                                <option value="Toyota">Toyota</option>
-                                                <option value="Mitsubishi">Mitsubishi</option>
-                                                <option value="Honda">Honda</option>
-                                                <option value="Ford">Ford</option>
-                                                <option value="Nissan">Nissan</option>
-                                                <option value="Hyundai">Hyundai</option>
-                                                <option value="Isuzu">Isuzu</option>
-                                                <option value="Suzuki">Suzuki</option>
-                                            </select>
-                                        </div>
+                                        <!-- Services Selection List -->
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <label class="form-label small text-secondary fw-semibold mb-0">
+                                                    Services & Options <span class="text-speed-pink">*</span>
+                                                </label>
+                                                <span class="fw-bold text-speed-blue fs-6 vehicle-total-display">Total: ₱0.00</span>
+                                            </div>
 
-                                        <!-- Model -->
-                                        <div class="col-md-6 col-xl-4">
-                                            <label class="form-label small text-secondary fw-semibold">Model <span class="text-danger">*</span></label>
-                                            <select name="vehicles[0][vehicle_model]" class="form-select form-select-figma model-select" required disabled>
-                                                <option value="" disabled selected>Select Brand First</option>
-                                            </select>
-                                        </div>
+                                            <!-- Search Bar for Services -->
+                                            <div class="mb-3">
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text input-group-text-dark">
+                                                        <i class="bi bi-search"></i>
+                                                    </span>
+                                                    <input type="text" class="form-control form-control-dark service-search-input" placeholder="Search services or options (e.g., Wash, Oil Change, Sports Car)...">
+                                                </div>
+                                            </div>
 
-                                        <!-- Vehicle Type -->
-                                        <div class="col-md-6 col-xl-4">
-                                            <label class="form-label small text-secondary fw-semibold">Vehicle Type <span class="text-danger">*</span></label>
-                                            <select name="vehicles[0][vehicle_type]" class="form-select form-select-figma type-select" required>
-                                                <option value="" disabled selected>Select Vehicle Type</option>
-                                                <option value="Sedan">Sedan</option>
-                                                <option value="SUV">SUV</option>
-                                                <option value="Pickup Truck">Pickup Truck</option>
-                                                <option value="Van">Van</option>
-                                            </select>
-                                        </div>
+                                            <!-- Placeholder notice shown when NO vehicle type is selected -->
+                                            <div class="p-3 text-center border border-secondary border-opacity-25 rounded-3 bg-black bg-opacity-40 vehicle-type-placeholder">
+                                                <i class="bi bi-info-circle text-speed-blue me-1 fs-6"></i>
+                                                <span class="small text-secondary fw-semibold">Please select a <strong>Vehicle Type</strong> above to view available services.</span>
+                                            </div>
 
-                                        <!-- Year -->
-                                        <div class="col-md-4 col-xl-3">
-                                            <label class="form-label small text-secondary fw-semibold">Year <span class="text-danger">*</span></label>
-                                            <select name="vehicles[0][vehicle_year]" class="form-select form-select-figma year-select" required>
-                                                <option value="" disabled selected>Year</option>
-                                                @for ($year = date('Y') + 1; $year >= 1990; $year--)
-                                                    <option value="{{ $year }}">{{ $year }}</option>
-                                                @endfor
-                                            </select>
-                                        </div>
-
-                                        <!-- Mechanic Assigned -->
-                                        <div class="col-md-8 col-xl-5">
-                                            <label class="form-label small text-secondary fw-semibold">Mechanic Assigned <span class="text-danger">*</span></label>
-                                            <select name="vehicles[0][mechanic_assigned]" class="form-select form-select-figma mechanic-select" required>
-                                                <option value="" disabled selected>Select technician</option>
-                                                @if(isset($technicians) && count($technicians) > 0)
-                                                    @foreach($technicians as $tech)
-                                                        <option value="{{ $tech->name }}">{{ $tech->name }}</option>
-                                                    @endforeach
-                                                @else
-                                                    <option value="John Mechanic">John Mechanic</option>
-                                                    <option value="Mike Technician">Mike Technician</option>
-                                                    <option value="Alex Senior Tech">Alex Senior Tech</option>
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- Services Selection List -->
-                                    <div class="mb-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-2.5">
-                                            <label class="form-label small text-secondary fw-semibold mb-0">
-                                                Services & Options
-                                            </label>
-                                            <span class="fw-bold text-primary fs-6 vehicle-total-display">Total: ₱0.00</span>
-                                        </div>
-
-                                        <!-- Placeholder notice shown when NO vehicle type is selected -->
-                                        <div class="p-3 text-center border rounded-3 bg-light-subtle vehicle-type-placeholder">
-                                            <i class="bi bi-info-circle text-primary me-1 fs-6"></i>
-                                            <span class="small text-muted fw-semibold">Please select a <strong>Vehicle Type</strong> above to view available services.</span>
-                                        </div>
-
-                                        <div class="d-flex flex-column gap-3 service-list-container">
-                                            @if(isset($services) && count($services) > 0)
-                                                @foreach($services as $service)
-                                                    @php
-                                                        $flatPrice = (float) ($service->flat_price ?? 0);
-                                                        $hasOptions = isset($service->options) && $service->options->count() > 0;
-                                                    @endphp
-                                                    
-                                                    <div class="service-card-item rounded-3 border bg-white overflow-hidden" 
-                                                         data-service-id="{{ $service->id }}"
-                                                         data-selection-type="{{ $service->selection_type }}"
-                                                         data-flat-price="{{ $flatPrice }}"
-                                                         data-vehicle-type="{{ $service->vehicle_type ?? 'All' }}"
-                                                         style="display: none !important;">
+                                            <div class="d-flex flex-column gap-3 service-list-container">
+                                                @if(isset($services) && count($services) > 0)
+                                                    @foreach($services as $service)
+                                                        @php
+                                                            $flatPrice = (float) ($service->flat_price ?? 0);
+                                                            $hasOptions = isset($service->options) && $service->options->count() > 0;
+                                                        @endphp
                                                         
-                                                        <input type="hidden" name="vehicles[0][services][{{ $service->id }}][price]" class="service-price-input" value="0.00">
+                                                        <div class="service-card-item rounded-3 overflow-hidden" 
+                                                             data-service-id="{{ $service->id }}"
+                                                             data-selection-type="{{ $service->selection_type }}"
+                                                             data-flat-price="{{ $flatPrice }}"
+                                                             data-vehicle-type="{{ $service->vehicle_type ?? 'All' }}"
+                                                             style="display: none !important;">
+                                                            
+                                                            <input type="hidden" name="vehicles[0][services][{{ $service->id }}][price]" class="service-price-input" value="0.00">
 
-                                                        <!-- Service Checkbox Header -->
-                                                        <div class="p-3 d-flex align-items-start justify-content-between service-header">
-                                                            <div class="form-check m-0 pe-3">
-                                                                <input class="form-check-input service-checkbox mt-1" 
-                                                                       type="checkbox" 
-                                                                       name="vehicles[0][services][{{ $service->id }}][selected]" 
-                                                                       value="1" 
-                                                                       id="v0_srv_{{ $service->id }}">
-                                                                <label class="form-check-label ms-2 cursor-pointer" for="v0_srv_{{ $service->id }}">
-                                                                    <span class="fw-bold text-dark d-block fs-6 lh-sm">{{ $service->name }}</span>
-                                                                    @if($service->description)
-                                                                        <span class="text-muted small d-block mt-0.5">{{ $service->description }}</span>
+                                                            <!-- Service Checkbox Header -->
+                                                            <div class="p-3 d-flex align-items-start justify-content-between service-header">
+                                                                <div class="form-check m-0 pe-3">
+                                                                    <input class="form-check-input service-checkbox mt-1" 
+                                                                           type="checkbox" 
+                                                                           name="vehicles[0][services][{{ $service->id }}][selected]" 
+                                                                           value="1" 
+                                                                           id="v0_srv_{{ $service->id }}">
+                                                                    <label class="form-check-label ms-2 cursor-pointer" for="v0_srv_{{ $service->id }}">
+                                                                        <span class="fw-bold text-white d-block fs-6 lh-sm">{{ $service->name }}</span>
+                                                                        @if($service->description)
+                                                                            <span class="text-secondary small d-block mt-0.5">{{ $service->description }}</span>
+                                                                        @endif
+                                                                        @if($service->notice)
+                                                                            <span class="text-warning small d-block mt-1">
+                                                                                <i class="bi bi-info-circle me-1"></i>{{ $service->notice }}
+                                                                            </span>
+                                                                        @endif
+                                                                    </label>
+                                                                </div>
+
+                                                                <!-- Price Tag Display -->
+                                                                <div class="text-end text-nowrap">
+                                                                    @if($flatPrice > 0)
+                                                                        <span class="text-secondary small d-block">Base Price</span>
+                                                                        <span class="fw-bold text-speed-blue fs-6">₱{{ number_format($flatPrice, 2) }}</span>
+                                                                    @else
+                                                                        <span class="text-secondary small d-block">Price Varies</span>
+                                                                        <span class="badge bg-info bg-opacity-20 text-speed-blue border border-info border-opacity-30 rounded-pill">By Vehicle Type</span>
                                                                     @endif
-                                                                    @if($service->notice)
-                                                                        <span class="text-warning-emphasis small d-block mt-1">
-                                                                            <i class="bi bi-info-circle me-1"></i>{{ $service->notice }}
-                                                                        </span>
-                                                                    @endif
-                                                                </label>
-                                                            </div>
-
-                                                            <!-- Price Tag Display -->
-                                                            <div class="text-end text-nowrap">
-                                                                @if($flatPrice > 0)
-                                                                    <span class="text-muted small d-block">Base Price</span>
-                                                                    <span class="fw-bold text-primary fs-6">₱{{ number_format($flatPrice, 2) }}</span>
-                                                                @else
-                                                                    <span class="text-muted small d-block">Price Varies</span>
-                                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">By Vehicle Type</span>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Options Panel -->
-                                                        @if($hasOptions)
-                                                            <div class="service-options-panel p-3 border-top bg-light-subtle d-none">
-                                                                <span class="text-uppercase fw-bold text-secondary subservice-title d-block mb-2">
-                                                                    Select Coverage / Vehicle Pricing:
-                                                                </span>
-                                                                <div class="d-flex flex-column gap-2">
-                                                                    @foreach($service->options as $option)
-                                                                        @php
-                                                                            // Fallback to parent service vehicle type if option vehicle type is null or empty
-                                                                            $optVehicleType = !empty($option->vehicle_type) ? $option->vehicle_type : (!empty($service->vehicle_type) ? $service->vehicle_type : 'All');
-                                                                        @endphp
-                                                                        <label class="d-flex justify-content-between align-items-center cursor-pointer subservice-option-item" 
-                                                                               data-vehicle-type="{{ $optVehicleType }}">
-                                                                            <div class="d-flex align-items-center gap-2">
-                                                                                @if($service->selection_type === 'single')
-                                                                                    <input type="radio" 
-                                                                                           name="vehicles[0][services][{{ $service->id }}][option_id]" 
-                                                                                           value="{{ $option->id }}" 
-                                                                                           class="service-option-input form-check-input mt-0" 
-                                                                                           data-price="{{ $option->price }}"
-                                                                                           data-label="{{ $option->name }}"
-                                                                                           data-vehicle-type="{{ $optVehicleType }}">
-                                                                                @else
-                                                                                    <input type="checkbox" 
-                                                                                           name="vehicles[0][services][{{ $service->id }}][options][]" 
-                                                                                           value="{{ $option->id }}" 
-                                                                                           class="service-option-input form-check-input mt-0" 
-                                                                                           data-price="{{ $option->price }}"
-                                                                                           data-label="{{ $option->name }}"
-                                                                                           data-vehicle-type="{{ $optVehicleType }}">
-                                                                                @endif
-                                                                                <div>
-                                                                                    <span class="fw-medium text-dark d-block lh-1">{{ $option->name }}</span>
-                                                                                    <span class="badge bg-secondary-subtle text-secondary mt-1" style="font-size: 10px;">
-                                                                                        <i class="bi bi-car-front me-1"></i>{{ $optVehicleType }}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
-                                                                            <span class="fw-bold text-dark font-monospace fs-6">₱{{ number_format($option->price, 2) }}</span>
-                                                                        </label>
-                                                                    @endforeach
                                                                 </div>
                                                             </div>
-                                                        @endif
 
+                                                            <!-- Options Panel -->
+                                                            @if($hasOptions)
+                                                                <div class="service-options-panel p-3 border-top border-secondary border-opacity-25 bg-black bg-opacity-30 d-none">
+                                                                    <span class="text-uppercase fw-bold text-secondary subservice-title d-block mb-2">
+                                                                        Select Coverage / Vehicle Pricing:
+                                                                    </span>
+                                                                    <div class="d-flex flex-column gap-2">
+                                                                        @foreach($service->options as $option)
+                                                                            @php
+                                                                                $optVehicleType = !empty($option->vehicle_type) ? $option->vehicle_type : (!empty($service->vehicle_type) ? $service->vehicle_type : 'All');
+                                                                            @endphp
+                                                                            <label class="d-flex justify-content-between align-items-center cursor-pointer subservice-option-item" 
+                                                                                   data-vehicle-type="{{ $optVehicleType }}">
+                                                                                <div class="d-flex align-items-center gap-2">
+                                                                                    @if($service->selection_type === 'single')
+                                                                                        <input type="radio" 
+                                                                                               name="vehicles[0][services][{{ $service->id }}][option_id]" 
+                                                                                               value="{{ $option->id }}" 
+                                                                                               class="service-option-input form-check-input mt-0" 
+                                                                                               data-price="{{ $option->price }}"
+                                                                                               data-label="{{ $option->name }}"
+                                                                                               data-vehicle-type="{{ $optVehicleType }}">
+                                                                                    @else
+                                                                                        <input type="checkbox" 
+                                                                                               name="vehicles[0][services][{{ $service->id }}][options][]" 
+                                                                                               value="{{ $option->id }}" 
+                                                                                               class="service-option-input form-check-input mt-0" 
+                                                                                               data-price="{{ $option->price }}"
+                                                                                               data-label="{{ $option->name }}"
+                                                                                               data-vehicle-type="{{ $optVehicleType }}">
+                                                                                    @endif
+                                                                                    <div>
+                                                                                        <span class="fw-medium text-white d-block lh-1">{{ $option->name }}</span>
+                                                                                        <span class="badge bg-secondary bg-opacity-25 text-secondary mt-1" style="font-size: 10px;">
+                                                                                            <i class="bi bi-car-front me-1"></i>{{ $optVehicleType }}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <span class="fw-bold text-speed-blue font-monospace fs-6">₱{{ number_format($option->price, 2) }}</span>
+                                                                            </label>
+                                                                        @endforeach
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <div class="p-3 text-center text-secondary small border border-secondary border-opacity-25 rounded-3 bg-black bg-opacity-40">
+                                                        No services found in database.
                                                     </div>
-                                                @endforeach
-                                            @else
-                                                <div class="p-3 text-center text-muted small border rounded-3 bg-white">
-                                                    No services found in database.
-                                                </div>
-                                            @endif
+                                                @endif
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <!-- Price Adjustment Note -->
-                                    <div class="pt-2 border-top">
-                                        <label class="form-label small text-secondary fw-semibold mb-1">
-                                            Price Adjustment Note <span class="text-muted fw-normal">(Optional)</span>
-                                        </label>
-                                        <input type="text" name="vehicles[0][price_adjustment_note]" class="form-control form-control-figma" placeholder="Explain adjustments (e.g., custom discount, extra labor)">
+                                        <!-- Service Note Box -->
+                                        <div class="pt-3 border-top border-secondary border-opacity-25 mt-3">
+                                            <div class="service-note-wrapper">
+                                                <label class="form-label small text-secondary fw-semibold mb-1">
+                                                    Service Note <span class="text-secondary fw-normal">(Optional)</span>
+                                                </label>
+                                                <textarea name="vehicles[0][price_adjustment_note]" 
+                                                          rows="2" 
+                                                          class="form-control form-control-dark price-adjustment-note-input" 
+                                                          placeholder="Add any specific service notes, client requests, or vehicle conditions..."></textarea>
+                                            </div>
+                                        </div>
+
                                     </div>
 
                                 </div>
@@ -486,7 +684,7 @@
                                 <button type="button" class="btn-generate" id="generateCodeBtn">
                                     <i class="bi bi-arrow-repeat me-1"></i> Generate Tracking Code
                                 </button>
-                                <input type="text" id="trackingCodeInput" name="tracking_code" readonly value="SPD26-E2B3P4" class="code-box" />
+                                <input type="text" id="trackingCodeInput" name="tracking_code" readonly value="{{ old('tracking_code') }}" placeholder="" class="code-box" />
                             </div>
 
                         </div>
@@ -495,32 +693,32 @@
                         <div class="col-lg-5 col-xl-4">
                             <div class="sticky-receipt-wrapper">
 
-                                <div class="card card-figma border-0 shadow-sm rounded-4 p-4 bg-white mb-3">
-                                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-                                        <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2 fs-6">
-                                            <i class="bi bi-receipt text-primary fs-5"></i> Service Receipt
+                                <div class="card speed-card border-0 shadow-sm rounded-4 p-4 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center border-bottom border-secondary border-opacity-25 pb-3 mb-3">
+                                        <h5 class="fw-bold mb-0 text-white d-flex align-items-center gap-2 fs-6">
+                                            <i class="bi bi-receipt text-speed-pink fs-5"></i> Service Receipt
                                         </h5>
-                                        <span class="badge bg-light text-dark font-monospace border px-2.5 py-1.5 fs-6" id="previewCode">SPD26-E2B3P4</span>
+                                        <span class="badge bg-black bg-opacity-50 text-speed-blue font-monospace border border-secondary border-opacity-25 px-2.5 py-1.5 fs-6" id="previewCode">{{ old('tracking_code', '---') }}</span>
                                     </div>
 
-                                    <div class="mb-3 pb-2 border-bottom">
+                                    <div class="mb-3 pb-2 border-bottom border-secondary border-opacity-25">
                                         <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Customer Info</span>
-                                        <div class="fs-6 fw-bold text-dark" id="previewCustomer">---</div>
-                                        <div class="small text-muted font-monospace" id="previewPhone">---</div>
+                                        <div class="fs-6 fw-bold text-white" id="previewCustomer">---</div>
+                                        <div class="small text-secondary font-monospace" id="previewPhone">---</div>
                                     </div>
 
                                     <div id="previewVehiclesContainer" class="d-flex flex-column gap-3 mb-3" style="max-height: 380px; overflow-y: auto;">
-                                        <p class="text-muted small mb-0">No vehicle details or services selected yet.</p>
+                                        <p class="text-secondary small mb-0">No vehicle details or services selected yet.</p>
                                     </div>
 
-                                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                                        <span class="fw-bold text-dark fs-6">Grand Total Estimated Cost:</span>
-                                        <span class="fw-bold fs-4 text-primary font-monospace" id="previewTotal">₱0.00</span>
+                                    <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary border-opacity-25">
+                                        <span class="fw-bold text-white fs-6">Total Estimated Cost:</span>
+                                        <span class="fw-bold fs-4 text-speed-pink font-monospace" id="previewTotal">₱0.00</span>
                                     </div>
                                 </div>
 
-                                <div class="card card-figma p-3 bg-white shadow-sm">
-                                    <button type="submit" class="btn btn-save-order w-100 fs-6 d-flex justify-content-center align-items-center gap-2" id="saveOrderBtn">
+                                <div class="card speed-card p-3 shadow-sm rounded-4">
+                                    <button type="submit" class="btn btn-speed-gradient w-100 fs-6 d-flex justify-content-center align-items-center gap-2 py-3 rounded-3" id="saveOrderBtn">
                                         <i class="bi bi-check-circle-fill"></i> Save Service Order
                                     </button>
                                 </div>
@@ -539,461 +737,846 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        const DEFAULT_MODELS = {
-            "Toyota": ["Vios", "Fortuner", "Hilux", "Innova", "Corolla Cross", "Wigo", "RAV4", "Avanza", "Hiace"],
-            "Mitsubishi": ["Montero Sport", "Xpander", "Strada", "Mirage G4", "L300", "Pajero"],
-            "Honda": ["Civic", "CR-V", "City", "HR-V", "BR-V", "Brio", "Accord"],
-            "Ford": ["Ranger", "Everest", "Territory", "Explorer", "Mustang"],
-            "Nissan": ["Navara", "Terra", "Almera", "Urvan", "Kicks", "Patrol"],
-            "Hyundai": ["Tucson", "Creta", "Stargazer", "Accent", "H-100"],
-            "Isuzu": ["D-Max", "mu-X", "N-Series"],
-            "Suzuki": ["Ertiga", "Jimny", "Swift", "Dzire", "XL7", "APV"]
-        };
+    // Vehicle models updated with their matching vehicle types and year ranges from VehicleModelSeeder
+    const DEFAULT_MODELS = {
+        "Toyota": [
+            { name: "Vios", type: "Sedan", year_start: 2013, year_end: 2026 },
+            { name: "Corolla Altis", type: "Sedan", year_start: 2014, year_end: 2026 },
+            { name: "Camry", type: "Sedan", year_start: 2015, year_end: 2026 },
+            { name: "Wigo", type: "Hatchback", year_start: 2014, year_end: 2026 },
+            { name: "Yaris Cross", type: "Crossover", year_start: 2023, year_end: 2026 },
+            { name: "Avanza", type: "MPV", year_start: 2012, year_end: 2026 },
+            { name: "Veloz", type: "MPV", year_start: 2022, year_end: 2026 },
+            { name: "Innova", type: "MPV", year_start: 2016, year_end: 2026 },
+            { name: "Innova Zenix", type: "MPV", year_start: 2023, year_end: 2026 },
+            { name: "Fortuner", type: "SUV", year_start: 2016, year_end: 2026 },
+            { name: "RAV4", type: "SUV", year_start: 2019, year_end: 2026 },
+            { name: "Corolla Cross", type: "Crossover", year_start: 2020, year_end: 2026 },
+            { name: "Land Cruiser Prado", type: "SUV", year_start: 2010, year_end: 2026 },
+            { name: "Land Cruiser 300", type: "SUV", year_start: 2021, year_end: 2026 },
+            { name: "Hilux", type: "Pickup", year_start: 2015, year_end: 2026 },
+            { name: "Hiace Commuter", type: "Van", year_start: 2014, year_end: 2026 },
+            { name: "Hiace GL Grandia", type: "Van", year_start: 2019, year_end: 2026 },
+            { name: "Super Grandia", type: "Van", year_start: 2019, year_end: 2026 },
+            { name: "Alphard", type: "Van", year_start: 2015, year_end: 2026 },
+            { name: "GR Supra", type: "Sports Car", year_start: 2019, year_end: 2026 },
+            { name: "GR86", type: "Sports Car", year_start: 2022, year_end: 2026 },
+            { name: "GR Yaris", type: "Sports Car", year_start: 2021, year_end: 2026 }
+        ],
+        "Porsche": [
+            { name: "911 Carrera / GT3", type: "Sports Car", year_start: 2012, year_end: 2026 },
+            { name: "718 Cayman", type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "718 Boxster", type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "Taycan", type: "Sports Car", year_start: 2020, year_end: 2026 },
+            { name: "Panamera", type: "Sedan", year_start: 2017, year_end: 2026 },
+            { name: "Macan", type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "Cayenne", type: "SUV", year_start: 2011, year_end: 2026 }
+        ],
+        "Ford": [
+            { name: "Mustang GT / Dark Horse", type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "Territory", type: "Crossover", year_start: 2020, year_end: 2026 },
+            { name: "Everest", type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "Ranger", type: "Pickup", year_start: 2015, year_end: 2026 },
+            { name: "Ranger Raptor", type: "Pickup", year_start: 2018, year_end: 2026 },
+            { name: "Explorer", type: "SUV", year_start: 2016, year_end: 2026 },
+            { name: "Expedition", type: "SUV", year_start: 2018, year_end: 2026 }
+        ],
+        "Chevrolet": [
+            { name: "Corvette C8", type: "Sports Car", year_start: 2020, year_end: 2026 },
+            { name: "Camaro", type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "Trailblazer", type: "SUV", year_start: 2017, year_end: 2026 },
+            { name: "Tracker", type: "Crossover", year_start: 2021, year_end: 2026 },
+            { name: "Suburban", type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "Tahoe", type: "SUV", year_start: 2021, year_end: 2026 }
+        ],
+        "Dodge": [
+            { name: "Challenger SRT / Hellcat", type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "Charger", type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "Durango", type: "SUV", year_start: 2014, year_end: 2026 }
+        ],
+        "Nissan": [
+            { name: "GT-R (R35)", type: "Supercar", year_start: 2008, year_end: 2026 },
+            { name: "Z", type: "Sports Car", year_start: 2023, year_end: 2026 },
+            { name: "Almera", type: "Sedan", year_start: 2015, year_end: 2026 },
+            { name: "Kicks e-POWER", type: "Crossover", year_start: 2022, year_end: 2026 },
+            { name: "Terra", type: "SUV", year_start: 2018, year_end: 2026 },
+            { name: "Navara", type: "Pickup", year_start: 2015, year_end: 2026 },
+            { name: "Urvan NV350", type: "Van", year_start: 2015, year_end: 2026 },
+            { name: "Patrol Royale", type: "SUV", year_start: 2014, year_end: 2026 }
+        ],
+        "Honda": [
+            { name: "Civic Type R (FL5 / FK8)", type: "Sports Car", year_start: 2017, year_end: 2026 },
+            { name: "NSX", type: "Supercar", year_start: 2017, year_end: 2024 },
+            { name: "City", type: "Sedan", year_start: 2014, year_end: 2026 },
+            { name: "City Hatchback", type: "Hatchback", year_start: 2021, year_end: 2026 },
+            { name: "Civic", type: "Sedan", year_start: 2016, year_end: 2026 },
+            { name: "Accord", type: "Sedan", year_start: 2015, year_end: 2026 },
+            { name: "Brio", type: "Hatchback", year_start: 2014, year_end: 2026 },
+            { name: "BR-V", type: "MPV", year_start: 2016, year_end: 2026 },
+            { name: "HR-V", type: "Crossover", year_start: 2015, year_end: 2026 },
+            { name: "CR-V", type: "SUV", year_start: 2017, year_end: 2026 }
+        ],
+        "Subaru": [
+            { name: "BRZ", type: "Sports Car", year_start: 2013, year_end: 2026 },
+            { name: "WRX / WRX STI", type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "XV / Crosstrek", type: "Crossover", year_start: 2012, year_end: 2026 },
+            { name: "Forester", type: "SUV", year_start: 2014, year_end: 2026 },
+            { name: "Outback", type: "Crossover", year_start: 2015, year_end: 2026 }
+        ],
+        "Mazda": [
+            { name: "MX-5 Miata", type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "Mazda 3", type: "Sedan", year_start: 2014, year_end: 2026 },
+            { name: "Mazda 6", type: "Sedan", year_start: 2014, year_end: 2026 },
+            { name: "CX-30", type: "Crossover", year_start: 2020, year_end: 2026 },
+            { name: "CX-5", type: "SUV", year_start: 2013, year_end: 2026 },
+            { name: "CX-60 / CX-90", type: "SUV", year_start: 2023, year_end: 2026 },
+            { name: "BT-50", type: "Pickup", year_start: 2013, year_end: 2026 }
+        ],
+        "BMW": [
+            { name: "M3 / M4", type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "M2 / M5", type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "Z4 Roadster", type: "Sports Car", year_start: 2019, year_end: 2026 },
+            { name: "3 Series", type: "Sedan", year_start: 2012, year_end: 2026 },
+            { name: "5 Series", type: "Sedan", year_start: 2010, year_end: 2026 },
+            { name: "7 Series", type: "Sedan", year_start: 2016, year_end: 2026 },
+            { name: "X1 / X3", type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "X5 / X7", type: "SUV", year_start: 2013, year_end: 2026 }
+        ],
+        "Mercedes-Benz": [
+            { name: "AMG GT / SL Roadster", type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "C-Class / C63 AMG", type: "Sedan", year_start: 2014, year_end: 2026 },
+            { name: "E-Class", type: "Sedan", year_start: 2016, year_end: 2026 },
+            { name: "S-Class", type: "Sedan", year_start: 2013, year_end: 2026 },
+            { name: "GLA / GLC / GLE", type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "G-Class (G-Wagon)", type: "SUV", year_start: 2013, year_end: 2026 }
+        ],
+        "Audi": [
+            { name: "R8", type: "Supercar", year_start: 2015, year_end: 2024 },
+            { name: "TT / RS3", type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "A4 / A6", type: "Sedan", year_start: 2016, year_end: 2026 },
+            { name: "Q3 / Q5 / Q7 / Q8", type: "SUV", year_start: 2015, year_end: 2026 }
+        ],
+        "Ferrari": [
+            { name: "488 / F8 Tributo / 296 GTB", type: "Supercar", year_start: 2016, year_end: 2026 },
+            { name: "Roma / Portofino", type: "Sports Car", year_start: 2018, year_end: 2026 },
+            { name: "Purosangue", type: "SUV", year_start: 2023, year_end: 2026 }
+        ],
+        "Lamborghini": [
+            { name: "Huracan / Revuelto", type: "Supercar", year_start: 2015, year_end: 2026 },
+            { name: "Urus", type: "SUV", year_start: 2018, year_end: 2026 }
+        ],
+        "Jeep": [
+            { name: "Wrangler Rubicon", type: "SUV", year_start: 2012, year_end: 2026 },
+            { name: "Gladiator", type: "Pickup", year_start: 2020, year_end: 2026 },
+            { name: "Grand Cherokee", type: "SUV", year_start: 2015, year_end: 2026 }
+        ],
+        "Land Rover": [
+            { name: "Defender 90/110/130", type: "SUV", year_start: 2020, year_end: 2026 },
+            { name: "Range Rover / Sport", type: "SUV", year_start: 2014, year_end: 2026 },
+            { name: "Evoque / Velar", type: "SUV", year_start: 2015, year_end: 2026 }
+        ],
+        "BYD": [
+            { name: "Seal", type: "Sports Car", year_start: 2023, year_end: 2026 },
+            { name: "Atto 3", type: "Crossover", year_start: 2022, year_end: 2026 },
+            { name: "Dolphin", type: "Hatchback", year_start: 2023, year_end: 2026 },
+            { name: "Han", type: "Sedan", year_start: 2022, year_end: 2026 }
+        ],
+        "Tesla": [
+            { name: "Model 3 / Performance", type: "Sedan", year_start: 2017, year_end: 2026 },
+            { name: "Model Y", type: "Crossover", year_start: 2020, year_end: 2026 },
+            { name: "Model S Plaid", type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "Model X", type: "SUV", year_start: 2016, year_end: 2026 },
+            { name: "Cybertruck", type: "Pickup", year_start: 2023, year_end: 2026 }
+        ],
+        "Mitsubishi": [
+            { name: "Montero Sport", type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "Xpander", type: "MPV", year_start: 2018, year_end: 2026 },
+            { name: "Strada", type: "Pickup", year_start: 2015, year_end: 2026 },
+            { name: "Mirage G4", type: "Sedan", year_start: 2013, year_end: 2026 },
+            { name: "L300", type: "Van", year_start: 2010, year_end: 2026 },
+            { name: "Pajero", type: "SUV", year_start: 2008, year_end: 2021 }
+        ],
+        "Hyundai": [
+            { name: "Tucson", type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "Creta", type: "Crossover", year_start: 2022, year_end: 2026 },
+            { name: "Stargazer", type: "MPV", year_start: 2022, year_end: 2026 },
+            { name: "Accent", type: "Sedan", year_start: 2011, year_end: 2023 },
+            { name: "H-100", type: "Van", year_start: 2010, year_end: 2026 }
+        ],
+        "Isuzu": [
+            { name: "D-Max", type: "Pickup", year_start: 2013, year_end: 2026 },
+            { name: "mu-X", type: "SUV", year_start: 2014, year_end: 2026 },
+            { name: "N-Series", type: "Van", year_start: 2010, year_end: 2026 }
+        ],
+        "Suzuki": [
+            { name: "Ertiga", type: "MPV", year_start: 2014, year_end: 2026 },
+            { name: "Jimny", type: "SUV", year_start: 2018, year_end: 2026 },
+            { name: "Swift", type: "Hatchback", year_start: 2011, year_end: 2026 },
+            { name: "Dzire", type: "Sedan", year_start: 2013, year_end: 2026 },
+            { name: "XL7", type: "MPV", year_start: 2020, year_end: 2026 },
+            { name: "APV", type: "Van", year_start: 2008, year_end: 2026 }
+        ]
+    };
 
-        window.VEHICLE_MODELS = @json($vehicleModels ?? []);
+    window.VEHICLE_MODELS = @json($vehicleModels ?? []);
 
-        document.addEventListener('DOMContentLoaded', function () {
-            let vehicleIndexCounter = 1;
+    document.addEventListener('DOMContentLoaded', function () {
+        const addVehicleBtn = document.getElementById('addVehicleBtn');
+        const vehiclesContainer = document.getElementById('vehiclesContainer');
+        const customerNameInput = document.getElementById('customer_name');
+        const customerPhoneInput = document.getElementById('customer_phone');
+        const generateCodeBtn = document.getElementById('generateCodeBtn');
+        const trackingCodeInput = document.getElementById('trackingCodeInput');
+        const previewCode = document.getElementById('previewCode');
 
-            const addVehicleBtn = document.getElementById('addVehicleBtn');
-            const vehiclesContainer = document.getElementById('vehiclesContainer');
-            const customerNameInput = document.getElementById('customer_name');
-            const customerPhoneInput = document.getElementById('customer_phone');
-            const generateCodeBtn = document.getElementById('generateCodeBtn');
-            const trackingCodeInput = document.getElementById('trackingCodeInput');
-            const previewCode = document.getElementById('previewCode');
+        // --- VALIDATE THAT VEHICLE & SERVICE INFORMATION IS COMPLETED ---
+        function validateVehicleServiceInfo() {
+            const custName = (customerNameInput?.value || '').trim();
+            const custPhone = (customerPhoneInput?.value || '').trim();
 
-            // Initialize all vehicle cards on page load
-            document.querySelectorAll('.vehicle-card').forEach(card => {
-                filterOptionsByVehicleType(card);
-            });
+            if (!custName || !custPhone) {
+                alert('Please fill out the Customer Name and Phone Number first.');
+                if (!custName && customerNameInput) customerNameInput.focus();
+                else if (customerPhoneInput) customerPhoneInput.focus();
+                return false;
+            }
 
-            updateCustomerPreview();
-            calculateGrandTotal();
+            const vehicleCards = document.querySelectorAll('.vehicle-card');
+            if (vehicleCards.length === 0) {
+                alert('Please add at least one vehicle.');
+                return false;
+            }
 
-            // VEHICLE TYPE DYNAMIC FILTERING FUNCTION
-            function filterOptionsByVehicleType(vehicleCard) {
-                const selectedType = (vehicleCard.querySelector('.type-select')?.value || '').toLowerCase().trim();
-                const placeholder = vehicleCard.querySelector('.vehicle-type-placeholder');
+            for (let i = 0; i < vehicleCards.length; i++) {
+                const card = vehicleCards[i];
+                const vehicleNum = i + 1;
+                const plate = (card.querySelector('.plate-input')?.value || '').trim();
+                const brand = (card.querySelector('.brand-select')?.value || '').trim();
+                const model = (card.querySelector('.model-select')?.value || '').trim();
+                const type = (card.querySelector('.type-select')?.value || '').trim();
+                const year = (card.querySelector('.year-select')?.value || '').trim();
+                const mechanic = (card.querySelector('.mechanic-select')?.value || '').trim();
 
-                // IF NO VEHICLE TYPE IS SELECTED: Hide all services and show placeholder
-                if (!selectedType) {
-                    if (placeholder) placeholder.style.setProperty('display', 'block', 'important');
-
-                    vehicleCard.querySelectorAll('.service-card-item').forEach(serviceCard => {
-                        serviceCard.style.setProperty('display', 'none', 'important');
-                        const serviceCheckbox = serviceCard.querySelector('.service-checkbox');
-                        if (serviceCheckbox && serviceCheckbox.checked) {
-                            serviceCheckbox.checked = false; // Reset selection if type unselected
-                            const optionsPanel = serviceCard.querySelector('.service-options-panel');
-                            if (optionsPanel) optionsPanel.classList.add('d-none');
-                        }
-                    });
-
-                    calculateGrandTotal();
-                    return;
+                if (!plate || !brand || !model || !type || !year || !mechanic) {
+                    alert(`Please complete all required vehicle details for Vehicle #${vehicleNum} (Plate, Brand, Model, Type, Year, Mechanic).`);
+                    
+                    // Open collapse if hidden
+                    const collapseBody = card.querySelector('.vehicle-collapse-body');
+                    if (collapseBody && !collapseBody.classList.contains('show')) {
+                        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseBody);
+                        bsCollapse.show();
+                    }
+                    return false;
                 }
 
-                // VEHICLE TYPE IS SELECTED: Hide placeholder and reveal matching services
-                if (placeholder) placeholder.style.setProperty('display', 'none', 'important');
+                const selectedServices = card.querySelectorAll('.service-checkbox:checked');
+                if (selectedServices.length === 0) {
+                    alert(`Please select at least one service for Vehicle #${vehicleNum}.`);
+
+                    const collapseBody = card.querySelector('.vehicle-collapse-body');
+                    if (collapseBody && !collapseBody.classList.contains('show')) {
+                        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseBody);
+                        bsCollapse.show();
+                    }
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // --- GENERATE SPECIFIC TRACKING CODE (FORMAT: SPDL26-GI45T) ---
+        function generateTrackingCode() {
+            const year = new Date().getFullYear().toString().slice(-2);
+
+            const rawName = (customerNameInput?.value || '').trim().replace(/[^a-zA-Z]/g, '').toUpperCase();
+            const nameLetters = rawName.length >= 2 ? rawName.substring(0, 2) : (rawName + 'XX').substring(0, 2);
+
+            const firstVehicleCard = document.querySelector('.vehicle-card');
+            const rawPlate = (firstVehicleCard?.querySelector('.plate-input')?.value || '').trim();
+            const digitsOnly = rawPlate.replace(/[^0-9]/g, '');
+            const plateDigits = digitsOnly.length >= 2 ? digitsOnly.slice(-2) : (digitsOnly + '00').slice(-2);
+
+            const randomLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+
+            return `SPDL${year}-${nameLetters}${plateDigits}${randomLetter}`;
+        }
+
+        // --- FILTER SERVICES AND OPTIONS BY VEHICLE TYPE AND SEARCH QUERY ---
+        function filterOptionsByVehicleType(vehicleCard) {
+            const selectedType = (vehicleCard.querySelector('.type-select')?.value || '').toLowerCase().trim();
+            const searchQuery = (vehicleCard.querySelector('.service-search-input')?.value || '').toLowerCase().trim();
+            const placeholder = vehicleCard.querySelector('.vehicle-type-placeholder');
+
+            if (!selectedType) {
+                if (placeholder) placeholder.style.setProperty('display', 'block', 'important');
 
                 vehicleCard.querySelectorAll('.service-card-item').forEach(serviceCard => {
-                    const serviceType = (serviceCard.getAttribute('data-vehicle-type') || 'all').toLowerCase().trim();
+                    serviceCard.style.setProperty('display', 'none', 'important');
                     const serviceCheckbox = serviceCard.querySelector('.service-checkbox');
-                    
-                    let visibleOptionsCount = 0;
-                    const optionItems = serviceCard.querySelectorAll('.subservice-option-item');
+                    if (serviceCheckbox && serviceCheckbox.checked) {
+                        serviceCheckbox.checked = false;
+                        const optionsPanel = serviceCard.querySelector('.service-options-panel');
+                        if (optionsPanel) optionsPanel.classList.add('d-none');
+                    }
+                });
 
-                    // Filter subservice options inside this service
-                    optionItems.forEach(optionItem => {
-                        const optionType = (optionItem.getAttribute('data-vehicle-type') || 'all').toLowerCase().trim();
-                        const input = optionItem.querySelector('.service-option-input');
+                calculateVehicleTotal(vehicleCard);
+                calculateGrandTotal();
+                return;
+            }
 
-                        // Match option if option matches type, OR if option is 'all', OR if parent service matches
-                        const isOptionMatch = optionType === 'all' || 
+            if (placeholder) placeholder.style.setProperty('display', 'none', 'important');
+
+            vehicleCard.querySelectorAll('.service-card-item').forEach(serviceCard => {
+                const serviceType = (serviceCard.getAttribute('data-vehicle-type') || 'all').toLowerCase().trim();
+                const serviceName = (serviceCard.querySelector('.fw-bold')?.textContent || '').toLowerCase();
+                const serviceDesc = (serviceCard.querySelector('.text-secondary.small')?.textContent || '').toLowerCase();
+                const serviceNotice = (serviceCard.querySelector('.text-warning')?.textContent || '').toLowerCase();
+
+                const serviceCheckbox = serviceCard.querySelector('.service-checkbox');
+                let visibleOptionsCount = 0;
+                let searchMatchedOptionsCount = 0;
+
+                const optionItems = serviceCard.querySelectorAll('.subservice-option-item');
+
+                optionItems.forEach(optionItem => {
+                    const optionType = (optionItem.getAttribute('data-vehicle-type') || 'all').toLowerCase().trim();
+                    const optionText = (optionItem.textContent || '').toLowerCase();
+                    const input = optionItem.querySelector('.service-option-input');
+
+                    const isOptionTypeMatch = optionType === 'all' || 
                                               optionType === selectedType || 
                                               serviceType === 'all' || 
                                               serviceType === selectedType;
 
-                        if (isOptionMatch) {
-                            optionItem.style.setProperty('display', 'flex', 'important');
-                            visibleOptionsCount++;
-                        } else {
-                            optionItem.style.setProperty('display', 'none', 'important');
-                            if (input && input.checked) {
-                                input.checked = false; // Uncheck hidden options
-                            }
-                        }
-                    });
+                    const isOptionSearchMatch = !searchQuery || optionText.includes(searchQuery) || serviceName.includes(searchQuery);
 
-                    // Filter Main Service Card
-                    const isServiceMatch = serviceType === 'all' || serviceType === selectedType;
-                    const hasOptions = optionItems.length > 0;
-                    
-                    // Show service if service matches AND (has no options OR has matching options)
-                    const shouldShowService = isServiceMatch && (!hasOptions || visibleOptionsCount > 0);
-
-                    if (shouldShowService) {
-                        serviceCard.style.setProperty('display', 'block', 'important');
+                    if (isOptionTypeMatch && isOptionSearchMatch) {
+                        optionItem.style.setProperty('display', 'flex', 'important');
+                        visibleOptionsCount++;
+                        if (optionText.includes(searchQuery)) searchMatchedOptionsCount++;
                     } else {
-                        serviceCard.style.setProperty('display', 'none', 'important');
-                        if (serviceCheckbox && serviceCheckbox.checked) {
-                            serviceCheckbox.checked = false; // Uncheck service if hidden
-                            const optionsPanel = serviceCard.querySelector('.service-options-panel');
-                            if (optionsPanel) optionsPanel.classList.add('d-none');
+                        optionItem.style.setProperty('display', 'none', 'important');
+                        if (input && input.checked && !isOptionTypeMatch) {
+                            input.checked = false;
                         }
                     }
                 });
 
-                calculateGrandTotal();
+                const isServiceTypeMatch = serviceType === 'all' || serviceType === selectedType;
+                const isServiceSearchMatch = !searchQuery || 
+                                             serviceName.includes(searchQuery) || 
+                                             serviceDesc.includes(searchQuery) || 
+                                             serviceNotice.includes(searchQuery) || 
+                                             searchMatchedOptionsCount > 0;
+
+                const hasOptions = optionItems.length > 0;
+                const shouldShowService = isServiceTypeMatch && isServiceSearchMatch && (!hasOptions || visibleOptionsCount > 0);
+
+                if (shouldShowService) {
+                    serviceCard.style.setProperty('display', 'block', 'important');
+                } else {
+                    serviceCard.style.setProperty('display', 'none', 'important');
+                    if (serviceCheckbox && serviceCheckbox.checked) {
+                        serviceCheckbox.checked = false;
+                        const optionsPanel = serviceCard.querySelector('.service-options-panel');
+                        if (optionsPanel) optionsPanel.classList.add('d-none');
+                    }
+                }
+            });
+
+            calculateVehicleTotal(vehicleCard);
+            calculateGrandTotal();
+        }
+
+        // --- CALCULATE INDIVIDUAL VEHICLE TOTAL ---
+        function calculateVehicleTotal(vehicleCard) {
+            let servicesSubtotal = 0;
+
+            vehicleCard.querySelectorAll('.service-card-item').forEach(serviceCard => {
+                const checkbox = serviceCard.querySelector('.service-checkbox');
+                const priceInput = serviceCard.querySelector('.service-price-input');
+                const optionsPanel = serviceCard.querySelector('.service-options-panel');
+                const selectionType = serviceCard.getAttribute('data-selection-type');
+                const flatPrice = parseFloat(serviceCard.getAttribute('data-flat-price')) || 0;
+
+                if (checkbox && checkbox.checked) {
+                    if (optionsPanel) optionsPanel.classList.remove('d-none');
+
+                    let itemPrice = 0;
+                    if (selectionType === 'flat') {
+                        itemPrice = flatPrice;
+                    } else if (selectionType === 'single') {
+                        const checkedRadio = serviceCard.querySelector('.service-option-input:checked');
+                        if (checkedRadio) {
+                            itemPrice = parseFloat(checkedRadio.getAttribute('data-price')) || 0;
+                        } else {
+                            const firstVisibleRadio = Array.from(serviceCard.querySelectorAll('.service-option-input'))
+                                .find(input => input.closest('.subservice-option-item').style.display !== 'none');
+                            if (firstVisibleRadio) {
+                                firstVisibleRadio.checked = true;
+                                itemPrice = parseFloat(firstVisibleRadio.getAttribute('data-price')) || 0;
+                            } else {
+                                itemPrice = flatPrice;
+                            }
+                        }
+                    } else if (selectionType === 'multi') {
+                        let optionsSum = 0;
+                        serviceCard.querySelectorAll('.service-option-input:checked').forEach(opt => {
+                            optionsSum += parseFloat(opt.getAttribute('data-price')) || 0;
+                        });
+                        itemPrice = flatPrice + optionsSum;
+                    } else {
+                        itemPrice = flatPrice;
+                    }
+
+                    if (priceInput) priceInput.value = itemPrice.toFixed(2);
+                    servicesSubtotal += itemPrice;
+                } else {
+                    if (optionsPanel) optionsPanel.classList.add('d-none');
+                    if (priceInput) priceInput.value = '0.00';
+                }
+            });
+
+            const totalCost = Math.max(0, servicesSubtotal);
+            const hiddenTotalInput = vehicleCard.querySelector('.vehicle-total-cost-input');
+            if (hiddenTotalInput) hiddenTotalInput.value = totalCost.toFixed(2);
+
+            const totalDisplay = vehicleCard.querySelector('.vehicle-total-display');
+            if (totalDisplay) {
+                totalDisplay.textContent = 'Total: ₱' + totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
 
-            // ADD ANOTHER VEHICLE HANDLER
-            if (addVehicleBtn && vehiclesContainer) {
-                addVehicleBtn.addEventListener('click', function () {
-                    const templateCard = vehiclesContainer.querySelector('.vehicle-card');
-                    if (!templateCard) return;
+            return totalCost;
+        }
 
-                    const newCard = templateCard.cloneNode(true);
-                    const index = vehicleIndexCounter++;
+        // --- CALCULATE GRAND TOTAL AND UPDATE RECEIPT SIDEBAR PREVIEW ---
+        function calculateGrandTotal() {
+            let grandTotal = 0;
+            const vehicleCards = document.querySelectorAll('.vehicle-card');
+            const previewContainer = document.getElementById('previewVehiclesContainer');
+            
+            let receiptHTML = '';
 
-                    newCard.setAttribute('data-vehicle-index', index);
+            vehicleCards.forEach((card, index) => {
+                const vehIndex = index + 1;
+                const plate = (card.querySelector('.plate-input')?.value || '').trim().toUpperCase() || 'N/A';
+                const brand = card.querySelector('.brand-select')?.value || '';
+                const model = card.querySelector('.model-select')?.value || '';
+                const type = card.querySelector('.type-select')?.value || '';
+                const mechanic = card.querySelector('.mechanic-select')?.value || 'Unassigned';
 
-                    const badge = newCard.querySelector('.vehicle-number-badge');
-                    if (badge) badge.textContent = index + 1;
+                const vehTitle = [brand, model, type].filter(Boolean).join(' ') || `Vehicle #${vehIndex}`;
+                const vTotal = calculateVehicleTotal(card);
+                grandTotal += vTotal;
 
-                    const removeBtn = newCard.querySelector('.remove-vehicle-btn');
-                    if (removeBtn) removeBtn.classList.remove('d-none');
+                const selectedServicesHTML = [];
+                card.querySelectorAll('.service-card-item').forEach(serviceCard => {
+                    const checkbox = serviceCard.querySelector('.service-checkbox');
+                    if (checkbox && checkbox.checked) {
+                        const name = serviceCard.querySelector('.fw-bold')?.textContent.trim() || 'Service';
+                        const price = parseFloat(serviceCard.querySelector('.service-price-input')?.value || 0);
+                        
+                        let optionDetails = [];
+                        serviceCard.querySelectorAll('.service-option-input:checked').forEach(opt => {
+                            const label = opt.getAttribute('data-label');
+                            if (label) optionDetails.push(label);
+                        });
 
-                    newCard.querySelectorAll('input, select').forEach(input => {
-                        if (input.name) {
-                            input.name = input.name.replace(/vehicles\[\d+\]/, `vehicles[${index}]`);
-                        }
-                        if (input.id) {
-                            input.id = input.id.replace(/v\d+_/, `v${index}_`);
-                        }
+                        const optionText = optionDetails.length > 0 ? ` (${optionDetails.join(', ')})` : '';
 
-                        if (input.type === 'checkbox' || input.type === 'radio') {
-                            input.checked = false;
-                        } else if (input.type === 'hidden') {
-                            if (input.classList.contains('vehicle-total-cost-input') || input.classList.contains('service-price-input')) {
-                                input.value = "0.00";
-                            }
-                        } else {
-                            input.value = '';
-                        }
-                    });
+                        selectedServicesHTML.push(`
+                            <div class="d-flex justify-content-between align-items-center small py-1 border-bottom border-secondary border-opacity-10">
+                                <span class="text-white">• ${name}${optionText}</span>
+                                <span class="font-monospace text-speed-blue fw-bold">₱${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                        `);
+                    }
+                });
 
-                    newCard.querySelectorAll('label').forEach(label => {
-                        if (label.getAttribute('for')) {
-                            label.setAttribute('for', label.getAttribute('for').replace(/v\d+_/, `v${index}_`));
-                        }
-                    });
+                const serviceNote = card.querySelector('.price-adjustment-note-input')?.value.trim();
 
-                    const modelSelect = newCard.querySelector('.model-select');
-                    if (modelSelect) {
-                        modelSelect.innerHTML = '<option value="" disabled selected>Select Brand First</option>';
-                        modelSelect.disabled = true;
+                receiptHTML += `
+                    <div class="card border border-secondary border-opacity-25 rounded-3 p-3 bg-black bg-opacity-40">
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary border-opacity-25">
+                            <div>
+                                <h6 class="fw-bold text-white mb-0 fs-7"><i class="bi bi-car-front text-speed-pink me-1"></i> ${vehTitle}</h6>
+                                <small class="text-secondary" style="font-size: 0.75rem;"><i class="bi bi-person me-1"></i>Tech: ${mechanic}</small>
+                            </div>
+                            <span class="badge bg-secondary bg-opacity-25 text-white font-monospace">${plate}</span>
+                        </div>
+                        <div class="mb-2">
+                            ${selectedServicesHTML.length > 0 ? selectedServicesHTML.join('') : '<div class="small text-secondary italic">No services selected yet.</div>'}
+                        </div>
+                        ${serviceNote ? `
+                            <div class="small text-info bg-info bg-opacity-10 border border-info border-opacity-20 p-2 rounded-2 my-2" style="font-size: 0.75rem; word-break: break-word;">
+                                <i class="bi bi-info-circle me-1"></i>
+                                <strong>Service Note:</strong> ${serviceNote}
+                            </div>
+                        ` : ''}
+                        <div class="d-flex justify-content-between align-items-center pt-2 mt-1 border-top border-secondary border-opacity-25 small fw-bold">
+                            <span class="text-secondary">Vehicle Total:</span>
+                            <span class="text-speed-blue font-monospace fs-6">₱${vTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (previewContainer) {
+                previewContainer.innerHTML = receiptHTML || '<p class="text-secondary small mb-0">No vehicle details or services selected yet.</p>';
+            }
+
+            const previewTotal = document.getElementById('previewTotal');
+            if (previewTotal) {
+                previewTotal.textContent = '₱' + grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            // HEADER SUMMARY UPDATED
+            const vehiclesHeaderSummary = document.getElementById('vehiclesHeaderSummary');
+            if (vehiclesHeaderSummary) {
+                vehiclesHeaderSummary.textContent = `(${vehicleCards.length} vehicle${vehicleCards.length > 1 ? 's' : ''})`;
+            }
+        }
+
+        // --- BRAND TO MODEL DROPDOWN POPULATOR WITH AUTO-TYPE & YEAR RANGE DATA ---
+        function updateModelDropdown(brandSelect) {
+            const card = brandSelect.closest('.vehicle-card');
+            const modelSelect = card.querySelector('.model-select');
+            const yearSelect = card.querySelector('.year-select');
+
+            if (!modelSelect) return;
+
+            const brand = brandSelect.value;
+            modelSelect.innerHTML = '<option value="" disabled selected>Select Model</option>';
+
+            // Reset Year Dropdown until a model is selected
+            if (yearSelect) {
+                yearSelect.innerHTML = '<option value="" disabled selected>Select Model First</option>';
+                yearSelect.disabled = true;
+            }
+
+            let models = [];
+            if (window.VEHICLE_MODELS && window.VEHICLE_MODELS[brand] && window.VEHICLE_MODELS[brand].length > 0) {
+                models = window.VEHICLE_MODELS[brand];
+            } else if (DEFAULT_MODELS[brand]) {
+                models = DEFAULT_MODELS[brand];
+            }
+
+            if (models.length > 0) {
+                models.forEach(m => {
+                    const opt = document.createElement('option');
+                    let name = typeof m === 'object' ? (m.name || m.vehicle_model || '') : m;
+                    let vType = typeof m === 'object' ? (m.type || m.vehicle_type || '') : '';
+                    let yStart = typeof m === 'object' ? (m.year_start || m.start_year || 1990) : 1990;
+                    let yEnd = typeof m === 'object' ? (m.year_end || m.end_year || new Date().getFullYear()) : new Date().getFullYear();
+
+                    opt.value = name;
+                    opt.textContent = name;
+                    if (vType) opt.setAttribute('data-type', vType);
+                    opt.setAttribute('data-year-start', yStart);
+                    opt.setAttribute('data-year-end', yEnd);
+
+                    modelSelect.appendChild(opt);
+                });
+                modelSelect.disabled = false;
+            } else {
+                const opt = document.createElement('option');
+                opt.value = 'Other';
+                opt.textContent = 'Other / Custom';
+                modelSelect.appendChild(opt);
+                modelSelect.disabled = false;
+            }
+        }
+
+        // --- CUSTOMER INFORMATION PREVIEW ---
+        function updateCustomerPreview() {
+            const custName = customerNameInput?.value.trim() || '---';
+            const custPhone = customerPhoneInput?.value.trim() || '---';
+            
+            const previewCustomer = document.getElementById('previewCustomer');
+            const previewPhone = document.getElementById('previewPhone');
+
+            if (previewCustomer) previewCustomer.textContent = custName;
+            if (previewPhone) previewPhone.textContent = custPhone;
+        }
+
+        if (customerNameInput) customerNameInput.addEventListener('input', updateCustomerPreview);
+        if (customerPhoneInput) customerPhoneInput.addEventListener('input', updateCustomerPreview);
+
+        // --- TRACKING CODE GENERATOR BUTTON WITH VALIDATION ---
+        if (generateCodeBtn) {
+            generateCodeBtn.addEventListener('click', function() {
+                if (!validateVehicleServiceInfo()) {
+                    return; // Halt code generation if information is incomplete
+                }
+
+                const newCode = generateTrackingCode();
+                if (trackingCodeInput) trackingCodeInput.value = newCode;
+                if (previewCode) previewCode.textContent = newCode;
+            });
+        }
+
+        // --- UPDATE CARD HEADER DISPLAY ---
+        function updateVehicleCardHeader(card) {
+            const plate = (card.querySelector('.plate-input')?.value || '').trim().toUpperCase();
+            const brand = card.querySelector('.brand-select')?.value || '';
+            const model = card.querySelector('.model-select')?.value || '';
+            const statusLabel = card.querySelector('.vehicle-status-label');
+
+            if (statusLabel) {
+                const titleParts = [brand, model, plate].filter(Boolean);
+                if (titleParts.length > 0) {
+                    statusLabel.textContent = titleParts.join(' · ');
+                    statusLabel.classList.remove('text-secondary');
+                    statusLabel.classList.add('text-speed-blue', 'fw-bold');
+                } else {
+                    statusLabel.textContent = 'Not yet filled';
+                    statusLabel.classList.remove('text-speed-blue', 'fw-bold');
+                    statusLabel.classList.add('text-secondary');
+                }
+            }
+        }
+
+        // --- REINDEX FORM INPUT ATTRIBUTES AND COLLAPSE TARGETS ---
+        function reindexVehicleCards() {
+            const cards = document.querySelectorAll('.vehicle-card');
+            cards.forEach((card, index) => {
+                card.setAttribute('data-vehicle-index', index);
+                
+                const badge = card.querySelector('.vehicle-number-badge');
+                if (badge) badge.textContent = index + 1;
+
+                const removeBtn = card.querySelector('.remove-vehicle-btn');
+                if (removeBtn) {
+                    if (cards.length > 1) {
+                        removeBtn.classList.remove('d-none');
+                    } else {
+                        removeBtn.classList.add('d-none');
+                    }
+                }
+
+                const collapseTrigger = card.querySelector('.vehicle-collapse-trigger');
+                const collapseBody = card.querySelector('.vehicle-collapse-body');
+                const targetId = `vehicleCollapse_${index}`;
+
+                if (collapseTrigger && collapseBody) {
+                    collapseBody.setAttribute('id', targetId);
+                    collapseTrigger.setAttribute('data-bs-target', `#${targetId}`);
+                    collapseTrigger.setAttribute('aria-controls', targetId);
+                }
+
+                card.querySelectorAll('[name]').forEach(input => {
+                    const oldName = input.getAttribute('name');
+                    if (oldName) {
+                        const newName = oldName.replace(/vehicles\[\d+\]/, `vehicles[${index}]`);
+                        input.setAttribute('name', newName);
+                    }
+                });
+
+                card.querySelectorAll('[id]').forEach(elem => {
+                    const oldId = elem.getAttribute('id');
+                    if (oldId && oldId.startsWith('v') && !elem.classList.contains('vehicle-collapse-body')) {
+                        const newId = oldId.replace(/^v\d+_/, `v${index}_`);
+                        elem.setAttribute('id', newId);
+                    }
+                });
+
+                card.querySelectorAll('label[for]').forEach(elem => {
+                    const oldFor = elem.getAttribute('for');
+                    if (oldFor && oldFor.startsWith('v')) {
+                        const newFor = oldFor.replace(/^v\d+_/, `v${index}_`);
+                        elem.setAttribute('for', newFor);
+                    }
+                });
+            });
+        }
+
+        // --- ATTACH ALL DOM EVENTS TO A VEHICLE CARD ---
+        function attachVehicleEvents(card) {
+            const typeSelect = card.querySelector('.type-select');
+            const brandSelect = card.querySelector('.brand-select');
+            const modelSelect = card.querySelector('.model-select');
+            const yearSelect = card.querySelector('.year-select');
+            const plateInput = card.querySelector('.plate-input');
+            const mechanicSelect = card.querySelector('.mechanic-select');
+            const searchInput = card.querySelector('.service-search-input');
+            const serviceNoteInput = card.querySelector('.price-adjustment-note-input');
+
+            if (typeSelect) {
+                typeSelect.addEventListener('change', function() {
+                    filterOptionsByVehicleType(card);
+                    updateVehicleCardHeader(card);
+                });
+            }
+
+            if (brandSelect) {
+                brandSelect.addEventListener('change', function() {
+                    updateModelDropdown(brandSelect);
+                    updateVehicleCardHeader(card);
+                    calculateGrandTotal();
+                });
+            }
+
+            // AUTO-SELECT VEHICLE TYPE & POPULATE ACCURATE YEARS WHEN MODEL IS SELECTED
+            if (modelSelect) {
+                modelSelect.addEventListener('change', function() {
+                    const selectedOpt = modelSelect.options[modelSelect.selectedIndex];
+                    const autoType = selectedOpt ? selectedOpt.getAttribute('data-type') : null;
+
+                    if (autoType && typeSelect) {
+                        typeSelect.value = autoType;
+                        typeSelect.dispatchEvent(new Event('change'));
                     }
 
-                    newCard.querySelectorAll('.service-options-panel').forEach(panel => panel.classList.add('d-none'));
+                    // Dynamically update Year dropdown based on model range
+                    if (yearSelect && selectedOpt) {
+                        const yStart = parseInt(selectedOpt.getAttribute('data-year-start')) || 1990;
+                        const yEnd = parseInt(selectedOpt.getAttribute('data-year-end')) || new Date().getFullYear();
 
-                    const totalDisplay = newCard.querySelector('.vehicle-total-display');
-                    if (totalDisplay) totalDisplay.textContent = 'Total: ₱0.00';
-
-                    const statusLabel = newCard.querySelector('.vehicle-status-label');
-                    if (statusLabel) {
-                        statusLabel.textContent = 'Not yet filled';
-                        statusLabel.className = 'fw-semibold text-secondary small vehicle-status-label';
+                        yearSelect.innerHTML = '<option value="" disabled selected>Select Year</option>';
+                        for (let y = yEnd; y >= yStart; y--) {
+                            const opt = document.createElement('option');
+                            opt.value = y;
+                            opt.textContent = y;
+                            yearSelect.appendChild(opt);
+                        }
+                        yearSelect.disabled = false;
                     }
 
-                    vehiclesContainer.appendChild(newCard);
-                    filterOptionsByVehicleType(newCard);
+                    updateVehicleCardHeader(card);
+                    calculateGrandTotal();
+                });
+            }
+
+            if (plateInput) {
+                plateInput.addEventListener('input', function() {
+                    updateVehicleCardHeader(card);
+                    calculateGrandTotal();
+                });
+            }
+
+            if (mechanicSelect) {
+                mechanicSelect.addEventListener('change', function() {
+                    calculateGrandTotal();
+                });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    filterOptionsByVehicleType(card);
+                });
+            }
+
+            if (serviceNoteInput) {
+                serviceNoteInput.addEventListener('input', function() {
+                    calculateGrandTotal();
+                });
+            }
+
+            card.querySelectorAll('.service-checkbox').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    calculateVehicleTotal(card);
+                    calculateGrandTotal();
+                });
+            });
+
+            card.querySelectorAll('.service-option-input').forEach(opt => {
+                opt.addEventListener('change', function() {
+                    calculateVehicleTotal(card);
+                    calculateGrandTotal();
+                });
+            });
+
+            const removeBtn = card.querySelector('.remove-vehicle-btn');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function() {
+                    card.remove();
                     reindexVehicleCards();
                     calculateGrandTotal();
                 });
+            }
+        }
 
-                // REMOVE VEHICLE HANDLER
-                vehiclesContainer.addEventListener('click', function (e) {
-                    const removeBtn = e.target.closest('.remove-vehicle-btn');
-                    if (removeBtn) {
-                        const card = removeBtn.closest('.vehicle-card');
-                        card.remove();
-                        reindexVehicleCards();
-                        calculateGrandTotal();
+        // --- DYNAMIC ADD VEHICLE CARD BUTTON ---
+        if (addVehicleBtn) {
+            addVehicleBtn.addEventListener('click', function() {
+                const firstCard = document.querySelector('.vehicle-card');
+                if (!firstCard) return;
+
+                document.querySelectorAll('.vehicle-card').forEach(existingCard => {
+                    const collapseBody = existingCard.querySelector('.vehicle-collapse-body');
+                    if (collapseBody && collapseBody.classList.contains('show')) {
+                        const bsCollapse = bootstrap.Collapse.getInstance(collapseBody) || new bootstrap.Collapse(collapseBody, { toggle: false });
+                        bsCollapse.hide();
                     }
                 });
-            }
 
-            function reindexVehicleCards() {
-                const cards = vehiclesContainer.querySelectorAll('.vehicle-card');
-                cards.forEach((card, idx) => {
-                    const badge = card.querySelector('.vehicle-number-badge');
-                    if (badge) badge.textContent = idx + 1;
+                const newCard = firstCard.cloneNode(true);
 
-                    const removeBtn = card.querySelector('.remove-vehicle-btn');
-                    if (removeBtn) {
-                        if (cards.length === 1) {
-                            removeBtn.classList.add('d-none');
-                        } else {
-                            removeBtn.classList.remove('d-none');
-                        }
-                    }
-                });
-            }
-
-            // DYNAMIC LISTENERS FOR BRAND, VEHICLE TYPE, OPTIONS
-            document.addEventListener('change', function (e) {
-                if (e.target.classList.contains('brand-select')) {
-                    const card = e.target.closest('.vehicle-card');
-                    const modelSelect = card.querySelector('.model-select');
-                    const brand = e.target.value;
-
-                    modelSelect.innerHTML = '<option value="" disabled selected>Select Model</option>';
-
-                    let modelList = [];
-                    if (window.VEHICLE_MODELS && window.VEHICLE_MODELS[brand]) {
-                        modelList = window.VEHICLE_MODELS[brand].map(m => typeof m === 'object' ? m.model_name : m);
-                    } else if (DEFAULT_MODELS[brand]) {
-                        modelList = DEFAULT_MODELS[brand];
-                    }
-
-                    if (modelList.length > 0) {
-                        modelList.forEach(model => {
-                            const opt = document.createElement('option');
-                            opt.value = model;
-                            opt.textContent = model;
-                            modelSelect.appendChild(opt);
-                        });
-                        modelSelect.disabled = false;
+                newCard.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
+                    if (input.classList.contains('service-price-input') || input.classList.contains('vehicle-total-cost-input')) {
+                        input.value = '0.00';
                     } else {
-                        modelSelect.innerHTML = '<option value="" disabled selected>No models available</option>';
-                        modelSelect.disabled = true;
+                        input.value = '';
                     }
-                    updateVehicleStatus(card);
-                    calculateGrandTotal();
-                }
-
-                // VEHICLE TYPE CHANGE: FILTER PRICING OPTIONS & SERVICES
-                if (e.target.classList.contains('type-select')) {
-                    const card = e.target.closest('.vehicle-card');
-                    if (card) {
-                        filterOptionsByVehicleType(card);
-                        updateVehicleStatus(card);
-                        calculateGrandTotal();
-                    }
-                }
-
-                // SERVICE CHECKBOX TOGGLE
-                if (e.target.classList.contains('service-checkbox')) {
-                    const card = e.target.closest('.vehicle-card');
-                    const serviceCard = e.target.closest('.service-card-item');
-                    const optionsPanel = serviceCard.querySelector('.service-options-panel');
-
-                    if (e.target.checked) {
-                        if (optionsPanel) {
-                            optionsPanel.classList.remove('d-none');
-                            if (card) filterOptionsByVehicleType(card);
-                        }
-                    } else {
-                        if (optionsPanel) {
-                            optionsPanel.classList.add('d-none');
-                            optionsPanel.querySelectorAll('.service-option-input').forEach(opt => opt.checked = false);
-                        }
-                    }
-                    calculateGrandTotal();
-                }
-
-                // OPTION / FIELD CHANGES
-                if (e.target.classList.contains('service-option-input') || 
-                    e.target.classList.contains('model-select') || 
-                    e.target.classList.contains('year-select') || 
-                    e.target.classList.contains('mechanic-select')) {
-                    const card = e.target.closest('.vehicle-card');
-                    if (card) updateVehicleStatus(card);
-                    calculateGrandTotal();
-                }
-            });
-
-            document.addEventListener('input', function(e) {
-                if (e.target.classList.contains('plate-input')) {
-                    const card = e.target.closest('.vehicle-card');
-                    if (card) updateVehicleStatus(card);
-                    calculateGrandTotal();
-                }
-
-                if (e.target.id === 'customer_name' || e.target.id === 'customer_phone') {
-                    updateCustomerPreview();
-                }
-            });
-
-            // CODE GENERATOR
-            if (generateCodeBtn) {
-                generateCodeBtn.addEventListener('click', function () {
-                    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                    let code = 'SPD26-';
-                    for (let i = 0; i < 6; i++) {
-                        code += chars.charAt(Math.floor(Math.random() * chars.length));
-                    }
-                    if (trackingCodeInput) trackingCodeInput.value = code;
-                    if (previewCode) previewCode.textContent = code;
                 });
-            }
 
-            function updateCustomerPreview() {
-                const previewCustomer = document.getElementById('previewCustomer');
-                const previewPhone = document.getElementById('previewPhone');
+                const newPlateInput = newCard.querySelector('.plate-input');
+                if (newPlateInput) newPlateInput.value = '';
 
-                if (previewCustomer) {
-                    previewCustomer.textContent = customerNameInput && customerNameInput.value.trim() !== '' 
-                        ? customerNameInput.value.trim() 
-                        : '---';
-                }
-                if (previewPhone) {
-                    previewPhone.textContent = customerPhoneInput && customerPhoneInput.value.trim() !== '' 
-                        ? customerPhoneInput.value.trim() 
-                        : '---';
-                }
-            }
+                newCard.querySelectorAll('select').forEach(select => {
+                    select.selectedIndex = 0;
+                    if (select.classList.contains('model-select')) {
+                        select.disabled = true;
+                        select.innerHTML = '<option value="" disabled selected>Select Brand First</option>';
+                    }
+                    if (select.classList.contains('year-select')) {
+                        select.disabled = true;
+                        select.innerHTML = '<option value="" disabled selected>Select Model First</option>';
+                    }
+                });
 
-            function updateVehicleStatus(vehicleCard) {
-                const plate = vehicleCard.querySelector('.plate-input')?.value.trim();
-                const brand = vehicleCard.querySelector('.brand-select')?.value;
-                const statusLabel = vehicleCard.querySelector('.vehicle-status-label');
+                newCard.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(chk => {
+                    chk.checked = false;
+                });
 
+                newCard.querySelectorAll('.service-options-panel').forEach(panel => {
+                    panel.classList.add('d-none');
+                });
+
+                const statusLabel = newCard.querySelector('.vehicle-status-label');
                 if (statusLabel) {
-                    if (plate && brand) {
-                        statusLabel.textContent = `${brand} (${plate.toUpperCase()})`;
-                        statusLabel.className = 'fw-semibold text-success small vehicle-status-label';
-                    } else if (plate) {
-                        statusLabel.textContent = plate.toUpperCase();
-                        statusLabel.className = 'fw-semibold text-primary small vehicle-status-label';
-                    } else {
-                        statusLabel.textContent = 'Not yet filled';
-                        statusLabel.className = 'fw-semibold text-secondary small vehicle-status-label';
-                    }
-                }
-            }
-
-            // CALCULATION & RECEIPT RENDERER
-            function calculateGrandTotal() {
-                const vehicleCards = document.querySelectorAll('.vehicle-card');
-                let grandTotal = 0;
-                const receiptVehiclesContainer = document.getElementById('previewVehiclesContainer');
-                let receiptHTML = '';
-
-                vehicleCards.forEach((card, idx) => {
-                    let vehicleTotal = 0;
-                    const plate = card.querySelector('.plate-input')?.value.trim().toUpperCase() || 'UNREGISTERED';
-                    const brand = card.querySelector('.brand-select')?.value || '';
-                    const model = card.querySelector('.model-select')?.value || '';
-                    const type = card.querySelector('.type-select')?.value || '';
-                    const year = card.querySelector('.year-select')?.value || '';
-                    const mechanic = card.querySelector('.mechanic-select')?.value || '';
-
-                    let selectedServicesList = [];
-
-                    card.querySelectorAll('.service-card-item').forEach(serviceCard => {
-                        // Skip completely hidden services
-                        if (window.getComputedStyle(serviceCard).display === 'none') {
-                            return;
-                        }
-
-                        const checkbox = serviceCard.querySelector('.service-checkbox');
-                        const flatPrice = parseFloat(serviceCard.getAttribute('data-flat-price')) || 0;
-                        const priceInput = serviceCard.querySelector('.service-price-input');
-                        const serviceName = serviceCard.querySelector('.fw-bold')?.textContent.trim() || 'Service';
-
-                        let serviceTotal = 0;
-                        let selectedOptionsText = [];
-
-                        if (checkbox && checkbox.checked) {
-                            serviceTotal += flatPrice;
-
-                            // Only calculate options that are checked AND currently visible
-                            const selectedOptions = serviceCard.querySelectorAll('.service-option-input:checked');
-                            selectedOptions.forEach(opt => {
-                                const optItem = opt.closest('.subservice-option-item');
-                                if (optItem && window.getComputedStyle(optItem).display !== 'none') {
-                                    const optPrice = parseFloat(opt.getAttribute('data-price')) || 0;
-                                    const optLabel = opt.getAttribute('data-label') || '';
-                                    serviceTotal += optPrice;
-                                    if (optLabel) selectedOptionsText.push(`${optLabel} (₱${optPrice.toFixed(2)})`);
-                                }
-                            });
-
-                            if (priceInput) priceInput.value = serviceTotal.toFixed(2);
-                            vehicleTotal += serviceTotal;
-
-                            let detailString = serviceName;
-                            if (flatPrice > 0 && selectedOptionsText.length === 0) {
-                                detailString += ` - ₱${flatPrice.toFixed(2)}`;
-                            } else if (selectedOptionsText.length > 0) {
-                                detailString += ` (${selectedOptionsText.join(', ')})`;
-                            }
-
-                            selectedServicesList.push({
-                                name: detailString,
-                                cost: serviceTotal
-                            });
-                        } else {
-                            if (priceInput) priceInput.value = '0.00';
-                        }
-                    });
-
-                    // Update Hidden Input & Total Display
-                    const vehicleTotalInput = card.querySelector('.vehicle-total-cost-input');
-                    if (vehicleTotalInput) vehicleTotalInput.value = vehicleTotal.toFixed(2);
-
-                    const totalDisplay = card.querySelector('.vehicle-total-display');
-                    if (totalDisplay) totalDisplay.textContent = `Total: ₱${vehicleTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-                    grandTotal += vehicleTotal;
-
-                    // Receipt Item Render
-                    const vehicleTitle = [brand, model, type, year].filter(Boolean).join(' ') || `Vehicle #${idx + 1}`;
-
-                    receiptHTML += `
-                        <div class="border rounded-3 p-3 bg-light-subtle">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="fw-bold text-dark small">${idx + 1}. ${vehicleTitle}</span>
-                                <span class="badge bg-secondary font-monospace">${plate}</span>
-                            </div>
-                            ${mechanic ? `<div class="small text-muted mb-2"><i class="bi bi-person-badge me-1"></i>Tech: ${mechanic}</div>` : ''}
-                            
-                            <div class="border-top pt-2 mt-1">
-                                ${selectedServicesList.length > 0 ? selectedServicesList.map(s => `
-                                    <div class="d-flex justify-content-between align-items-center small mb-1">
-                                        <span class="text-secondary text-truncate me-2" style="max-width: 75%;">${s.name}</span>
-                                        <span class="font-monospace fw-semibold text-dark">₱${s.cost.toFixed(2)}</span>
-                                    </div>
-                                `).join('') : '<div class="small text-muted fst-italic">No services selected</div>'}
-                            </div>
-                            
-                            <div class="d-flex justify-content-between align-items-center pt-2 mt-2 border-top small fw-bold text-dark">
-                                <span>Subtotal:</span>
-                                <span class="text-primary font-monospace fs-6">₱${vehicleTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                // Update Header Summary & Receipt Totals
-                const vehiclesHeaderSummary = document.getElementById('vehiclesHeaderSummary');
-                if (vehiclesHeaderSummary) {
-                    vehiclesHeaderSummary.textContent = `(${vehicleCards.length} vehicle${vehicleCards.length > 1 ? 's' : ''} · Grand Total: ₱${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`;
+                    statusLabel.textContent = 'Not yet filled';
+                    statusLabel.classList.remove('text-speed-blue', 'fw-bold');
+                    statusLabel.classList.add('text-secondary');
                 }
 
-                if (receiptVehiclesContainer) {
-                    receiptVehiclesContainer.innerHTML = receiptHTML || '<p class="text-muted small mb-0">No vehicle details or services selected yet.</p>';
+                const newCollapseBody = newCard.querySelector('.vehicle-collapse-body');
+                if (newCollapseBody) {
+                    newCollapseBody.classList.add('show');
                 }
 
-                const previewTotal = document.getElementById('previewTotal');
-                if (previewTotal) {
-                    previewTotal.textContent = `₱${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                }
-            }
+                vehiclesContainer.appendChild(newCard);
+
+                reindexVehicleCards();
+                attachVehicleEvents(newCard);
+                filterOptionsByVehicleType(newCard);
+                calculateGrandTotal();
+
+                newCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
+
+        // --- INITIALIZATION ON PAGE LOAD ---
+        document.querySelectorAll('.vehicle-card').forEach(card => {
+            attachVehicleEvents(card);
+            filterOptionsByVehicleType(card);
         });
-    </script>
+
+        updateCustomerPreview();
+        calculateGrandTotal();
+    });
+</script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpeedLane - Transaction Records</title>
+    <title>SpeedLane - Transaction Records & Reports</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -11,39 +11,325 @@
     <!-- Custom Admin CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     <style>
-        .stat-card { border-radius: 12px; border: 1px solid #e9ecef; }
-        .stat-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        :root {
+            --speed-pink: #f42582;
+            --speed-blue: #00a2ff;
+            --speed-dark-bg: #07090e;
+            --speed-card-bg: #0e111a;
+            --speed-card-border: rgba(255, 255, 255, 0.08);
+            --speed-sidebar-bg: #0a0d16;
+        }
+
+        body {
+            background-color: var(--speed-dark-bg) !important;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%) !important;
+            background-attachment: fixed;
+        }
+
+        /* Color Utility Classes */
+        .text-speed-pink { color: var(--speed-pink) !important; }
+        .text-speed-blue { color: var(--speed-blue) !important; }
+        .bg-speed-pink { background-color: var(--speed-pink) !important; }
+        .bg-speed-blue { background-color: var(--speed-blue) !important; }
+
+        /* Role Badge Styling */
+        .badge-super-admin {
+            background-color: rgba(244, 37, 130, 0.18) !important;
+            color: #ffb3d9 !important;
+            border: 1px solid rgba(244, 37, 130, 0.5) !important;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-admin {
+            background-color: rgba(0, 162, 255, 0.18) !important;
+            color: #99dbff !important;
+            border: 1px solid rgba(0, 162, 255, 0.5) !important;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Assigned Mechanic Badge Styling */
+        .badge-mechanic {
+            background-color: rgba(0, 162, 255, 0.18) !important;
+            color: #7dd3fc !important;
+            border: 1px solid rgba(0, 162, 255, 0.4) !important;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            box-shadow: 0 0 10px rgba(0, 162, 255, 0.1);
+        }
+
+        /* Top Navigation Header */
+        .navbar-speed {
+            background: rgba(7, 9, 14, 0.95);
+            border-bottom: 1px solid var(--speed-card-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .brand-logo-text {
+            font-size: 1.35rem;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            font-style: italic;
+            line-height: 1;
+        }
+
+        .brand-subtext {
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+
+        /* Sidebar Styling */
+        .admin-sidebar {
+            background-color: var(--speed-sidebar-bg) !important;
+            border-right: 1px solid var(--speed-card-border) !important;
+        }
+
+        .admin-nav-link {
+            color: #94a3b8 !important;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border: 1px solid transparent;
+        }
+
+        .admin-nav-link:hover {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .admin-nav-link.active {
+            background: linear-gradient(90deg, rgba(244, 37, 130, 0.15) 0%, rgba(0, 162, 255, 0.15) 100%) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(244, 37, 130, 0.3) !important;
+            box-shadow: 0 0 15px rgba(244, 37, 130, 0.15);
+        }
+
+        /* Speed Card Theme */
+        .speed-card {
+            background-color: var(--speed-card-bg) !important;
+            border: 1px solid var(--speed-card-border) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Gradient Action Buttons */
+        .btn-speed-gradient {
+            background: linear-gradient(90deg, var(--speed-pink) 0%, var(--speed-blue) 100%);
+            border: none;
+            color: #ffffff !important;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(244, 37, 130, 0.3);
+        }
+
+        .btn-speed-gradient:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
+        }
+
+        /* Inputs & Dropdowns */
+        .form-control-dark, .form-select-dark {
+            background-color: #06080d !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            transition: all 0.25s ease;
+        }
+
+        .form-control-dark:focus, .form-select-dark:focus {
+            border-color: var(--speed-blue) !important;
+            box-shadow: 0 0 12px rgba(0, 162, 255, 0.25) !important;
+            color: #ffffff !important;
+        }
+
+        .form-control-dark::placeholder {
+            color: #64748b !important;
+        }
+
+        .input-group-text-dark {
+            background-color: #090c14 !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-right: none !important;
+            color: var(--speed-blue) !important;
+        }
+
+        .input-group .form-control-dark {
+            border-left: none !important;
+        }
+
+        /* High Visibility Logout Button */
+        .btn-logout {
+            color: #ff6b81 !important;
+            border: 1px solid rgba(255, 107, 129, 0.4) !important;
+            background: rgba(255, 107, 129, 0.05);
+            transition: all 0.25s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 107, 129, 0.2) !important;
+            color: #ffffff !important;
+            border-color: #ff6b81 !important;
+        }
+
+        /* Custom Table Styling for Dark Theme */
+        .custom-admin-table {
+            color: #e2e8f0;
+        }
+        .custom-admin-table th {
+            background-color: rgba(6, 8, 13, 0.8) !important;
+            color: #cbd5e1 !important;
+            border-bottom: 1px solid var(--speed-card-border) !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+        }
+        .custom-admin-table td {
+            background-color: transparent !important;
+            color: #e2e8f0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+            padding: 14px 16px;
+            vertical-align: middle;
+        }
+        .custom-admin-table tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02) !important;
+        }
+
+        /* Stat Icon */
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .extra-small { font-size: 0.75rem; }
+
+        /* Report Option Cards in Modal */
+        .report-card-option {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #06080d;
+        }
+        .report-card-option:hover {
+            border-color: var(--speed-blue);
+            box-shadow: 0 4px 15px rgba(0, 162, 255, 0.15);
+            transform: translateY(-1px);
+        }
+        .form-check-input:checked + .report-card-label .report-card-option {
+            border-color: var(--speed-pink) !important;
+            background-color: rgba(244, 37, 130, 0.08) !important;
+            box-shadow: 0 0 15px rgba(244, 37, 130, 0.2);
+        }
+
+        /* Modal Dark Theme Overrides */
+        .modal-content-dark {
+            background-color: var(--speed-card-bg) !important;
+            border: 1px solid var(--speed-card-border) !important;
+            color: #e2e8f0;
+        }
+
+        /* Printable area styles for PDF/Print preview */
+        .printable-area {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm;
+            }
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            body * { 
+                visibility: hidden !important; 
+            }
+            .print-active, .print-active * { 
+                visibility: visible !important; 
+            }
+            .print-active { 
+                position: absolute !important; 
+                left: 0 !important; 
+                top: 0 !important; 
+                width: 100% !important; 
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important; 
+                color: #000000 !important;
+                transform: none !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            .modal, .modal-dialog, .modal-content, .modal-body {
+                position: static !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                transform: none !important;
+                overflow: visible !important;
+                display: block !important;
+            }
+            .no-print, .modal-header, .modal-footer, .btn-close, .navbar, aside, main > *:not(.modal) { 
+                display: none !important; 
+            }
+        }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
     <!-- Header Navigation -->
-    <header class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-2 sticky-top shadow-sm">
+    <header class="navbar navbar-expand-lg navbar-dark navbar-speed px-4 py-2 sticky-top" style="z-index: 1020;">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('admin.dashboard') }}">
-                <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                <div class="bg-speed-pink text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                     <i class="bi bi-car-front-fill fs-6"></i>
                 </div>
                 <div>
-                    <span class="fw-bold text-primary fs-5 d-block lh-1">SpeedLane</span>
-                    <span class="text-muted small">Admin Panel</span>
+                    <span class="brand-logo-text d-block">
+                        <span class="text-speed-pink">SPEED</span><span class="text-speed-blue">LANE</span>
+                    </span>
+                    <span class="brand-subtext d-block">ADMIN OVERVIEW</span>
                 </div>
             </a>
 
             <div class="d-flex align-items-center gap-3 ms-auto">
-                @if(auth()->check() && auth()->user()->isSuperAdmin())
-                    <span class="badge bg-light text-primary border border-primary px-3 py-2 rounded-pill">
-                        <i class="bi bi-shield-check me-1"></i> Super Admin
-                    </span>
-                @else
-                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
-                        <i class="bi bi-person-badge text-primary me-1"></i> Admin
-                    </span>
+                @if(auth()->check())
+                    @if(method_exists(auth()->user(), 'isSuperAdmin') && auth()->user()->isSuperAdmin())
+                        <span class="badge badge-super-admin px-3 py-2 rounded-pill d-flex align-items-center gap-1">
+                            <i class="bi bi-shield-check me-1"></i>
+                            <span>{{ auth()->user()->name }}</span>
+                            <span class="ms-1" style="font-size: 0.85em;">(Super Admin)</span>
+                        </span>
+                    @else
+                        <span class="badge badge-admin px-3 py-2 rounded-pill d-flex align-items-center gap-1">
+                            <i class="bi bi-person-badge me-1"></i>
+                            <span>{{ auth()->user()->name }}</span>
+                            <span class="ms-1" style="font-size: 0.85em;">(Admin)</span>
+                        </span>
+                    @endif
                 @endif
 
                 <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
                     @csrf
-                    <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-1">
+                    <button type="submit" class="btn btn-logout btn-sm px-3 rounded-3 d-flex align-items-center gap-1">
                         <i class="bi bi-box-arrow-right"></i> Logout
                     </button>
                 </form>
@@ -55,24 +341,24 @@
         <div class="row">
             
             <!-- Sidebar Navigation -->
-            <aside class="col-md-3 col-lg-2 bg-white border-end min-vh-100 p-3">
+            <aside class="col-md-3 col-lg-2 admin-sidebar min-vh-100 p-3">
                 <nav class="nav flex-column gap-2">
-                    <a class="nav-link text-dark rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.dashboard') }}">
-                        <i class="bi bi-grid-fill"></i> Dashboard
+                    <a class="nav-link admin-nav-link rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.dashboard') }}">
+                        <i class="bi bi-grid-fill text-speed-pink"></i> Dashboard
                     </a>
-                    <a class="nav-link text-dark rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.register-service') }}">
-                        <i class="bi bi-plus-circle"></i> Register Service
+                    <a class="nav-link admin-nav-link rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.register-service') }}">
+                        <i class="bi bi-plus-circle text-speed-blue"></i> Register Service
                     </a>
-                    <a class="nav-link text-dark rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.update') }}">
-                        <i class="bi bi-arrow-repeat"></i> Update Service Status
+                    <a class="nav-link admin-nav-link rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.update') }}">
+                        <i class="bi bi-arrow-repeat text-warning"></i> Update Service Status
                     </a>
-                    <a class="nav-link active bg-primary text-white rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.transactions') }}">
-                        <i class="bi bi-file-earmark-text"></i> Transaction Records
+                    <a class="nav-link admin-nav-link active rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.transactions') }}">
+                        <i class="bi bi-file-earmark-text text-speed-blue"></i> Transaction Records
                     </a>
 
-                    @if(auth()->check() && auth()->user()->isSuperAdmin())
-                        <a class="nav-link text-dark rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.manage-services.index') }}">
-                            <i class="bi bi-gear-fill"></i> Manage Services
+                    @if(auth()->check() && method_exists(auth()->user(), 'isSuperAdmin') && auth()->user()->isSuperAdmin())
+                        <a class="nav-link admin-nav-link rounded-3 px-3 py-2 d-flex align-items-center gap-2" href="{{ route('admin.manage-services.index') }}">
+                            <i class="bi bi-gear-fill text-speed-pink"></i> Manage Services
                         </a>
                     @endif
                 </nav>
@@ -83,121 +369,114 @@
                 
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                     <div>
-                        <h2 class="fw-bold text-dark mb-1">Transaction Records</h2>
-                        <p class="text-muted mb-0">View all completed service transactions, search records, and generate reports.</p>
+                        <h3 class="fw-bold text-white mb-1">Transaction Records & Executive Reports</h3>
+                        <p class="text-secondary mb-0 small">View transaction history, analyze technician performance, and generate business decision reports.</p>
                     </div>
 
-                    <!-- Reports Action Dropdown -->
-                    <div class="dropdown">
-                        <button class="btn btn-primary rounded-3 px-3 py-2 fw-semibold d-flex align-items-center gap-2 dropdown-toggle shadow-sm" type="button" id="reportsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-file-earmark-bar-graph"></i> Generate Report
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2" aria-labelledby="reportsDropdown">
-                            <li>
-                                <button class="dropdown-item rounded-2 py-2 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#weeklyReportModal">
-                                    <i class="bi bi-calendar-week text-primary"></i> Weekly Report
-                                </button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item rounded-2 py-2 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#monthlyReportModal">
-                                    <i class="bi bi-calendar-month text-success"></i> Monthly Report
-                                </button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item rounded-2 py-2 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#yearlyReportModal">
-                                    <i class="bi bi-calendar3 text-warning"></i> Yearly Report
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
+                    <!-- Generate Report Modal Trigger Button -->
+                    <button class="btn btn-speed-gradient rounded-3 px-3 py-2 fw-semibold d-flex align-items-center gap-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#generateReportModal">
+                        <i class="bi bi-bar-chart-line-fill"></i> Generate Business Report
+                    </button>
                 </div>
 
                 <!-- Stats Overview Cards -->
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
-                        <div class="card stat-card p-3 bg-white shadow-sm d-flex flex-row justify-content-between align-items-center">
+                        <div class="card speed-card p-3 rounded-4 d-flex flex-row justify-content-between align-items-center">
                             <div>
-                                <span class="text-muted small d-block mb-1">Completed Transactions</span>
-                                <h3 class="fw-bold text-dark mb-0">{{ $completedCount ?? $completedTransactions ?? $transactions->count() }}</h3>
+                                <span class="text-secondary small d-block mb-1">Completed Services</span>
+                                <h3 class="fw-bold text-white mb-0">{{ $completedCount ?? $transactions->count() }}</h3>
                             </div>
-                            <div class="stat-icon bg-primary-subtle text-primary fs-4">
-                                <i class="bi bi-file-earmark-text-fill"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card stat-card p-3 bg-white shadow-sm d-flex flex-row justify-content-between align-items-center">
-                            <div>
-                                <span class="text-muted small d-block mb-1">Status</span>
-                                <h3 class="fw-bold text-success mb-0">All Completed</h3>
-                            </div>
-                            <div class="stat-icon bg-success-subtle text-success fs-4">
+                            <div class="stat-icon bg-speed-pink text-white fs-4 shadow-sm">
                                 <i class="bi bi-check-circle-fill"></i>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card stat-card p-3 bg-white shadow-sm d-flex flex-row justify-content-between align-items-center">
+                        <div class="card speed-card p-3 rounded-4 d-flex flex-row justify-content-between align-items-center">
                             <div>
-                                <span class="text-muted small d-block mb-1">Total Revenue</span>
-                                <h3 class="fw-bold text-primary mb-0">₱{{ number_format($totalRevenue ?? $transactions->sum('total_cost') ?? 0, 2) }}</h3>
+                                <span class="text-secondary small d-block mb-1">Status Scope</span>
+                                <h3 class="fw-bold mb-0" style="color: #4ade80 !important;">Completed Only</h3>
+                            </div>
+                            <div class="stat-icon bg-success bg-opacity-20 fs-4 border border-success border-opacity-25" style="color: #4ade80 !important;">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card speed-card p-3 rounded-4 d-flex flex-row justify-content-between align-items-center">
+                            <div>
+                                <span class="text-secondary small d-block mb-1">Total Revenue</span>
+                                <h3 class="fw-bold text-speed-blue mb-0">₱{{ number_format($totalRevenue ?? 0, 2) }}</h3>
+                            </div>
+                            <div class="stat-icon bg-speed-blue text-white fs-4 shadow-sm">
+                                <i class="bi bi-cash-stack"></i>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Search and Filter Bar Card -->
-                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
-                    <form method="GET" action="{{ route('admin.transactions') }}">
+                <!-- Dynamic Search and Filter Bar -->
+                <div class="card speed-card rounded-4 p-3 mb-4">
+                    <form method="GET" action="{{ route('admin.transactions') }}" id="searchFilterForm">
                         <div class="row g-2">
-                            <!-- Search Input (Customer Name, Tracking Code, Vehicle) -->
-                            <div class="col-md-4">
-                                <label class="form-label small fw-semibold text-muted mb-1">Search Keywords</label>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold text-light opacity-75 mb-1">Search Records</label>
                                 <div class="input-group input-group-sm">
-                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-                                    <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Customer name, tracking code, vehicle model..." value="{{ request('search') }}">
+                                    <span class="input-group-text input-group-text-dark"><i class="bi bi-search text-speed-blue"></i></span>
+                                    <input type="text" name="search" id="transactionSearchInput" class="form-control form-control-dark" placeholder="Customer, mechanic, plate, code..." value="{{ request('search') }}">
                                 </div>
                             </div>
 
-                            <!-- Vehicle Type Filter -->
                             <div class="col-md-2">
-                                <label class="form-label small fw-semibold text-muted mb-1">Vehicle Type</label>
-                                <select name="vehicle_type" class="form-select form-select-sm bg-light">
+                                <label class="form-label small fw-semibold text-light opacity-75 mb-1">Vehicle Type</label>
+                                <select name="vehicle_type" class="form-select form-select-sm form-select-dark">
                                     <option value="">All Vehicles</option>
-                                    <option value="Sedan" {{ request('vehicle_type') == 'Sedan' ? 'selected' : '' }}>Sedan</option>
-                                    <option value="SUV" {{ request('vehicle_type') == 'SUV' ? 'selected' : '' }}>SUV</option>
-                                    <option value="Pickup / Truck" {{ request('vehicle_type') == 'Pickup / Truck' ? 'selected' : '' }}>Pickup / Truck</option>
-                                    <option value="Van / MPV" {{ request('vehicle_type') == 'Van / MPV' ? 'selected' : '' }}>Van / MPV</option>
+                                    @if(isset($vehicleTypes) && count($vehicleTypes) > 0)
+                                        @foreach($vehicleTypes as $vType)
+                                            <option value="{{ $vType }}" {{ request('vehicle_type') == $vType ? 'selected' : '' }}>{{ $vType }}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
                             </div>
 
-                            <!-- Service Type Filter -->
                             <div class="col-md-2">
-                                <label class="form-label small fw-semibold text-muted mb-1">Service Type</label>
-                                <select name="service_type" class="form-select form-select-sm bg-light">
+                                <label class="form-label small fw-semibold text-light opacity-75 mb-1">Vehicle Brand</label>
+                                <select name="brand" class="form-select form-select-sm form-select-dark">
+                                    <option value="">All Brands</option>
+                                    @if(isset($vehicleBrands) && count($vehicleBrands) > 0)
+                                        @foreach($vehicleBrands as $b)
+                                            <option value="{{ $b }}" {{ request('brand') == $b || request('vehicle_brand') == $b ? 'selected' : '' }}>{{ $b }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label small fw-semibold text-light opacity-75 mb-1">Service Type</label>
+                                <select name="service_type" class="form-select form-select-sm form-select-dark">
                                     <option value="">All Services</option>
-                                    @if(isset($availableServices))
+                                    @if(isset($availableServices) && count($availableServices) > 0)
                                         @foreach($availableServices as $srv)
-                                            <option value="{{ $srv->name ?? $srv }}" {{ request('service_type') == ($srv->name ?? $srv) ? 'selected' : '' }}>
-                                                {{ $srv->name ?? $srv }}
+                                            @php $srvName = is_object($srv) ? $srv->name : (is_array($srv) ? ($srv['name'] ?? '') : $srv); @endphp
+                                            <option value="{{ $srvName }}" {{ request('service_type') == $srvName ? 'selected' : '' }}>
+                                                {{ $srvName }}
                                             </option>
                                         @endforeach
                                     @endif
                                 </select>
                             </div>
 
-                            <!-- Date Range Filter -->
-                            <div class="col-md-2">
-                                <label class="form-label small fw-semibold text-muted mb-1">Date</label>
-                                <input type="date" name="date" class="form-control form-control-sm bg-light" value="{{ request('date') }}">
+                            <div class="col-md-1">
+                                <label class="form-label small fw-semibold text-light opacity-75 mb-1">Date</label>
+                                <input type="date" name="date" class="form-control form-control-sm form-control-dark" value="{{ request('date') }}">
                             </div>
 
-                            <!-- Filter & Reset Action Buttons -->
                             <div class="col-md-2 d-flex align-items-end gap-2">
-                                <button type="submit" class="btn btn-primary btn-sm rounded-3 w-100 fw-semibold">
-                                    <i class="bi bi-funnel"></i> Search
+                                <button type="submit" class="btn btn-speed-gradient btn-sm rounded-3 w-100 fw-semibold">
+                                    <i class="bi bi-funnel"></i> Filter
                                 </button>
-                                <a href="{{ route('admin.transactions') }}" class="btn btn-outline-secondary btn-sm rounded-3 px-3" title="Reset Filters">
+                                <a href="{{ route('admin.transactions') }}" class="btn btn-outline-light btn-sm rounded-3 px-3" title="Reset Filters">
                                     <i class="bi bi-arrow-counterclockwise"></i>
                                 </a>
                             </div>
@@ -205,155 +484,116 @@
                     </form>
                 </div>
 
-                <!-- Completed Transactions Table Card -->
-                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <!-- Completed Transactions Table -->
+                <div class="card speed-card rounded-4 p-4 mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                            <i class="bi bi-file-earmark-text text-primary"></i> Completed Transactions
+                        <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2 fs-6">
+                            <i class="bi bi-file-earmark-text text-speed-pink"></i> Service Records Log
                         </h5>
-                        <span class="badge bg-light text-muted border px-3 py-2 rounded-pill small">
+                        <span class="badge bg-black bg-opacity-50 text-secondary border border-secondary border-opacity-25 px-3 py-2 rounded-pill small">
                             Showing {{ $transactions->count() }} record(s)
                         </span>
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table align-middle custom-admin-table mb-0">
+                        <table class="table align-middle custom-admin-table mb-0" id="transactionsTable">
                             <thead>
-                                <tr class="text-secondary small border-bottom">
+                                <tr>
                                     <th>Tracking Code</th>
                                     <th>Customer Name</th>
-                                    <th>Contact Number</th>
-                                    <th>Vehicle (Brand/Model/Type/Year)</th>
-                                    <th>Technician</th>
+                                    <th>Contact</th>
+                                    <th>Vehicle</th>
                                     <th>Plate Number</th>
-                                    <th>Service Types</th>
+                                    <th>Assigned Mechanic</th>
+                                    <th>Services Completed</th>
                                     <th>Date Registered</th>
                                     <th>Date Completed</th>
                                     <th>Total Cost</th>
-                                    <th class="text-center pe-3">Receipt</th>
+                                    <th class="text-center pe-3">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($transactions as $service)
-                                    @php
-                                        // Dynamic Contact Phone Resolution
-                                        $contactPhone = $service->contact_number 
-                                            ?? $service->phone_number 
-                                            ?? $service->customer_phone 
-                                            ?? $service->phone 
-                                            ?? $service->contact 
-                                            ?? 'N/A';
+                              @forelse($transactions as $service)
+    @php
+        $mechanicName = $service->mechanic_assigned 
+            ?? ($service->technician->name ?? $service->technician->full_name ?? null)
+            ?? ($service->mechanic->name ?? $service->mechanic->full_name ?? null)
+            ?? $service->technician_name 
+            ?? $service->mechanic_name 
+            ?? 'Unassigned';
 
-                                        // Dynamic Vehicle Resolution (Brand/Model/Type/Year)
-                                        $vehiclesList = $service->vehicles ?? collect();
+        $customerName = $service->customer_name 
+            ?? ($service->customer->name ?? null)
+            ?? ($service->user->name ?? null)
+            ?? $service->client_name 
+            ?? $service->name 
+            ?? 'N/A';
 
-                                        $formatVeh = function($v) {
-                                            $brand = $v->vehicle_brand ?? $v->brand ?? $v->vehicle_make ?? '';
-                                            $model = $v->vehicle_model ?? $v->model ?? '';
-                                            $brandModel = trim($brand . ' ' . $model);
+        $contactPhone = $service->contact_number 
+            ?? $service->phone_number 
+            ?? $service->customer_phone 
+            ?? $service->phone 
+            ?? ($service->customer->phone ?? 'N/A');
 
-                                            $type = $v->vehicle_type ?? $v->type ?? '';
-                                            $year = $v->vehicle_year ?? $v->year ?? '';
+        $servicesArr = is_array($service->selected_services) 
+            ? $service->selected_services 
+            : json_decode($service->selected_services ?? '[]', true);
 
-                                            $parts = array_filter([$brandModel, $type, $year]);
-                                            return count($parts) > 0 ? implode(' ', $parts) : 'N/A';
-                                        };
+        if (!is_array($servicesArr)) {
+            $servicesArr = array_filter(explode(', ', (string)($service->selected_services ?? '')));
+        }
 
-                                        if ($vehiclesList->count() > 0) {
-                                            $vehicleSummary = $formatVeh($vehiclesList->first());
-                                            if ($vehiclesList->count() > 1) {
-                                                $vehicleSummary .= ' (+ ' . ($vehiclesList->count() - 1) . ' more)';
-                                            }
-                                        } else {
-                                            $vehicleSummary = $formatVeh($service);
-                                        }
+        $serviceNames = array_map(function($item) {
+            return is_array($item) ? ($item['name'] ?? '') : $item;
+        }, $servicesArr ?? []);
+        $serviceNames = array_filter($serviceNames);
 
-                                        $mechanics = $vehiclesList->count() > 0 
-                                            ? $vehiclesList->pluck('mechanic_assigned')->filter()->unique()->implode(', ')
-                                            : ($service->mechanic_assigned ?? 'Unassigned');
-
-                                        $plates = $vehiclesList->count() > 0 
-                                            ? $vehiclesList->pluck('plate_number')->filter()->implode(', ')
-                                            : ($service->plate_number ?? 'N/A');
-
-                                        // Dynamic service parsing
-                                        $servicesArr = is_array($service->selected_services) 
-                                            ? $service->selected_services 
-                                            : json_decode($service->selected_services ?? '[]', true);
-
-                                        if (!is_array($servicesArr)) {
-                                            $servicesArr = array_filter(explode(', ', (string)$service->selected_services));
-                                        }
-                                    @endphp
-                                    <tr>
-                                        <!-- Tracking Code -->
-                                        <td class="fw-bold font-monospace text-primary small">{{ $service->tracking_code }}</td>
-
-                                        <!-- Customer Name -->
-                                        <td class="fw-semibold text-dark">{{ $service->customer_name }}</td>
-
-                                        <!-- Contact Number -->
-                                        <td class="text-secondary small font-monospace">{{ $contactPhone }}</td>
-
-                                        <!-- Vehicle (Brand/Model/Type/Year) -->
-                                        <td class="fw-medium text-dark small">({{ $vehicleSummary }})</td>
-
-                                        <!-- Technician -->
-                                        <td class="small">{{ $mechanics ?: 'Unassigned' }}</td>
-
-                                        <!-- Plate Number -->
-                                        <td class="font-monospace text-uppercase small text-secondary">{{ $plates }}</td>
-
-                                        <!-- Service Types -->
-                                        <td class="small text-truncate" style="max-width: 200px;">
-                                            @php
-                                                $serviceNames = array_map(function($item) {
-                                                    return is_array($item) ? ($item['name'] ?? '') : $item;
-                                                }, $servicesArr ?? []);
-                                                $serviceNames = array_filter($serviceNames);
-                                            @endphp
-                                            {{ count($serviceNames) > 0 ? implode(', ', $serviceNames) : 'N/A' }}
-                                        </td>
-
-                                        <!-- Date Registered -->
-                                        <td class="small text-muted">
-                                            {{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y') }}
-                                        </td>
-
-                                        <!-- Date Completed -->
-                                        <td class="small text-muted">
-                                            {{ \Carbon\Carbon::parse($service->updated_at ?? $service->created_at)->format('M d, Y') }}
-                                        </td>
-
-                                        <!-- Total Cost -->
-                                        <td class="fw-bold font-monospace text-dark">
-                                            ₱{{ number_format((float)($service->total_cost ?? 0), 2) }}
-                                        </td>
-
-                                        <!-- Actions -->
-                                        <td class="text-center">
-                                            <div class="d-flex justify-content-center gap-1">
-                                                <button type="button" 
-                                                        class="btn btn-outline-primary btn-sm rounded-2 px-2 py-1 d-flex align-items-center gap-1" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#viewModal{{ $service->id }}">
-                                                    <i class="bi bi-eye"></i> View
-                                                </button>
-                                                <a href="{{ route('admin.transactions.pdf', $service->id) }}" 
-                                                   class="btn btn-success btn-sm rounded-2 px-2 py-1 d-flex align-items-center gap-1">
-                                                    <i class="bi bi-download"></i> PDF
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="11" class="text-center py-5 text-muted">
-                                            <i class="bi bi-inbox fs-2 text-secondary d-block mb-2"></i>
-                                            No completed transactions found matching your search criteria.
-                                        </td>
-                                    </tr>
-                                @endforelse
+        $vehicleBrand = $service->vehicle_make ?? $service->vehicle_brand ?? $service->brand ?? $service->make ?? 'N/A';
+        $vehicleModel = $service->vehicle_model ?? $service->model ?? 'N/A';
+        $vehicleType  = $service->vehicle_type ?? $service->body_type ?? 'Sedan';
+    @endphp
+    <tr>
+        <td class="fw-bold font-monospace text-speed-blue small">{{ $service->tracking_code }}</td>
+        <td class="fw-semibold text-white">{{ $customerName }}</td>
+        <td class="text-secondary small font-monospace">{{ $contactPhone }}</td>
+        <td class="fw-medium text-white small">{{ $vehicleBrand }} {{ $vehicleModel }} ({{ $vehicleType }})</td>
+        <td class="font-monospace text-uppercase small text-secondary fw-bold">{{ $service->plate_number ?? 'N/A' }}</td>
+        <td>
+            <span class="badge badge-mechanic rounded-pill px-3 py-1.5 small fw-semibold d-inline-flex align-items-center gap-1">
+                <i class="bi bi-wrench-adjustable text-speed-blue"></i> {{ $mechanicName }}
+            </span>
+        </td>
+        <td class="small text-truncate text-secondary" style="max-width: 180px;">
+            {{ count($serviceNames) > 0 ? implode(', ', $serviceNames) : 'General Detailing' }}
+        </td>
+        <td class="small text-secondary">
+            {{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y') }}
+        </td>
+        <td class="small text-secondary">
+            {{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y') }}
+        </td>
+        <td class="fw-bold font-monospace text-speed-pink">
+            ₱{{ number_format((float)($service->total_cost ?? 0), 2) }}
+        </td>
+        <td class="text-center">
+            <div class="d-flex justify-content-center gap-1">
+                <button type="button" class="btn btn-outline-info btn-sm rounded-2 px-2 py-1 d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#viewModal{{ $service->id }}">
+                    <i class="bi bi-eye"></i> View
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm rounded-2 px-2 py-1 d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#pdfPreviewModal{{ $service->id }}">
+                    <i class="bi bi-file-earmark-pdf"></i> PDF
+                </button>
+            </div>
+        </td>
+    </tr>
+@empty
+    <tr>
+        <td colspan="11" class="text-center py-5 text-secondary">
+            <i class="bi bi-inbox fs-2 text-secondary d-block mb-2"></i>
+            No completed services found matching your filters.
+        </td>
+    </tr>
+@endforelse
                             </tbody>
                         </table>
                     </div>
@@ -363,333 +603,827 @@
         </div>
     </div>
 
-    <!-- REPORT PREVIEW & DOWNLOAD MODALS -->
 
-    <!-- 1. WEEKLY REPORT MODAL -->
-    <div class="modal fade" id="weeklyReportModal" tabindex="-1" aria-hidden="true">
+    <!-- RECORD MODALS LOOP -->
+@foreach($transactions as $service)
+    @php
+        $mechanicName = $service->mechanic_assigned 
+            ?? ($service->technician->name ?? $service->technician->full_name ?? null)
+            ?? ($service->mechanic->name ?? $service->mechanic->full_name ?? null)
+            ?? $service->technician_name 
+            ?? $service->mechanic_name 
+            ?? 'Unassigned';
+
+        $customerName = $service->customer_name 
+            ?? ($service->customer->name ?? null)
+            ?? ($service->user->name ?? null)
+            ?? $service->client_name 
+            ?? $service->name 
+            ?? 'N/A';
+
+        $contactPhone = $service->contact_number 
+            ?? $service->phone_number 
+            ?? $service->customer_phone 
+            ?? $service->phone 
+            ?? ($service->customer->phone ?? 'N/A');
+
+        $servicesArr = is_array($service->selected_services) 
+            ? $service->selected_services 
+            : json_decode($service->selected_services ?? '[]', true);
+
+        if (!is_array($servicesArr)) {
+            $servicesArr = array_filter(explode(', ', (string)($service->selected_services ?? '')));
+        }
+
+        $serviceNames = array_map(function($item) {
+            return is_array($item) ? ($item['name'] ?? '') : $item;
+        }, $servicesArr ?? []);
+        $serviceNames = array_filter($serviceNames);
+
+        $vehicleBrand = $service->vehicle_make ?? $service->vehicle_brand ?? $service->brand ?? $service->make ?? 'N/A';
+        $vehicleModel = $service->vehicle_model ?? $service->model ?? 'N/A';
+        $vehicleType  = $service->vehicle_type ?? $service->body_type ?? 'Sedan';
+        $vehicleYear  = $service->vehicle_year ?? $service->year ?? 'N/A';
+        $plateNumber  = $service->plate_number ?? $service->plate_no ?? $service->plate ?? 'N/A';
+    @endphp
+
+    <!-- View Record Modal -->
+    <div class="modal fade" id="viewModal{{ $service->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 rounded-4 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-calendar-week text-primary"></i> Weekly Transaction Report
+            <div class="modal-content modal-content-dark rounded-4 shadow">
+                <div class="modal-header border-bottom border-secondary border-opacity-25 py-3">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2 fs-6">
+                        <i class="bi bi-file-earmark-text text-speed-pink fs-5"></i> Service Record Details
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <form action="{{ route('admin.transactions.reports.download') }}" method="GET" target="_blank">
-                        <input type="hidden" name="type" value="weekly">
-                        
-                        <div class="row g-3 align-items-center mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Select Week / Start Date</label>
-                                <input type="date" name="start_date" class="form-control" value="{{ date('Y-m-d', strtotime('monday this week')) }}" required>
+                    <div class="p-4 border border-secondary border-opacity-25 rounded-4 bg-black bg-opacity-40 shadow-sm">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom border-secondary border-opacity-25 pb-3 mb-3 gap-2">
+                            <div>
+                                <h4 class="fw-bold text-speed-pink mb-1 d-flex align-items-center gap-2 fs-5">
+                                    <i class="bi bi-car-front-fill"></i> SpeedLane AutoSpa
+                                </h4>
+                                <p class="text-secondary small mb-0">Official Transaction & Service Record</p>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold text-muted">Report Summary Period</label>
-                                <div class="p-2 bg-light border rounded-3 small fw-bold text-primary">
-                                    Current Week Performance Overview
+                            <div class="text-end">
+                                <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30 px-3 py-1 rounded-pill mb-1 fw-bold">
+                                    <i class="bi bi-check-circle-fill me-1"></i> PAID
+                                </span>
+                                <p class="text-secondary small mb-0">Tracking Code: <strong class="font-monospace text-speed-blue">{{ $service->tracking_code }}</strong></p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3 p-3 bg-black bg-opacity-50 rounded-3 border border-secondary border-opacity-25 mx-0">
+                            <div class="col-md-6 border-end-md">
+                                <span class="text-secondary extra-small d-block fw-bold text-uppercase mb-1">Customer Details</span>
+                                <strong class="text-white fs-6 d-block">{{ $customerName }}</strong>
+                                <small class="text-secondary font-monospace"><i class="bi bi-telephone me-1 text-speed-blue"></i>{{ $contactPhone }}</small>
+                            </div>
+                            <div class="col-md-6 ps-md-3">
+                                <span class="text-secondary extra-small d-block fw-bold text-uppercase mb-1">Assigned Mechanic</span>
+                                <span class="badge badge-mechanic rounded-pill px-3 py-1.5 fs-6 fw-semibold d-inline-flex align-items-center gap-1 mt-1">
+                                    <i class="bi bi-wrench me-1 text-speed-blue"></i>{{ $mechanicName }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 border border-secondary border-opacity-25 rounded-3 bg-black bg-opacity-30 mb-3">
+                            <h6 class="fw-bold text-white mb-3 d-flex align-items-center gap-2 border-bottom border-secondary border-opacity-25 pb-2 fs-6">
+                                <i class="bi bi-card-heading text-speed-blue"></i> Vehicle Information
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-3 col-6">
+                                    <span class="text-secondary extra-small d-block text-uppercase fw-semibold">Brand & Model</span>
+                                    <span class="fw-bold text-white small">{{ $vehicleBrand }} {{ $vehicleModel }}</span>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <span class="text-secondary extra-small d-block text-uppercase fw-semibold">Vehicle Type</span>
+                                    <span class="fw-bold text-white small">{{ $vehicleType }}</span>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <span class="text-secondary extra-small d-block text-uppercase fw-semibold">Plate Number</span>
+                                    <span class="fw-bold font-monospace text-uppercase text-speed-blue small">{{ $plateNumber }}</span>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <span class="text-secondary extra-small d-block text-uppercase fw-semibold">Year</span>
+                                    <span class="fw-bold text-white small">{{ $vehicleYear }}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-light">
-                                    <span class="text-muted small d-block">Weekly Jobs Completed</span>
-                                    <strong class="fs-4 text-dark">{{ $weeklyCount ?? 0 }}</strong>
-                                </div>
+                        <div class="row g-2 mb-3 p-2 bg-black bg-opacity-50 rounded-3 border border-secondary border-opacity-25 mx-0">
+                            <div class="col-md-6 border-end-md">
+                                <span class="text-secondary extra-small d-block">Date Registered:</span>
+                                <strong class="text-white small">{{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y h:i A') }}</strong>
                             </div>
-                            <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-light">
-                                    <span class="text-muted small d-block">Weekly Total Revenue</span>
-                                    <strong class="fs-4 text-success">₱{{ number_format($weeklyRevenue ?? 0, 2) }}</strong>
-                                </div>
+                            <div class="col-md-6 ps-md-3">
+                                <span class="text-secondary extra-small d-block">Date Completed:</span>
+                                <strong class="text-white small">{{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y h:i A') }}</strong>
                             </div>
                         </div>
 
-                        <div class="alert alert-info border-0 rounded-3 small mb-0">
-                            <i class="bi bi-info-circle me-1"></i> Downloading will generate an official PDF containing the full list of transactions and revenue stats for the selected week.
-                        </div>
-
-                        <div class="modal-footer border-top mt-4 px-0 pb-0">
-                            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold d-flex align-items-center gap-1">
-                                <i class="bi bi-file-earmark-pdf"></i> Download Weekly PDF
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. MONTHLY REPORT MODAL -->
-    <div class="modal fade" id="monthlyReportModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 rounded-4 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-calendar-month text-success"></i> Monthly Transaction Report
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form action="{{ route('admin.transactions.reports.download') }}" method="GET" target="_blank">
-                        <input type="hidden" name="type" value="monthly">
-                        
-                        <div class="row g-3 align-items-center mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Select Month & Year</label>
-                                <input type="month" name="month_year" class="form-control" value="{{ date('Y-m') }}" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold text-muted">Report Scope</label>
-                                <div class="p-2 bg-light border rounded-3 small fw-bold text-success">
-                                    Full Monthly Financial & Service Audit
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-light">
-                                    <span class="text-muted small d-block">Monthly Jobs Completed</span>
-                                    <strong class="fs-4 text-dark">{{ $monthlyCount ?? 0 }}</strong>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-light">
-                                    <span class="text-muted small d-block">Monthly Total Revenue</span>
-                                    <strong class="fs-4 text-success">₱{{ number_format($monthlyRevenue ?? 0, 2) }}</strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="alert alert-info border-0 rounded-3 small mb-0">
-                            <i class="bi bi-info-circle me-1"></i> Generating this report provides a detailed overview of monthly revenue breakdown by technician and service type.
-                        </div>
-
-                        <div class="modal-footer border-top mt-4 px-0 pb-0">
-                            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-success rounded-3 px-4 fw-semibold d-flex align-items-center gap-1">
-                                <i class="bi bi-file-earmark-pdf"></i> Download Monthly PDF
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. YEARLY REPORT MODAL -->
-    <div class="modal fade" id="yearlyReportModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 rounded-4 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-calendar3 text-warning"></i> Yearly Transaction Report
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form action="{{ route('admin.transactions.reports.download') }}" method="GET" target="_blank">
-                        <input type="hidden" name="type" value="yearly">
-                        
-                        <div class="row g-3 align-items-center mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Select Year</label>
-                                <select name="year" class="form-select" required>
-                                    @for($y = date('Y'); $y >= date('Y') - 5; $y--)
-                                        <option value="{{ $y }}">{{ $y }}</option>
-                                    @endfor
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold text-muted">Report Scope</label>
-                                <div class="p-2 bg-light border rounded-3 small fw-bold text-warning">
-                                    Annual Service & Financial Summary
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-light">
-                                    <span class="text-muted small d-block">Yearly Jobs Completed</span>
-                                    <strong class="fs-4 text-dark">{{ $yearlyCount ?? 0 }}</strong>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="p-3 border rounded-3 bg-light">
-                                    <span class="text-muted small d-block">Yearly Total Revenue</span>
-                                    <strong class="fs-4 text-success">₱{{ number_format($yearlyRevenue ?? 0, 2) }}</strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="alert alert-info border-0 rounded-3 small mb-0">
-                            <i class="bi bi-info-circle me-1"></i> The yearly report summarizes overall shop performance, annual gross income, and high-demand service metrics.
-                        </div>
-
-                        <div class="modal-footer border-top mt-4 px-0 pb-0">
-                            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-warning rounded-3 px-4 fw-semibold text-dark d-flex align-items-center gap-1">
-                                <i class="bi bi-file-earmark-pdf"></i> Download Yearly PDF
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- INDIVIDUAL TRANSACTION RECEIPT MODALS -->
-    @foreach($transactions as $service)
-        @php
-            $contactPhone = $service->contact_number 
-                ?? $service->phone_number 
-                ?? $service->customer_phone 
-                ?? $service->phone 
-                ?? $service->contact 
-                ?? 'N/A';
-
-            $vehiclesList = $service->vehicles ?? collect();
-
-            $formatVeh = function($v) {
-                $brand = $v->vehicle_brand ?? $v->brand ?? $v->vehicle_make ?? '';
-                $model = $v->vehicle_model ?? $v->model ?? '';
-                $brandModel = trim($brand . ' ' . $model);
-
-                $type = $v->vehicle_type ?? $v->type ?? '';
-                $year = $v->vehicle_year ?? $v->year ?? '';
-
-                $parts = array_filter([$brandModel, $type, $year]);
-                return count($parts) > 0 ? implode(' ', $parts) : 'N/A';
-            };
-
-            if ($vehiclesList->count() > 0) {
-                $vehicleSummary = $formatVeh($vehiclesList->first());
-                if ($vehiclesList->count() > 1) {
-                    $vehicleSummary .= ' (+ ' . ($vehiclesList->count() - 1) . ' more)';
-                }
-            } else {
-                $vehicleSummary = $formatVeh($service);
-            }
-
-            $mechanics = $vehiclesList->count() > 0 
-                ? $vehiclesList->pluck('mechanic_assigned')->filter()->unique()->implode(', ')
-                : ($service->mechanic_assigned ?? 'Unassigned');
-
-            $plates = $vehiclesList->count() > 0 
-                ? $vehiclesList->pluck('plate_number')->filter()->implode(', ')
-                : ($service->plate_number ?? 'N/A');
-
-            $servicesArr = is_array($service->selected_services) 
-                ? $service->selected_services 
-                : json_decode($service->selected_services ?? '[]', true);
-
-            if (!is_array($servicesArr)) {
-                $servicesArr = array_filter(explode(', ', (string)$service->selected_services));
-            }
-
-            $pricesMap = is_array($service->selected_services_prices) 
-                ? $service->selected_services_prices 
-                : json_decode($service->selected_services_prices ?? '[]', true);
-            
-            if (!is_array($pricesMap)) { $pricesMap = []; }
-        @endphp
-
-        <div class="modal fade" id="viewModal{{ $service->id }}" tabindex="-1" aria-labelledby="viewModalLabel{{ $service->id }}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content border-0 rounded-4 shadow">
-                    <div class="modal-header border-bottom">
-                        <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="viewModalLabel{{ $service->id }}">
-                            <i class="bi bi-receipt text-primary"></i> Receipt Details
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-4">
-                        
-                        <div class="row mb-3 bg-light p-3 rounded-3 border g-2">
-                            <div class="col-md-6">
-                                <span class="text-muted small d-block">Tracking Code</span>
-                                <span class="fs-5 fw-bold text-primary font-monospace">{{ $service->tracking_code }}</span>
-                            </div>
-                            <div class="col-md-6 text-md-end">
-                                <span class="text-muted small d-block">Date Registered</span>
-                                <strong class="text-dark">{{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y') }}</strong>
-                            </div>
-                            <div class="col-md-6 border-top pt-2">
-                                <span class="text-muted small d-block">Customer Name</span>
-                                <strong class="text-dark">{{ $service->customer_name }}</strong>
-                                <span class="d-block text-secondary small font-monospace">{{ $contactPhone }}</span>
-                            </div>
-                            <div class="col-md-6 text-md-end border-top pt-2">
-                                <span class="text-muted small d-block">Date Completed</span>
-                                <strong class="text-dark">{{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y') }}</strong>
-                            </div>
-                            <div class="col-md-12 border-top pt-2">
-                                <span class="text-muted small d-block">Vehicle Info & Plate Number</span>
-                                <strong class="text-dark">({{ $vehicleSummary }})</strong>
-                                <span class="d-block font-monospace text-uppercase text-secondary small">Plate: {{ $plates }}</span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <span class="text-muted small d-block mb-1">Assigned Mechanic: <strong>{{ $mechanics ?: 'Unassigned' }}</strong></span>
-                        </div>
-
-                        <table class="table table-sm border align-middle mb-3">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="py-2 px-3">Service Name</th>
-                                    <th class="py-2 px-3 text-end">Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($servicesArr as $idx => $srv)
-                                    @php
-                                        $srvName = is_array($srv) ? ($srv['name'] ?? $srv['service_name'] ?? '') : (string)$srv;
-                                        $srvTrim = trim($srvName);
-
-                                        $itemPrice = $pricesMap[$srvTrim] 
-                                            ?? $pricesMap[$srvName] 
-                                            ?? $pricesMap[$idx] 
-                                            ?? 0;
-                                    @endphp
+                        <div class="table-responsive mb-0">
+                            <table class="table table-sm custom-admin-table mb-0">
+                                <thead>
                                     <tr>
-                                        <td class="py-2 px-3 text-dark small">{{ $srvName }}</td>
-                                        <td class="py-2 px-3 text-end font-monospace text-success fw-semibold small">
-                                            ₱{{ number_format((float)$itemPrice, 2) }}
+                                        <th style="width: 40px;" class="text-center">#</th>
+                                        <th>Completed Service Description</th>
+                                        <th class="text-end" style="width: 120px;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if(count($serviceNames) > 0)
+                                        @foreach($serviceNames as $idx => $sName)
+                                            <tr>
+                                                <td class="text-center small text-secondary">{{ $idx + 1 }}</td>
+                                                <td class="fw-semibold text-white">{{ $sName }}</td>
+                                                <td class="text-end text-success small fw-bold">
+                                                    <i class="bi bi-check-circle me-1"></i>Completed
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td class="text-center small text-secondary">1</td>
+                                            <td class="fw-semibold text-white">General Detailing & Care Service</td>
+                                            <td class="text-end text-success small fw-bold">
+                                                <i class="bi bi-check-circle me-1"></i>Completed
+                                            </td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2" class="text-end fw-bold text-white">Total Cost Paid:</td>
+                                        <td class="text-end fw-bold text-speed-pink font-monospace fs-5">
+                                            ₱{{ number_format((float)($service->total_cost ?? 0), 2) }}
                                         </td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="2" class="text-center py-2 text-muted small">No individual services listed.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-secondary border-opacity-25 py-2 d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm px-3" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#pdfPreviewModal{{ $service->id }}">
+                        <i class="bi bi-file-earmark-pdf"></i> Switch to PDF Receipt Preview
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                            <span class="fw-bold text-dark fs-5">Total Estimated Cost:</span>
-                            <span class="fw-bold text-success fs-4 font-monospace">₱{{ number_format((float)($service->total_cost ?? 0), 2) }}</span>
+    <!-- PDF Receipt Preview Modal -->
+    <div class="modal fade" id="pdfPreviewModal{{ $service->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content modal-content-dark rounded-4 shadow">
+                <div class="modal-header border-bottom border-secondary border-opacity-25 py-3">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2 fs-6">
+                        <i class="bi bi-file-earmark-pdf text-danger fs-5"></i> Official PDF Receipt ({{ $service->tracking_code }})
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 bg-black bg-opacity-30">
+                    <div class="printable-area p-4 border rounded-3 bg-white shadow-sm text-dark mx-auto" style="max-width: 750px;">
+                        <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
+                            <div>
+                                <h4 class="fw-bold text-primary mb-1 d-flex align-items-center gap-2">
+                                    <i class="bi bi-car-front-fill"></i> SpeedLane AutoSpa
+                                </h4>
+                                <p class="text-muted small mb-0">Official Transaction & Service Record Receipt</p>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success text-white px-3 py-1 rounded-pill mb-1 fw-bold">PAID</span>
+                                <p class="text-muted small mb-0">Tracking Code: <strong class="font-monospace text-dark">{{ $service->tracking_code }}</strong></p>
+                            </div>
                         </div>
 
+                        <div class="row g-3 mb-3 p-3 bg-light rounded-3 border-0 mx-0">
+                            <div class="col-6">
+                                <span class="text-muted extra-small d-block fw-semibold text-uppercase">Customer Information</span>
+                                <strong class="text-dark fs-6">{{ $customerName }}</strong><br>
+                                <small class="text-dark font-monospace"><i class="bi bi-telephone me-1"></i>{{ $contactPhone }}</small>
+                            </div>
+                            <div class="col-6 text-end">
+                                <span class="text-muted extra-small d-block fw-semibold text-uppercase">Assigned Mechanic</span>
+                                <strong class="text-dark fs-6"><i class="bi bi-wrench me-1 text-primary"></i>{{ $mechanicName }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="p-3 border rounded-3 bg-light-subtle mb-3">
+                            <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
+                                <i class="bi bi-card-heading text-primary"></i> Vehicle Information
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-3">
+                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Brand & Model</span>
+                                    <span class="fw-bold text-dark small">{{ $vehicleBrand }} {{ $vehicleModel }}</span>
+                                </div>
+                                <div class="col-3">
+                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Vehicle Type</span>
+                                    <span class="fw-bold text-dark small">{{ $vehicleType }}</span>
+                                </div>
+                                <div class="col-3">
+                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Plate Number</span>
+                                    <span class="fw-bold font-monospace text-uppercase text-dark small">{{ $plateNumber }}</span>
+                                </div>
+                                <div class="col-3">
+                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Year</span>
+                                    <span class="fw-bold text-dark small">{{ $vehicleYear }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3 p-2 bg-light rounded-3 border-0 mx-0">
+                            <div class="col-6">
+                                <span class="text-muted extra-small d-block">Date Registered:</span>
+                                <strong class="text-dark small">{{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y h:i A') }}</strong>
+                            </div>
+                            <div class="col-6 text-end">
+                                <span class="text-muted extra-small d-block">Date Completed:</span>
+                                <strong class="text-dark small">{{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y h:i A') }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive mb-3">
+                            <table class="table table-sm table-bordered align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr class="small text-dark">
+                                        <th style="width: 40px;" class="text-center">#</th>
+                                        <th>Completed Service Description</th>
+                                        <th class="text-end" style="width: 120px;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if(count($serviceNames) > 0)
+                                        @foreach($serviceNames as $idx => $sName)
+                                            <tr>
+                                                <td class="text-center small text-dark">{{ $idx + 1 }}</td>
+                                                <td class="fw-semibold text-dark">{{ $sName }}</td>
+                                                <td class="text-end text-dark small fw-bold">Completed</td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td class="text-center small text-dark">1</td>
+                                            <td class="fw-semibold text-dark">General Detailing & Care Service</td>
+                                            <td class="text-end text-dark small fw-bold">Completed</td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-light">
+                                        <td colspan="2" class="text-end fw-bold text-dark">Total Cost Paid:</td>
+                                        <td class="text-end fw-bold text-dark font-monospace fs-5">
+                                            ₱{{ number_format((float)($service->total_cost ?? 0), 2) }}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="text-center extra-small text-muted pt-3 border-top">
+                            Thank you for choosing SpeedLane AutoSpa! Keep this receipt for warranty records.
+                        </div>
                     </div>
-                    <div class="modal-footer border-top">
-                        <button type="button" class="btn btn-secondary rounded-3 px-4" data-bs-dismiss="modal">Close</button>
-                        <a href="{{ route('admin.transactions.pdf', $service->id) }}" class="btn btn-success rounded-3 px-4 d-flex align-items-center gap-1">
-                            <i class="bi bi-download"></i> Download PDF
+                </div>
+                <div class="modal-footer border-top border-secondary border-opacity-25 py-2 d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm px-3" data-bs-dismiss="modal">Close</button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-light btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" onclick="printElement('pdfPreviewModal{{ $service->id }}')">
+                            <i class="bi bi-printer-fill"></i> Print
+                        </button>
+                        <a href="{{ route('admin.transactions.pdf', $service->id) }}" class="btn btn-danger btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" target="_blank">
+                            <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
                         </a>
                     </div>
                 </div>
             </div>
         </div>
-    @endforeach
+    </div>
+@endforeach
+
+    <!-- SYSTEM REPORT GENERATION MODAL (REDESIGNED) -->
+    <div class="modal fade" id="generateReportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content modal-content-dark border-0 rounded-4 shadow-lg overflow-hidden">
+                <!-- Modal Header -->
+                <div class="modal-header border-bottom border-secondary border-opacity-25 py-3 px-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="bg-speed-pink text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                            <i class="bi bi-bar-chart-line-fill fs-6"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold text-white mb-0 fs-6">Business Report Generator</h5>
+                            <span class="text-secondary extra-small">Select report type and options to evaluate operational analytics</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <form id="reportFilterForm">
+                        @csrf
+                        
+                        <!-- 1. Report Category Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-white small text-uppercase mb-2 d-flex align-items-center gap-2">
+                                <span class="badge bg-speed-pink rounded-circle" style="width: 20px; height: 20px; line-height: 12px;">1</span>
+                                Select Report Category
+                            </label>
+                            
+                            <div class="row g-2">
+                                <!-- Financial & Revenue -->
+                                <div class="col-md-6">
+                                    <input class="form-check-input d-none" type="radio" name="report_type" id="type_financial" value="financial" checked onchange="toggleReportFilters()">
+                                    <label class="w-100 report-card-label m-0" for="type_financial">
+                                        <div class="report-card-option p-3 rounded-3 d-flex align-items-center gap-3">
+                                            <div class="bg-speed-pink text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; min-width: 38px;">
+                                                <i class="bi bi-cash-stack fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <strong class="d-block text-white small">Financial & Revenue</strong>
+                                                <span class="text-secondary extra-small">Gross revenue, pricing & profits</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Technician Performance -->
+                                <div class="col-md-6">
+                                    <input class="form-check-input d-none" type="radio" name="report_type" id="type_technician" value="technician" onchange="toggleReportFilters()">
+                                    <label class="w-100 report-card-label m-0" for="type_technician">
+                                        <div class="report-card-option p-3 rounded-3 d-flex align-items-center gap-3">
+                                            <div class="bg-speed-blue text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; min-width: 38px;">
+                                                <i class="bi bi-person-badge-fill fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <strong class="d-block text-white small">Technician Performance</strong>
+                                                <span class="text-secondary extra-small">Jobs completed & mechanic output</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Service Demand -->
+                                <div class="col-md-6">
+                                    <input class="form-check-input d-none" type="radio" name="report_type" id="type_service" value="service_demand" onchange="toggleReportFilters()">
+                                    <label class="w-100 report-card-label m-0" for="type_service">
+                                        <div class="report-card-option p-3 rounded-3 d-flex align-items-center gap-3">
+                                            <div class="bg-speed-pink text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; min-width: 38px;">
+                                                <i class="bi bi-pie-chart-fill fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <strong class="d-block text-white small">Service Demand Analytics</strong>
+                                                <span class="text-secondary extra-small">Popular services & package volume</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Service Queue Log -->
+                                <div class="col-md-6">
+                                    <input class="form-check-input d-none" type="radio" name="report_type" id="type_queue" value="queue_log" onchange="toggleReportFilters()">
+                                    <label class="w-100 report-card-label m-0" for="type_queue">
+                                        <div class="report-card-option p-3 rounded-3 d-flex align-items-center gap-3">
+                                            <div class="bg-speed-blue text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; min-width: 38px;">
+                                                <i class="bi bi-list-task fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <strong class="d-block text-white small">Service Audit & Queue Log</strong>
+                                                <span class="text-secondary extra-small">Service logs & status progression</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Customer Loyalty -->
+                                <div class="col-md-6">
+                                    <input class="form-check-input d-none" type="radio" name="report_type" id="type_customer" value="customer" onchange="toggleReportFilters()">
+                                    <label class="w-100 report-card-label m-0" for="type_customer">
+                                        <div class="report-card-option p-3 rounded-3 d-flex align-items-center gap-3">
+                                            <div class="bg-speed-pink text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; min-width: 38px;">
+                                                <i class="bi bi-person-heart fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <strong class="d-block text-white small">Customer Retention</strong>
+                                                <span class="text-secondary extra-small">Repeat visits & client loyalty</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Vehicle Analysis -->
+                                <div class="col-md-6">
+                                    <input class="form-check-input d-none" type="radio" name="report_type" id="type_vehicle" value="vehicle" onchange="toggleReportFilters()">
+                                    <label class="w-100 report-card-label m-0" for="type_vehicle">
+                                        <div class="report-card-option p-3 rounded-3 d-flex align-items-center gap-3">
+                                            <div class="bg-speed-blue text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; min-width: 38px;">
+                                                <i class="bi bi-car-front-fill fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <strong class="d-block text-white small">Vehicle Segment Analysis</strong>
+                                                <span class="text-secondary extra-small">Sedan, SUV & Pickup distribution</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Evaluation Timeframe -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-white small text-uppercase mb-2 d-flex align-items-center gap-2">
+                                <span class="badge bg-speed-pink rounded-circle" style="width: 20px; height: 20px; line-height: 12px;">2</span>
+                                Timeframe Scope
+                            </label>
+                            
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-5">
+                                    <select name="timeframe" id="filter_timeframe" class="form-select form-select-sm form-select-dark fw-semibold" onchange="toggleTimeframeFields()">
+                                        <option value="all_time" selected>All-Time Cumulative</option>
+                                        <option value="monthly">Monthly Performance</option>
+                                        <option value="weekly">Weekly Analysis (7 Days)</option>
+                                        <option value="yearly">Yearly Overview</option>
+                                        <option value="custom">Custom Date Range</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-7">
+                                    <!-- Weekly Field -->
+                                    <div id="field_weekly" style="display: none;">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text input-group-text-dark small">Start Date</span>
+                                            <input type="date" name="start_date" class="form-control form-control-dark" value="{{ date('Y-m-d', strtotime('-7 days')) }}">
+                                        </div>
+                                    </div>
+
+                                    <!-- Monthly Field -->
+                                    <div id="field_monthly" style="display: none;">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text input-group-text-dark small">Month</span>
+                                            <input type="month" name="month_year" class="form-control form-control-dark" value="{{ date('Y-m') }}">
+                                        </div>
+                                    </div>
+
+                                    <!-- Yearly Field -->
+                                    <div id="field_yearly" style="display: none;">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text input-group-text-dark small">Year</span>
+                                            <select name="year" class="form-select form-select-dark">
+                                                @for($y = date('Y'); $y >= date('Y') - 5; $y--)
+                                                    <option value="{{ $y }}">{{ $y }}</option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Custom Date Field -->
+                                    <div id="field_custom_start" style="display: none;">
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <input type="date" name="date_from" class="form-control form-control-sm form-control-dark" value="{{ date('Y-m-01') }}" placeholder="From">
+                                            </div>
+                                            <div class="col-6" id="field_custom_end">
+                                                <input type="date" name="date_to" class="form-control form-control-sm form-control-dark" value="{{ date('Y-m-d') }}" placeholder="To">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Dynamic Contextual Report Filters -->
+                        <div class="p-3 border border-secondary border-opacity-25 rounded-3 bg-black bg-opacity-40">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-bold text-white small text-uppercase mb-0 d-flex align-items-center gap-2">
+                                    <span class="badge bg-speed-pink rounded-circle" style="width: 20px; height: 20px; line-height: 12px;">3</span>
+                                    Target Filters
+                                </label>
+                                <span class="badge bg-black bg-opacity-50 text-secondary border border-secondary border-opacity-25 extra-small fw-normal" id="activeFilterBadge">
+                                    Dynamic Filters Active
+                                </span>
+                            </div>
+
+                            <div class="row g-2">
+                                <!-- Status Filter -->
+                                <div class="col-md-4 filter-group filter-status">
+                                    <label class="form-label extra-small text-secondary fw-bold mb-1">Status Scope</label>
+                                    <select name="status" class="form-select form-select-sm form-select-dark">
+                                        <option value="">All Statuses</option>
+                                        <option value="Completed" selected>Completed Only</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Queued">Queued</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+
+                                <!-- Assigned Mechanic Filter -->
+                                <div class="col-md-4 filter-group filter-mechanic">
+                                    <label class="form-label extra-small text-secondary fw-bold mb-1">Assigned Mechanic</label>
+                                    <select name="technician_id" class="form-select form-select-sm form-select-dark">
+                                        <option value="">All Mechanics</option>
+                                        @if(isset($technicians) && count($technicians) > 0)
+                                            @foreach($technicians as $tech)
+                                                @php
+                                                    $tId   = is_object($tech) ? ($tech->id ?? $tech->name) : (is_array($tech) ? ($tech['id'] ?? $tech['name']) : $tech);
+                                                    $tName = is_object($tech) ? ($tech->name ?? $tId) : (is_array($tech) ? ($tech['name'] ?? $tId) : $tech);
+                                                @endphp
+                                                <option value="{{ $tId }}" {{ (string)request('technician_id') === (string)$tId || (string)request('technician_id') === (string)$tName ? 'selected' : '' }}>
+                                                    {{ $tName }}
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+
+                                <!-- Service Package Filter -->
+                                <div class="col-md-4 filter-group filter-service">
+                                    <label class="form-label extra-small text-secondary fw-bold mb-1">Service Package</label>
+                                    <select name="service_type" class="form-select form-select-sm form-select-dark">
+                                        <option value="">All Offered Services</option>
+                                        @if(isset($availableServices) && count($availableServices) > 0)
+                                            @foreach($availableServices as $srv)
+                                                @php $sName = is_object($srv) ? $srv->name : (is_array($srv) ? ($srv['name'] ?? '') : $srv); @endphp
+                                                <option value="{{ $sName }}">{{ $sName }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+
+                                <!-- Vehicle Segment Filter -->
+                                <div class="col-md-4 filter-group filter-vehicle-type">
+                                    <label class="form-label extra-small text-secondary fw-bold mb-1">Vehicle Segment</label>
+                                    <select name="vehicle_type" class="form-select form-select-sm form-select-dark">
+                                        <option value="">All Vehicles</option>
+                                        @if(isset($vehicleTypes) && count($vehicleTypes) > 0)
+                                            @foreach($vehicleTypes as $vSeg)
+                                                <option value="{{ $vSeg }}">{{ $vSeg }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+
+                                <!-- Vehicle Brand Filter -->
+                                <div class="col-md-4 filter-group filter-brand">
+                                    <label class="form-label extra-small text-secondary fw-bold mb-1">Vehicle Brand</label>
+                                    <select name="brand" class="form-select form-select-sm form-select-dark">
+                                        <option value="">All Brands</option>
+                                        @if(isset($vehicleBrands) && count($vehicleBrands) > 0)
+                                            @foreach($vehicleBrands as $b)
+                                                <option value="{{ $b }}">{{ $b }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+
+                                <!-- Customer Name Filter -->
+                                <div class="col-md-4 filter-group filter-customer">
+                                    <label class="form-label extra-small text-secondary fw-bold mb-1">Customer Name</label>
+                                    <input type="text" name="customer_name" id="customer_name_input" class="form-control form-control-sm form-control-dark" list="customer_datalist" placeholder="Filter customer..." value="{{ request('customer_name') }}">
+                                    <datalist id="customer_datalist">
+                                        @if(isset($customers) && count($customers) > 0)
+                                            @foreach($customers as $cName)
+                                                <option value="{{ $cName }}"></option>
+                                            @endforeach
+                                        @endif
+                                    </datalist>
+                                </div>
+
+                                <!-- Search Keyword -->
+                                <div class="col-md-4 filter-group filter-keyword">
+                                    <label class="form-label extra-small text-secondary fw-bold mb-1">Search Keyword</label>
+                                    <input type="text" name="search_term" class="form-control form-control-sm form-control-dark" placeholder="Tracking, plate, notes...">
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="modal-footer border-top border-secondary border-opacity-25 py-3 d-flex justify-content-between px-4">
+                    <button type="button" class="btn btn-outline-secondary rounded-3 px-4 fw-semibold btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btnPreviewReport" class="btn btn-speed-gradient rounded-3 px-4 fw-semibold btn-sm d-flex align-items-center gap-2 shadow-sm">
+                        <i class="bi bi-file-earmark-bar-graph"></i> Compile & Preview Executive Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- REPORT PREVIEW MODAL WITH ACTION TOOLBAR -->
+    <div class="modal fade" id="reportPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content modal-content-dark border-0 rounded-4 shadow">
+                <div class="modal-header border-bottom border-secondary border-opacity-25 py-3">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2 fs-6">
+                        <i class="bi bi-file-earmark-text-fill text-speed-pink"></i> Executive Decision Support System - Document Preview
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <!-- Action Toolbar Inside Modal -->
+                <div class="bg-black bg-opacity-40 border-bottom border-secondary border-opacity-25 px-4 py-2 d-flex justify-content-between align-items-center">
+                    <div class="text-secondary extra-small">
+                        <i class="bi bi-info-circle me-1 text-speed-blue"></i> Document rendered dynamically based on selected database criteria.
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" id="btnPrintReportModal" class="btn btn-outline-light btn-sm rounded-2 fw-semibold d-flex align-items-center gap-1">
+                            <i class="bi bi-printer"></i> Direct Print
+                        </button>
+                        <button type="button" id="btnDownloadPDF" class="btn btn-danger btn-sm rounded-2 fw-semibold d-flex align-items-center gap-1">
+                            <i class="bi bi-file-earmark-pdf"></i> Download Official PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-body p-4 bg-black bg-opacity-30">
+                    <div id="reportPreviewContainer" class="printable-area bg-white p-4 border rounded-3 shadow-sm text-dark mx-auto" style="max-width: 900px; min-height: 600px;">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <p class="text-muted small">Compiling database analytics and rendering report...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-secondary border-opacity-25 py-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 px-4" data-bs-dismiss="modal">Close Document</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Print Helper function to target exact element without printing whole UI
+        function printElement(target) {
+            document.querySelectorAll('.print-active').forEach(el => el.classList.remove('print-active'));
+            
+            let el = (typeof target === 'string') ? document.getElementById(target) : target;
+            if (!el) return;
+            
+            let printTarget = el.classList.contains('printable-area') ? el : (el.querySelector('.printable-area') || el);
+            printTarget.classList.add('print-active');
+            
+            window.print();
+            
+            setTimeout(() => {
+                printTarget.classList.remove('print-active');
+            }, 1000);
+        }
+
+        // Toggle Timeframe Input Fields
+        function toggleTimeframeFields() {
+            const timeframeSelect = document.getElementById('filter_timeframe');
+            const val = timeframeSelect ? timeframeSelect.value : 'all_time';
+            
+            const fieldWeekly = document.getElementById('field_weekly');
+            const fieldMonthly = document.getElementById('field_monthly');
+            const fieldYearly = document.getElementById('field_yearly');
+            const fieldCustomStart = document.getElementById('field_custom_start');
+
+            if (fieldWeekly) fieldWeekly.style.display = (val === 'weekly') ? 'block' : 'none';
+            if (fieldMonthly) fieldMonthly.style.display = (val === 'monthly') ? 'block' : 'none';
+            if (fieldYearly) fieldYearly.style.display = (val === 'yearly') ? 'block' : 'none';
+            if (fieldCustomStart) fieldCustomStart.style.display = (val === 'custom') ? 'block' : 'none';
+        }
+
+        // Dynamically Show/Hide Filters Related to the Selected Report Category
+        function toggleReportFilters() {
+            const reportTypeEl = document.querySelector('input[name="report_type"]:checked');
+            if (!reportTypeEl) return;
+
+            const selectedType = reportTypeEl.value;
+            const allFilterGroups = document.querySelectorAll('.filter-group');
+
+            allFilterGroups.forEach(el => el.style.display = 'none');
+
+            switch (selectedType) {
+                case 'financial':
+                    showFilters(['.filter-status']);
+                    break;
+                case 'technician':
+                    showFilters(['.filter-status', '.filter-mechanic']);
+                    break;
+                case 'service_demand':
+                    showFilters(['.filter-service', '.filter-vehicle-type']);
+                    break;
+                case 'queue_log':
+                    showFilters(['.filter-status', '.filter-mechanic', '.filter-customer', '.filter-keyword']);
+                    break;
+                case 'customer':
+                    showFilters(['.filter-customer', '.filter-keyword']);
+                    break;
+                case 'vehicle':
+                    showFilters(['.filter-vehicle-type', '.filter-brand']);
+                    break;
+                default:
+                    allFilterGroups.forEach(el => el.style.display = 'block');
+            }
+        }
+
+        function showFilters(classes) {
+            classes.forEach(cls => {
+                const el = document.querySelector(cls);
+                if (el) el.style.display = 'block';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleTimeframeFields();
+            toggleReportFilters();
+
+            // Real-Time Live Search for Transactions Table
+            const searchInput = document.getElementById('transactionSearchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase().trim();
+                    const tableRows = document.querySelectorAll('#transactionsTable tbody tr');
+
+                    tableRows.forEach(row => {
+                        if (row.querySelector('td[colspan]')) return;
+
+                        const rowText = row.textContent.toLowerCase();
+                        if (rowText.includes(query)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // Preview Click Handler
+            const btnPreview = document.getElementById('btnPreviewReport');
+            if (btnPreview) {
+                btnPreview.addEventListener('click', function() {
+                    const form = document.getElementById('reportFilterForm');
+                    const formData = new FormData(form);
+                    const params = new URLSearchParams(formData).toString();
+
+                    const container = document.getElementById('reportPreviewContainer');
+                    container.innerHTML = `
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <p class="text-muted small fw-semibold">Filtering database & compiling decision analytics...</p>
+                        </div>
+                    `;
+
+                    const genModalEl = document.getElementById('generateReportModal');
+                    const genModal = bootstrap.Modal.getInstance(genModalEl);
+                    if (genModal) genModal.hide();
+
+                    const prevModalEl = document.getElementById('reportPreviewModal');
+                    const prevModal = new bootstrap.Modal(prevModalEl);
+                    prevModal.show();
+
+                    fetch("{{ route('admin.reports.preview') }}?" + params)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response failed');
+                            return response.text();
+                        })
+                        .then(html => {
+                            container.innerHTML = html;
+                        })
+                        .catch(err => {
+                            container.innerHTML = `
+                                <div class="alert alert-danger my-4 p-4 text-center">
+                                    <i class="bi bi-exclamation-triangle-fill fs-3 d-block mb-2"></i>
+                                    <h6 class="fw-bold">Failed to Generate Report View</h6>
+                                    <p class="small mb-0">Please check filter conditions or database connectivity.</p>
+                                </div>
+                            `;
+                        })
+                        .finally(() => {
+                            toggleTimeframeFields();
+                            toggleReportFilters();
+                        });
+                });
+            }
+
+            // PDF Download Button Click Handler
+            const btnDownload = document.getElementById('btnDownloadPDF');
+            if (btnDownload) {
+                btnDownload.addEventListener('click', function() {
+                    const form = document.getElementById('reportFilterForm');
+                    const formData = new FormData(form);
+                    const params = new URLSearchParams(formData).toString();
+                    window.open("{{ route('admin.reports.pdf') }}?" + params, '_blank');
+                });
+            }
+
+            // Direct Print Button inside Report Preview Modal
+            const btnPrint = document.getElementById('btnPrintReportModal');
+            if (btnPrint) {
+                btnPrint.addEventListener('click', function() {
+                    printElement('reportPreviewContainer');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

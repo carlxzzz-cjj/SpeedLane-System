@@ -13,7 +13,7 @@ use App\Http\Controllers\AdminPasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
-| TEMPORARY DATABASE SETUP & DEBUG ROUTES (RENDER FREE TIER)
+| TEMPORARY DATABASE SETUP & DEBUG ROUTES
 |--------------------------------------------------------------------------
 */
 Route::get('/setup-db', function () {
@@ -33,10 +33,10 @@ Route::get('/setup-db', function () {
 Route::get('/debug-db', function () {
     try {
         return response()->json([
-            'default_connection'    => config('database.default'),
-            'database_name'         => DB::connection()->getDatabaseName(),
-            'database_host'         => config('database.connections.' . config('database.default') . '.host'),
-            'service_records_count' => \App\Models\ServiceRecord::count(),
+            'default_connection'     => config('database.default'),
+            'database_name'          => DB::connection()->getDatabaseName(),
+            'database_host'          => config('database.connections.' . config('database.default') . '.host'),
+            'service_records_count'  => \App\Models\ServiceRecord::count(),
             'service_records_sample' => \App\Models\ServiceRecord::latest()->take(5)->get(),
         ]);
     } catch (\Exception $e) {
@@ -56,7 +56,7 @@ Route::get('/track', [TrackController::class, 'track'])->name('customer.track');
 
 /*
 |--------------------------------------------------------------------------
-| 2. ADMIN AUTHENTICATION & PASSWORD RESET ROUTES (PUBLIC)
+| 2. ADMIN AUTHENTICATION ROUTES (PUBLIC)
 |--------------------------------------------------------------------------
 */
 Route::get('/admin/login', [AuthController::class, 'showLogin'])->name('admin.login');
@@ -92,9 +92,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/update/{id}/add-service', [ServiceController::class, 'addAdditional'])->name('admin.add-additional');
     Route::post('/admin/update/{id}/add-service-alt', [ServiceController::class, 'addAdditional'])->name('services.addAdditional');
 
-    // Transactions History & PDF Export
+    // Transactions History, System Reports & PDF Export
     Route::get('/admin/transactions', [TransactionController::class, 'index'])->name('admin.transactions');
+    
+    // System Report Routes (Mapped to support all client-side route names)
+    Route::get('/admin/reports/preview', [TransactionController::class, 'previewReport'])->name('admin.reports.preview');
+    Route::get('/admin/transactions/report/preview', [TransactionController::class, 'previewReport'])->name('admin.transactions.reports.preview');
+    
+    Route::get('/admin/reports/download', [TransactionController::class, 'downloadReport'])->name('admin.reports.download');
+    Route::get('/admin/reports/pdf', [TransactionController::class, 'downloadReport'])->name('admin.reports.pdf');
     Route::get('/admin/transactions/report/download', [TransactionController::class, 'downloadReport'])->name('admin.transactions.reports.download');
+    
     Route::get('/admin/transactions/{id}/pdf', [TransactionController::class, 'downloadPdf'])->name('admin.transactions.pdf');
 
     /*
@@ -108,14 +116,17 @@ Route::middleware('auth')->group(function () {
         Route::put('/services/{id}', [ManageServiceController::class, 'updateService'])->name('update-service');
         Route::delete('/services/{id}', [ManageServiceController::class, 'destroyService'])->name('destroy-service');
 
-        // Technician Roster Routes
+        // Technician Roster Routes & Report PDF Export
         Route::post('/technicians', [ManageServiceController::class, 'storeTechnician'])->name('store-technician');
         Route::patch('/technicians/{id}/toggle-status', [ManageServiceController::class, 'toggleTechnicianStatus'])->name('toggle-technician-status');
+        Route::get('/technicians/report/download', [ManageServiceController::class, 'downloadTechnicianReport'])->name('technicians.reports.download');
 
-        // Staff Roster Routes
+        // Staff Roster Routes & Report PDF Export
         Route::post('/staff', [ManageServiceController::class, 'storeStaff'])->name('store-staff');
         Route::put('/staff/{id}', [ManageServiceController::class, 'updateStaff'])->name('update-staff');
+        Route::patch('/staff/{id}/toggle-status', [ManageServiceController::class, 'toggleStaffStatus'])->name('toggle-staff-status');
         Route::delete('/staff/{id}', [ManageServiceController::class, 'destroyStaff'])->name('destroy-staff');
+        Route::get('/staff/report/download', [ManageServiceController::class, 'downloadStaffReport'])->name('staff.reports.download');
     });
 
 });

@@ -1,3 +1,7 @@
+<!-- ========================================================================= -->
+<!-- FILE LOCATION: resources/views/track-result.blade.php                      -->
+<!-- ========================================================================= -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,25 +16,166 @@
     
     <!-- Custom External CSS -->
     <link rel="stylesheet" href="{{ asset('css/customer.css') }}">
+    
+    <style>
+        :root {
+            --speed-pink: #f42582;
+            --speed-blue: #00a2ff;
+            --speed-dark-bg: #07090e;
+            --speed-card-bg: #0e111a;
+            --speed-card-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--speed-dark-bg) !important;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%) !important;
+            background-attachment: fixed;
+        }
+
+        /* Color Utility Classes */
+        .text-speed-pink { color: var(--speed-pink) !important; }
+        .text-speed-blue { color: #38bdf8 !important; } /* High-contrast bright blue for perfect dark mode text readability */
+        .bg-speed-pink { background-color: var(--speed-pink) !important; }
+        .bg-speed-blue { background-color: var(--speed-blue) !important; }
+
+        /* High-Contrast Success/Green for Dark Mode Readability */
+        .text-success { color: #4ade80 !important; }
+
+        /* Soft High-Contrast Status Badges matching register-service.blade.php */
+        .badge-status-completed {
+            background-color: rgba(34, 197, 94, 0.18) !important;
+            color: #4ade80 !important;
+            border: 1px solid rgba(34, 197, 94, 0.4) !important;
+            font-weight: 600;
+        }
+
+        .badge-status-blue {
+            background-color: rgba(0, 162, 255, 0.18) !important;
+            color: #99dbff !important;
+            border: 1px solid rgba(0, 162, 255, 0.4) !important;
+            font-weight: 600;
+        }
+
+        .extra-small {
+            font-size: 0.75rem;
+        }
+        .pointer-none {
+            pointer-events: none;
+        }
+
+        /* Top Navigation Header */
+        .navbar-speed {
+            background: rgba(7, 9, 14, 0.95);
+            border-bottom: 1px solid var(--speed-card-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .brand-logo-text {
+            font-size: 1.35rem;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            font-style: italic;
+            line-height: 1;
+        }
+
+        /* Speed Card Theme */
+        .speed-card {
+            background-color: var(--speed-card-bg) !important;
+            border: 1px solid var(--speed-card-border) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Easy-on-the-eyes Soft Action Buttons */
+        .btn-status-completed {
+            background-color: rgba(34, 197, 94, 0.18) !important;
+            color: #4ade80 !important;
+            border: 1px solid rgba(34, 197, 94, 0.4) !important;
+        }
+
+        .btn-status-progress {
+            background-color: rgba(0, 162, 255, 0.18) !important;
+            color: #99dbff !important;
+            border: 1px solid rgba(0, 162, 255, 0.4) !important;
+        }
+
+        .btn-action-dark {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e2e8f0 !important;
+            transition: all 0.25s ease;
+        }
+
+        .btn-action-dark:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-action-primary {
+            background: linear-gradient(90deg, var(--speed-pink) 0%, var(--speed-blue) 100%);
+            border: none;
+            color: #ffffff !important;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(244, 37, 130, 0.3);
+        }
+
+        .btn-action-primary:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .hover-shadow {
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .hover-shadow:hover {
+            background-color: rgba(15, 19, 34, 0.8) !important;
+            border-color: rgba(0, 162, 255, 0.4) !important;
+        }
+
+        /* Timeline Container */
+        .timeline-container {
+            position: relative;
+            padding-left: 0.5rem;
+        }
+        .timeline-step {
+            position: relative;
+        }
+        .timeline-step:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 24px;
+            bottom: -12px;
+            width: 2px;
+            background-color: rgba(255, 255, 255, 0.12);
+            z-index: 0;
+        }
+    </style>
 </head>
-<body class="bg-light min-vh-100 d-flex flex-column justify-content-between">
+<body class="min-vh-100 d-flex flex-column justify-content-between">
 
     <!-- Top Navigation Bar -->
-    <header class="navbar navbar-light bg-white border-bottom px-4 py-3 shadow-sm">
+    <header class="navbar navbar-dark navbar-speed px-4 py-3 sticky-top shadow-sm">
         <div class="container-fluid d-flex justify-content-between align-items-center">
             
-            <a href="{{ url('/') }}" class="text-decoration-none d-flex align-items-center gap-2 text-dark">
-                <i class="bi bi-arrow-left fs-5"></i>
-                <span class="fw-bold text-primary fs-4">SpeedLane</span>
+            <a href="{{ url('/') }}" class="text-decoration-none d-flex align-items-center gap-2 text-white">
+                <i class="bi bi-arrow-left fs-5 text-speed-pink"></i>
+                <span class="brand-logo-text">
+                    <span class="text-speed-pink">SPEED</span><span class="text-speed-blue">LANE</span>
+                </span>
             </a>
 
             <div>
                 @if(isset($transactions) && $transactions->count() > 0)
-                    <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill">
+                    <span class="badge bg-black bg-opacity-50 text-speed-blue font-monospace border border-secondary border-opacity-25 px-3 py-2 fs-6 rounded-pill">
                         Tracking Code: {{ $trackingCode }}
                     </span>
                 @else
-                    <span class="badge bg-secondary px-3 py-2 fs-6 rounded-pill opacity-50">
+                    <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25 px-3 py-2 fs-6 rounded-pill">
                         No Record Found
                     </span>
                 @endif
@@ -43,7 +188,7 @@
     <main class="container my-4" style="max-width: 1000px;">
         
         <div class="mb-4">
-            <h2 class="fw-bold text-dark">Vehicle Service Progress</h2>
+            <h2 class="fw-bold text-white">Vehicle Service Progress</h2>
         </div>
 
         @if(isset($transactions) && $transactions->count() > 0)
@@ -52,8 +197,30 @@
                 $grandTotalCost = $transactions->sum(function($item) {
                     return $item->total_cost ?? $item->cost ?? 0;
                 });
-                $highestStep = $transactions->max('current_step') ?? 1;
-                $allCompleted = $transactions->every(fn($t) => $t->status === 'Completed');
+                
+                $parseProp = function($prop) {
+                    if (is_string($prop)) {
+                        $decoded = json_decode($prop, true);
+                        return is_array($decoded) ? $decoded : [];
+                    }
+                    return is_array($prop) ? $prop : [];
+                };
+
+                // Check if all items across all vehicles are completed
+                $allCompleted = $transactions->every(function($t) use ($parseProp) {
+                    $rawServices = $parseProp($t->selected_services ?? $t->services ?? []);
+                    if (empty($rawServices)) {
+                        return str_contains(strtolower($t->status ?? ''), 'completed');
+                    }
+                    foreach ($rawServices as $srv) {
+                        $status = is_array($srv) ? ($srv['status'] ?? '') : '';
+                        if (!str_contains(strtolower($status), 'completed')) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+
                 $contactNum = $customerInfo->contact_number ?? $customerInfo->phone_number ?? null;
             @endphp
 
@@ -62,36 +229,36 @@
                 
                 <!-- Customer Details -->
                 <div class="col-lg-7">
-                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
-                        <div class="d-flex align-items-center gap-2 mb-3 text-primary fw-bold">
+                    <div class="card speed-card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <div class="d-flex align-items-center gap-2 mb-3 text-speed-pink fw-bold">
                             <i class="bi bi-person-circle fs-5"></i>
                             <span>Customer Information</span>
                         </div>
 
                         <div class="row g-3">
                             <div class="col-6">
-                                <span class="text-muted extra-small d-block">Customer Name</span>
-                                <span class="fw-bold text-dark fs-6">{{ $customerInfo->customer_name ?? 'N/A' }}</span>
+                                <span class="text-secondary extra-small d-block">Customer Name</span>
+                                <span class="fw-bold text-white fs-6">{{ $customerInfo->customer_name ?? 'N/A' }}</span>
                             </div>
                             <div class="col-6">
-                                <span class="text-muted extra-small d-block">Vehicles In Order</span>
-                                <span class="fw-bold text-dark fs-6">{{ $transactions->count() }} Vehicle(s)</span>
+                                <span class="text-secondary extra-small d-block">Vehicles In Order</span>
+                                <span class="fw-bold text-white fs-6">{{ $transactions->count() }} Vehicle(s)</span>
                             </div>
 
                             <div class="col-6">
-                                <span class="text-muted extra-small d-block">Contact Number</span>
+                                <span class="text-secondary extra-small d-block">Contact Number</span>
                                 @if($contactNum)
-                                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contactNum) }}" class="fw-bold text-primary text-decoration-none fs-6">
+                                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contactNum) }}" class="fw-bold text-speed-blue text-decoration-none fs-6">
                                         <i class="bi bi-telephone me-1"></i>{{ $contactNum }}
                                     </a>
                                 @else
-                                    <span class="fw-bold text-dark fs-6">N/A</span>
+                                    <span class="fw-bold text-white fs-6">N/A</span>
                                 @endif
                             </div>
                             <div class="col-6">
-                                <span class="text-muted extra-small d-block">Date Received</span>
-                                <span class="fw-bold text-dark fs-6">
-                                    {{ $customerInfo->created_at ? $customerInfo->created_at->format('M d, Y') : 'N/A' }}
+                                <span class="text-secondary extra-small d-block">Date Received</span>
+                                <span class="fw-bold text-white fs-6">
+                                    {{ $customerInfo->created_at ? \Carbon\Carbon::parse($customerInfo->created_at)->format('M d, Y • h:i A') : 'N/A' }}
                                 </span>
                             </div>
                         </div>
@@ -100,35 +267,43 @@
 
                 <!-- Order Summary -->
                 <div class="col-lg-5">
-                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
-                        <div class="d-flex align-items-center gap-2 mb-3 text-primary fw-bold">
+                    <div class="card speed-card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <div class="d-flex align-items-center gap-2 mb-3 text-speed-blue fw-bold">
                             <i class="bi bi-speedometer2 fs-5"></i>
                             <span>Order Summary</span>
                         </div>
 
                         <div class="mb-3 text-center">
                             @if($allCompleted)
-                                <span class="btn btn-success fw-bold rounded-3 px-4 py-2 w-100 fs-6 pointer-none">
+                                <span class="btn btn-status-completed fw-bold rounded-3 px-4 py-2 w-100 fs-6 pointer-none shadow-sm">
                                     <i class="bi bi-check-circle-fill me-1"></i> All Vehicles Completed
                                 </span>
                             @else
-                                <span class="btn btn-primary fw-bold rounded-3 px-4 py-2 w-100 fs-6 pointer-none">
+                                <span class="btn btn-status-progress fw-bold rounded-3 px-4 py-2 w-100 fs-6 pointer-none shadow-sm">
                                     <i class="bi bi-clock-history me-1"></i> Service In Progress
                                 </span>
                             @endif
                         </div>
 
-                        <div class="d-flex justify-content-between text-muted small fw-semibold mb-1">
-                            <span>Highest Progress Stage</span>
-                            <span class="text-primary fw-bold">Step {{ $highestStep }} of 5</span>
-                        </div>
-                        <div class="progress mb-3" style="height: 8px;">
-                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ ($highestStep / 5) * 100 }}%;"></div>
-                        </div>
-
-                        <div>
-                            <span class="text-muted extra-small d-block">Total Estimated Cost</span>
-                            <h3 class="fw-bold text-success mb-0">₱{{ number_format($grandTotalCost, 2) }}</h3>
+                        <!-- Dynamic Cost Label & Badge Switch -->
+                        <div class="p-3 rounded-3 border border-secondary border-opacity-25" style="background-color: #06080d;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-secondary extra-small font-monospace text-uppercase fw-semibold">
+                                    {{ $allCompleted ? 'Final Total Cost' : 'Total Estimated Cost' }}
+                                </span>
+                                @if($allCompleted)
+                                    <span class="badge badge-status-completed extra-small">
+                                        <i class="bi bi-patch-check-fill me-1"></i>Final Bill
+                                    </span>
+                                @else
+                                    <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-30 extra-small">
+                                        <i class="bi bi-hourglass-split me-1"></i>Estimate
+                                    </span>
+                                @endif
+                            </div>
+                            <h3 class="fw-bold {{ $allCompleted ? 'text-success' : 'text-speed-pink' }} mb-0 font-monospace">
+                                ₱{{ number_format($grandTotalCost, 2) }}
+                            </h3>
                         </div>
                     </div>
                 </div>
@@ -136,131 +311,261 @@
             </div>
 
             <!-- Vehicles Loop -->
-            <h5 class="fw-bold text-dark mb-3">
-                <i class="bi bi-car-front-fill me-2 text-primary"></i>Vehicles Registered Under Code: {{ $trackingCode }}
+            <h5 class="fw-bold text-white mb-3">
+                <i class="bi bi-car-front-fill me-2 text-speed-blue"></i>Vehicles Registered Under Code: {{ $trackingCode }}
             </h5>
             
             @foreach($transactions as $index => $item)
-                @php $step = $item->current_step ?? 1; @endphp
+                @php
+                    $rawSelectedServices = $parseProp($item->selected_services ?? $item->services ?? []);
+                    
+                    $serviceItems = [];
+                    foreach ($rawSelectedServices as $srv) {
+                        if (is_array($srv)) {
+                            $serviceItems[] = [
+                                'name'   => $srv['name'] ?? $srv['service_name'] ?? 'Service',
+                                'status' => $srv['status'] ?? 'Pending Queue',
+                                'note'   => $srv['note'] ?? $srv['status_note'] ?? '',
+                                'updated_at' => $srv['updated_at'] ?? null,
+                                'stage_timestamps' => $srv['stage_timestamps'] ?? []
+                            ];
+                        } else {
+                            $serviceItems[] = [
+                                'name'   => (string)$srv,
+                                'status' => 'Pending Queue',
+                                'note'   => '',
+                                'updated_at' => null,
+                                'stage_timestamps' => []
+                            ];
+                        }
+                    }
+
+                    // Fallback if empty array
+                    if (empty($serviceItems)) {
+                        $serviceItems[] = [
+                            'name'   => $item->service_type ?? 'General Service',
+                            'status' => $item->status ?? 'Pending Queue',
+                            'note'   => $item->note ?? '',
+                            'updated_at' => null,
+                            'stage_timestamps' => []
+                        ];
+                    }
+
+                    $isVehicleCompleted = array_reduce($serviceItems, function($carry, $s) {
+                        return $carry && str_contains(strtolower($s['status']), 'completed');
+                    }, true);
+                @endphp
                 
-                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <div class="card speed-card border-0 shadow-sm rounded-4 p-4 mb-4">
                     
                     <!-- Vehicle Title -->
-                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                        <h5 class="fw-bold text-dark mb-0">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                        <h5 class="fw-bold text-white mb-0">
                             Vehicle #{{ $index + 1 }}: {{ $item->vehicle_name ?? $item->vehicle_model ?? $item->vehicle_brand ?? 'Vehicle' }}
                         </h5>
-                        <span class="badge bg-dark font-monospace fs-6 px-3 py-1.5">{{ $item->plate_number }}</span>
+                        <span class="badge bg-black bg-opacity-50 text-speed-blue font-monospace fs-6 px-3 py-1.5 border border-secondary border-opacity-25">{{ $item->plate_number }}</span>
                     </div>
 
                     <!-- Details -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
-                            <span class="text-muted extra-small d-block">Service Type</span>
-                            <span class="fw-bold text-dark small">{{ $item->service_type ?? 'General Service' }}</span>
+                            <span class="text-secondary extra-small d-block">Service Type</span>
+                            <span class="fw-bold text-white small">{{ $item->service_type ?? 'General Service' }}</span>
                         </div>
                         <div class="col-md-4">
-                            <span class="text-muted extra-small d-block">Assigned Technician</span>
-                            <span class="fw-bold text-dark small">{{ $item->technician ?? $item->mechanic_assigned ?? 'Unassigned' }}</span>
+                            <span class="text-secondary extra-small d-block">Assigned Technician</span>
+                            <span class="fw-bold text-white small">{{ $item->technician ?? $item->mechanic_assigned ?? 'Unassigned' }}</span>
                         </div>
                         <div class="col-md-4">
-                            <span class="text-muted extra-small d-block">Vehicle Subtotal</span>
-                            <span class="fw-bold text-success small">₱{{ number_format($item->total_cost ?? $item->cost ?? 0, 2) }}</span>
+                            <span class="text-secondary extra-small d-block">
+                                {{ $isVehicleCompleted ? 'Vehicle Final Cost' : 'Vehicle Estimated Subtotal' }}
+                            </span>
+                            <span class="fw-bold {{ $isVehicleCompleted ? 'text-success' : 'text-speed-blue' }} small font-monospace">
+                                ₱{{ number_format($item->total_cost ?? $item->cost ?? 0, 2) }}
+                                @if($isVehicleCompleted)
+                                    <span class="badge badge-status-completed ms-1 extra-small">Final</span>
+                                @else
+                                    <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25 ms-1 extra-small">Estimated</span>
+                                @endif
+                            </span>
                         </div>
                     </div>
 
-                    <!-- Timeline -->
-                    <h6 class="fw-bold text-secondary small mb-3">Service Timeline</h6>
-                    <div class="timeline-container ms-2">
-                        @php
-                            $timezone = 'Asia/Manila';
+                    <!-- Service Items Timeline -->
+                    <h6 class="fw-bold text-secondary small mb-3">
+                        <i class="bi bi-clock-history me-1 text-speed-blue"></i>Service Timeline & Specific Stages
+                    </h6>
 
-                            $steps = [
-                                [
-                                    'number' => 1,
-                                    'title' => 'Step 1: Vehicle Received',
-                                    'timestamp' => $item->received_at ?? $item->created_at,
-                                ],
-                                [
-                                    'number' => 2,
-                                    'title' => 'Step 2: Inspection',
-                                    'timestamp' => $item->inspected_at ?? ($step >= 2 ? $item->updated_at : null),
-                                ],
-                                [
-                                    'number' => 3,
-                                    'title' => 'Step 3: Repair / Coating In Progress',
-                                    'timestamp' => $item->in_progress_at ?? ($step >= 3 ? $item->updated_at : null),
-                                ],
-                                [
-                                    'number' => 4,
-                                    'title' => 'Step 4: Quality Check / Ready for Pickup',
-                                    'timestamp' => $item->ready_at ?? ($step >= 4 ? $item->updated_at : null),
-                                ],
-                                [
-                                    'number' => 5,
-                                    'title' => 'Step 5: Released / Completed',
-                                    'timestamp' => $item->completed_at ?? ($step == 5 ? $item->updated_at : null),
-                                ],
-                            ];
+                    @foreach($serviceItems as $sIdx => $sItem)
+                        @php
+                            $sName = $sItem['name'];
+                            $sStatus = $sItem['status'];
+                            $sNote = trim($sItem['note']);
+                            $lowerName = strtolower($sName);
+
+                            // Stage list definitions matching admin update.blade.php exactly
+                            if (str_contains($lowerName, 'coating') || str_contains($lowerName, 'ceramic') || str_contains($lowerName, 'graphene')) {
+                                $stages = [
+                                    'Pending Queue',
+                                    'Decontamination & Wash Prep',
+                                    'Paint Correction & Polishing',
+                                    'Coating Layer Application',
+                                    'Curing Process',
+                                    'Final Inspection',
+                                    'Completed & Ready for Pick Up'
+                                ];
+                            } elseif (str_contains($lowerName, 'detail') || str_contains($lowerName, 'interior') || str_contains($lowerName, 'exterior')) {
+                                $stages = [
+                                    'Pending Queue',
+                                    'Exterior Wash & Clay Bar',
+                                    'Interior Vacuum & Steam Clean',
+                                    'Leather & Plastic Conditioning',
+                                    'Exterior Machine Polish',
+                                    'Final Inspection',
+                                    'Completed & Ready for Pick Up'
+                                ];
+                            } else {
+                                $stages = [
+                                    'Pending Queue',
+                                    'Under Inspection & Diagnostics',
+                                    'Awaiting Parts / Approval',
+                                    'Repair In Progress',
+                                    'Quality Testing',
+                                    'Completed & Ready for Pick Up'
+                                ];
+                            }
+
+                            // Match current stage index
+                            $currentStageIdx = array_search($sStatus, $stages);
+                            if ($currentStageIdx === false) {
+                                $currentStageIdx = 0;
+                                foreach ($stages as $stIdx => $stName) {
+                                    if (str_contains(strtolower($sStatus), strtolower(explode(' ', $stName)[0]))) {
+                                        $currentStageIdx = $stIdx;
+                                        break;
+                                    }
+                                }
+                            }
                         @endphp
 
-                        @foreach($steps as $s)
-                            @php
-                                $isDone = $step >= $s['number'];
-                                $isCurrent = $step == $s['number'];
-                                
-                                $ts = ($isDone && $s['timestamp']) 
-                                    ? \Carbon\Carbon::parse($s['timestamp'])->setTimezone($timezone)->format('M d, Y · h:i A') 
-                                    : null;
-                            @endphp
+                        <div class="p-3 rounded-3 border border-secondary border-opacity-25 mb-3" style="background-color: rgba(6, 8, 13, 0.6);">
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                                <span class="fw-bold text-white">
+                                    <i class="bi bi-tools text-speed-pink me-1"></i> {{ $sName }}
+                                </span>
+                                <span class="badge badge-status-blue px-2.5 py-1 extra-small">
+                                    Current Stage: {{ $sStatus }}
+                                </span>
+                            </div>
 
-                            <div class="timeline-step mb-3">
-                                <div class="d-flex align-items-center justify-content-between gap-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <i class="bi {{ $isDone ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted' }} fs-5"></i>
-                                        <div>
-                                            <span class="fw-semibold small {{ $isDone ? 'text-dark' : 'text-muted' }}">
-                                                {{ $s['title'] }}
-                                            </span>
-                                            @if($isCurrent && $step < 5)
-                                                <span class="badge bg-primary ms-2 extra-small">Current Stage</span>
-                                            @elseif($step == 5 && $s['number'] == 5)
-                                                <span class="badge bg-success ms-2 extra-small">Completed</span>
-                                            @endif
+                            <div class="timeline-container ms-1">
+                                @foreach($stages as $stIdx => $stageName)
+                                    @php
+                                        $isPassed = $stIdx < $currentStageIdx;
+                                        $isCurrent = $stIdx === $currentStageIdx;
+                                        $isStageCompleted = $isPassed || ($isCurrent && str_contains(strtolower($stageName), 'completed'));
+
+                                        // Determine timestamp for this stage
+                                        $stageTimestamp = null;
+                                        if (isset($sItem['stage_timestamps'][$stageName])) {
+                                            $stageTimestamp = \Carbon\Carbon::parse($sItem['stage_timestamps'][$stageName]);
+                                        } elseif ($stIdx === 0 && $item->created_at) {
+                                            $stageTimestamp = \Carbon\Carbon::parse($item->created_at);
+                                        } elseif (($isCurrent || $isPassed) && $item->updated_at) {
+                                            $stageTimestamp = \Carbon\Carbon::parse($item->updated_at);
+                                        }
+                                    @endphp
+
+                                    <div class="timeline-step mb-3">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <!-- Step Icon -->
+                                            <div style="z-index: 1;">
+                                                @if($isStageCompleted)
+                                                    <i class="bi bi-check-circle-fill text-success fs-5 rounded-circle" style="background-color: #0e111a;"></i>
+                                                @elseif($isCurrent)
+                                                    <i class="bi bi-arrow-right-circle-fill text-speed-blue fs-5 rounded-circle" style="background-color: #0e111a;"></i>
+                                                @else
+                                                    <i class="bi bi-circle text-secondary fs-5 rounded-circle" style="background-color: #0e111a;"></i>
+                                                @endif
+                                            </div>
+
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                                    <div>
+                                                        <span class="fw-semibold small {{ $isStageCompleted ? 'text-white' : ($isCurrent ? 'text-speed-blue fw-bold' : 'text-secondary') }}">
+                                                            Step {{ $stIdx + 1 }}: {{ $stageName }}
+                                                        </span>
+
+                                                        <!-- Stage Timestamp -->
+                                                        @if($stageTimestamp)
+                                                            <div class="extra-small text-secondary mt-0.5 d-flex align-items-center gap-1">
+                                                                <i class="bi bi-clock me-1"></i>
+                                                                @if($stIdx === 0)
+                                                                    <span>Received: {{ $stageTimestamp->format('M d, Y • h:i A') }}</span>
+                                                                @elseif($isStageCompleted)
+                                                                    <span>Done: {{ $stageTimestamp->format('M d, Y • h:i A') }}</span>
+                                                                @elseif($isCurrent)
+                                                                    <span>Updated: {{ $stageTimestamp->format('M d, Y • h:i A') }}</span>
+                                                                @endif
+                                                            </div>
+                                                        @else
+                                                            <div class="extra-small text-secondary opacity-50 mt-0.5 d-flex align-items-center gap-1">
+                                                                <i class="bi bi-dash-circle me-1"></i>
+                                                                <span>Pending stage</span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        @if($isCurrent && !str_contains(strtolower($stageName), 'completed'))
+                                                            <span class="badge badge-status-blue extra-small">Current Stage</span>
+                                                        @elseif($isStageCompleted && str_contains(strtolower($stageName), 'completed'))
+                                                            <span class="badge badge-status-completed extra-small">Completed</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+
+                                                <!-- Render Admin / Technician Remarks Note if entered in update.blade -->
+                                                @if($isCurrent && !empty($sNote))
+                                                    <div class="mt-2 p-2.5 rounded-3 border border-info border-opacity-30 text-white shadow-sm" style="background-color: rgba(0, 162, 255, 0.08);">
+                                                        <div class="d-flex align-items-center gap-1.5 fw-bold text-speed-blue mb-1 extra-small">
+                                                            <i class="bi bi-chat-left-text-fill"></i> Technician Progress Note
+                                                        </div>
+                                                        <p class="mb-0 text-light" style="font-size: 0.85rem; line-height: 1.45;">
+                                                            "{{ $sNote }}"
+                                                        </p>
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
-
-                                    @if($isDone && $ts)
-                                        <span class="badge bg-light text-secondary border font-monospace fw-normal extra-small">
-                                            <i class="bi bi-clock me-1"></i>{{ $ts }}
-                                        </span>
-                                    @endif
-                                </div>
+                                @endforeach
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @endforeach
+
                 </div>
             @endforeach
 
             <!-- Action Navigation -->
             <div class="d-flex gap-2 mb-4">
-                <a href="{{ url('/') }}" class="btn btn-outline-secondary px-4 py-2 fw-semibold rounded-3">
+                <a href="{{ url('/') }}" class="btn btn-action-dark px-4 py-2 fw-semibold rounded-3">
                     <i class="bi bi-arrow-left me-1"></i> Track Another Code
                 </a>
             </div>
 
         @else
             <!-- Empty State -->
-            <div class="card border-0 shadow-sm rounded-4 p-5 bg-white text-center mb-4">
+            <div class="card speed-card border-0 shadow-sm rounded-4 p-5 text-center mb-4">
                 <div class="py-4">
-                    <div class="bg-light text-muted d-inline-flex p-3 rounded-circle mb-3">
+                    <div class="bg-black bg-opacity-40 text-secondary d-inline-flex p-3 rounded-circle mb-3 border border-secondary border-opacity-25">
                         <i class="bi bi-search fs-1 text-secondary"></i>
                     </div>
-                    <h5 class="fw-bold text-dark mb-2">No Service Record Found</h5>
-                    <p class="text-muted small mx-auto mb-4" style="max-width: 450px;">
+                    <h5 class="fw-bold text-white mb-2">No Service Record Found</h5>
+                    <p class="text-secondary small mx-auto mb-4" style="max-width: 450px;">
                         No active vehicles were found matching that tracking code or plate number.
                     </p>
-                    <a href="{{ url('/') }}" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold">
+                    <a href="{{ url('/') }}" class="btn btn-action-primary px-4 py-2 rounded-3 fw-semibold">
                         <i class="bi bi-arrow-left me-1"></i> Return to Search
                     </a>
                 </div>
@@ -268,32 +573,32 @@
         @endif
 
         <!-- Support Card with Clickable Contacts -->
-        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-            <h6 class="fw-bold text-dark mb-1">Need Immediate Assistance?</h6>
-            <p class="text-muted small mb-3">Reach out to our customer support team for live updates regarding your vehicle's status.</p>
+        <div class="card speed-card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <h6 class="fw-bold text-white mb-1">Need Immediate Assistance?</h6>
+            <p class="text-secondary small mb-3">Reach out to our customer support team for live updates regarding your vehicle's status.</p>
 
             <div class="row g-3">
                 <!-- Phone Link -->
                 <div class="col-md-6">
                     <a href="tel:+639171234567" class="text-decoration-none">
-                        <div class="bg-light rounded-3 p-3 d-flex align-items-center gap-3 border border-transparent hover-shadow">
-                            <i class="bi bi-telephone-fill text-primary fs-5"></i>
+                        <div class="rounded-3 p-3 d-flex align-items-center gap-3 border border-secondary border-opacity-25 hover-shadow" style="background-color: rgba(6, 8, 13, 0.6);">
+                            <i class="bi bi-telephone-fill text-speed-pink fs-5"></i>
                             <div>
-                                <span class="extra-small text-muted d-block">Phone Support</span>
-                                <span class="fw-bold text-dark small">+63 917 123 4567</span>
+                                <span class="extra-small text-secondary d-block">Phone Support</span>
+                                <span class="fw-bold text-white small">+63 917 123 4567</span>
                             </div>
                         </div>
                     </a>
                 </div>
 
-                <!-- Email Link (Opens Gmail directly on web, or native mail app on mobile) -->
+                <!-- Email Link -->
                 <div class="col-md-6">
                     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@speedlane.com" target="_blank" class="text-decoration-none">
-                        <div class="bg-light rounded-3 p-3 d-flex align-items-center gap-3 border border-transparent hover-shadow">
-                            <i class="bi bi-envelope-fill text-primary fs-5"></i>
+                        <div class="rounded-3 p-3 d-flex align-items-center gap-3 border border-secondary border-opacity-25 hover-shadow" style="background-color: rgba(6, 8, 13, 0.6);">
+                            <i class="bi bi-envelope-fill text-speed-blue fs-5"></i>
                             <div>
-                                <span class="extra-small text-muted d-block">Email Support</span>
-                                <span class="fw-bold text-dark small">support@speedlane.com</span>
+                                <span class="extra-small text-secondary d-block">Email Support</span>
+                                <span class="fw-bold text-white small">support@speedlane.com</span>
                             </div>
                         </div>
                     </a>
@@ -303,7 +608,7 @@
 
     </main>
 
-    <footer class="text-center py-3 text-muted extra-small">
+    <footer class="text-center py-3 text-secondary extra-small">
         &copy; {{ date('Y') }} SpeedLane Service Center. All rights reserved.
     </footer>
 

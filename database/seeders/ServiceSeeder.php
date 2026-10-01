@@ -132,7 +132,7 @@ class ServiceSeeder extends Seeder
                 ]
             ],
             [
-                'name'           => 'Paint Protection Film (PPF)',
+                'name'           => 'PPF',
                 'description'    => 'Self-healing, ultra-clear protective film guarding against stone chips and physical abrasion.',
                 'notice'         => 'High-impact panel and full front protection options.',
                 'selection_type' => 'multi',
