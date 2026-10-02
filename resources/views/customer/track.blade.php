@@ -5,6 +5,17 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>SpeedLane AutoSpa - Track Status</title>
         
+          <!-- Early Theme Check Script (Defaults to Light Theme) -->
+    <script>
+        const savedTheme = localStorage.getItem('speedlane_theme');
+        // Default to Light Mode unless explicitly set to 'dark'
+        if (savedTheme !== 'dark') {
+            document.documentElement.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+        }
+    </script>
+
         <!-- Bootstrap 5 CSS CDN -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <!-- Bootstrap Icons CDN -->

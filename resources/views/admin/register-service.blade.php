@@ -10,12 +10,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedLane - Register Vehicle Service</title>
 
+    <!-- Early Theme Check Script -->
+    <script>
+        const savedTheme = localStorage.getItem('speedlane_theme');
+        if (savedTheme !== 'dark') {
+            document.documentElement.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+        }
+    </script>
+
     <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
     <!-- Custom Admin External Stylesheet -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <!-- Light Mode Toggle CSS -->
+    <link rel="stylesheet" href="{{ asset('css/theme-toggle.css') }}">
 
     <style>
         :root {
@@ -27,6 +39,7 @@
             --speed-sidebar-bg: #0a0d16;
         }
 
+        /* Dark Theme Default */
         body {
             background-color: var(--speed-dark-bg) !important;
             color: #e2e8f0;
@@ -34,6 +47,7 @@
             min-height: 100vh;
             background: radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%) !important;
             background-attachment: fixed;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Color Utility Classes */
@@ -42,7 +56,7 @@
         .bg-speed-pink { background-color: var(--speed-pink) !important; }
         .bg-speed-blue { background-color: var(--speed-blue) !important; }
 
-        /* Role Badge Styling */
+        /* Dark Theme Role Badges */
         .badge-super-admin {
             background-color: rgba(244, 37, 130, 0.18) !important;
             color: #ffb3d9 !important;
@@ -57,6 +71,40 @@
             border: 1px solid rgba(0, 162, 255, 0.5) !important;
             font-weight: 600;
             letter-spacing: 0.3px;
+        }
+
+        .badge-vehicle-type {
+            background-color: rgba(0, 162, 255, 0.18) !important;
+            color: #99dbff !important;
+            border: 1px solid rgba(0, 162, 255, 0.5) !important;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Dark Theme Logout Button */
+        .btn-logout {
+            color: #ff6b81 !important;
+            border: 1px solid rgba(255, 107, 129, 0.4) !important;
+            background: rgba(255, 107, 129, 0.05);
+            transition: all 0.25s ease;
+            font-weight: 600;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 107, 129, 0.2) !important;
+            color: #ffffff !important;
+            border-color: #ff6b81 !important;
+        }
+
+        /* Dark Theme Toggle Button */
+        #theme-toggle-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        #theme-toggle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
         }
 
         /* Top Navigation Header */
@@ -128,6 +176,7 @@
             opacity: 0.95;
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
+            color: #ffffff !important;
         }
 
         /* Inputs & Dropdowns */
@@ -157,20 +206,6 @@
 
         .input-group .form-control-dark {
             border-left: none !important;
-        }
-
-        /* High Visibility Logout Button */
-        .btn-logout {
-            color: #ff6b81 !important;
-            border: 1px solid rgba(255, 107, 129, 0.4) !important;
-            background: rgba(255, 107, 129, 0.05);
-            transition: all 0.25s ease;
-        }
-
-        .btn-logout:hover {
-            background: rgba(255, 107, 129, 0.2) !important;
-            color: #ffffff !important;
-            border-color: #ff6b81 !important;
         }
 
         /* Service Registration Specific Styles */
@@ -217,7 +252,7 @@
 
         .btn-generate {
             background: linear-gradient(90deg, var(--speed-pink) 0%, var(--speed-blue) 100%);
-            color: #ffffff;
+            color: #ffffff !important;
             border: none;
             padding: 0.5rem 1.1rem;
             border-radius: 8px;
@@ -232,6 +267,7 @@
             opacity: 0.95;
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
+            color: #ffffff !important;
         }
 
         .code-box {
@@ -272,6 +308,207 @@
                 overflow-y: auto;
             }
         }
+
+        /* ========================================================================= */
+        /* LIGHT MODE HIGH-CONTRAST OVERRIDES                                       */
+        /* ========================================================================= */
+        html.light-theme {
+            --speed-dark-bg: #f8fafc;
+            --speed-card-bg: #ffffff;
+            --speed-card-border: rgba(0, 0, 0, 0.08);
+            --speed-sidebar-bg: #f8fafc;
+        }
+
+        html.light-theme body {
+            background: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
+        html.light-theme .navbar-speed {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        html.light-theme h3,
+        html.light-theme h4,
+        html.light-theme h5,
+        html.light-theme h6 {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .text-white {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .btn-speed-gradient,
+        html.light-theme .btn-generate,
+        html.light-theme .badge.bg-speed-pink,
+        html.light-theme .bg-speed-pink.text-white {
+            color: #ffffff !important;
+        }
+
+        html.light-theme .badge-super-admin {
+            background-color: #fce7f3 !important;
+            color: #be185d !important;
+            border: 1px solid #f472b6 !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-admin {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            border: 1px solid #38bdf8 !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-vehicle-type {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            border: 1px solid #38bdf8 !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .btn-logout {
+            color: #e11d48 !important;
+            border: 1px solid #fda4af !important;
+            background: #fff1f2 !important;
+            font-weight: 600;
+        }
+
+        html.light-theme .btn-logout:hover {
+            background: #ffe4e6 !important;
+            color: #9f1239 !important;
+            border-color: #f43f5e !important;
+        }
+
+        html.light-theme #theme-toggle-btn {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme #theme-toggle-btn:hover {
+            background-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .admin-sidebar {
+            background-color: #f8fafc !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-theme .admin-nav-link {
+            color: #475569 !important;
+            font-weight: 600;
+        }
+
+        html.light-theme .admin-nav-link:hover {
+            color: #0f172a !important;
+            background: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .admin-nav-link.active {
+            background: linear-gradient(90deg, rgba(244, 37, 130, 0.12) 0%, rgba(0, 162, 255, 0.12) 100%) !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(244, 37, 130, 0.4) !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .speed-card {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-theme .form-control-dark,
+        html.light-theme .form-select-dark {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .form-control-dark:focus,
+        html.light-theme .form-select-dark:focus {
+            border-color: var(--speed-blue) !important;
+            color: #0f172a !important;
+            box-shadow: 0 0 12px rgba(0, 162, 255, 0.2) !important;
+        }
+
+        html.light-theme .form-control-dark::placeholder {
+            color: #64748b !important;
+        }
+
+        html.light-theme .input-group-text-dark {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-right: none !important;
+            color: #475569 !important;
+        }
+
+        html.light-theme .service-card-item {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        html.light-theme .subservice-option-item {
+            background-color: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .subservice-option-item:hover {
+            background-color: #f1f5f9 !important;
+            border-color: var(--speed-blue) !important;
+        }
+
+        html.light-theme .service-options-panel {
+            background-color: #f1f5f9 !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        html.light-theme .vehicle-type-placeholder {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .tracking-code-container {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        html.light-theme .code-box {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            color: #0284c7 !important;
+        }
+
+        html.light-theme #previewVehiclesContainer .card {
+            background-color: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        html.light-theme #previewCode {
+            background-color: #e2e8f0 !important;
+            color: #0284c7 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .alert-success {
+            background-color: #dcfce7 !important;
+            color: #15803d !important;
+            border-color: #86efac !important;
+        }
+
+        html.light-theme .alert-danger {
+            background-color: #fee2e2 !important;
+            color: #b91c1c !important;
+            border-color: #fca5a5 !important;
+        }
+
+        html.light-theme .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(50%);
+        }
     </style>
 </head>
 
@@ -288,7 +525,7 @@
                     <span class="brand-logo-text d-block">
                         <span class="text-speed-pink">SPEED</span><span class="text-speed-blue">LANE</span>
                     </span>
-                    <span class="brand-subtext d-block">ADMIN OVERVIEW</span>
+                    <span class="brand-subtext d-block">REGISTER SERVICE</span>
                 </div>
             </a>
 
@@ -310,6 +547,11 @@
                         <i class="bi bi-box-arrow-right"></i> Logout
                     </button>
                 </form>
+
+                <!-- Light / Dark Mode Toggle Button -->
+                <button id="theme-toggle-btn" type="button" class="btn d-flex align-items-center justify-content-center rounded-circle p-2" style="width: 40px; height: 40px;" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode" onclick="toggleSpeedLaneTheme()">
+                    <i id="theme-toggle-icon" class="bi bi-sun-fill text-warning"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -428,7 +670,7 @@
                                     <!-- Collapsible Header -->
                                     <div class="d-flex justify-content-between align-items-center vehicle-header pb-2">
                                         <div class="d-flex align-items-center gap-2 vehicle-collapse-trigger flex-grow-1" data-bs-toggle="collapse" data-bs-target="#vehicleCollapse_0" aria-expanded="true" aria-controls="vehicleCollapse_0">
-                                            <span class="badge bg-speed-pink rounded-circle px-2.5 py-1.5 vehicle-number-badge">1</span>
+                                            <span class="badge bg-speed-pink rounded-circle px-2.5 py-1.5 vehicle-number-badge text-white">1</span>
                                             <span class="fw-semibold text-secondary small vehicle-status-label">Not yet filled</span>
                                             <i class="bi bi-chevron-down text-secondary small ms-1 collapse-icon"></i>
                                         </div>
@@ -454,28 +696,45 @@
                                                 <label class="form-label small text-secondary fw-semibold">Brand <span class="text-speed-pink">*</span></label>
                                                 <select name="vehicles[0][vehicle_make]" class="form-select form-select-dark brand-select" required>
                                                     <option value="" disabled selected>Select Brand</option>
-                                                    <option value="Toyota">Toyota</option>
-                                                    <option value="Porsche">Porsche</option>
-                                                    <option value="Ford">Ford</option>
-                                                    <option value="Chevrolet">Chevrolet</option>
-                                                    <option value="Dodge">Dodge</option>
-                                                    <option value="Nissan">Nissan</option>
-                                                    <option value="Honda">Honda</option>
-                                                    <option value="Subaru">Subaru</option>
-                                                    <option value="Mazda">Mazda</option>
-                                                    <option value="BMW">BMW</option>
-                                                    <option value="Mercedes-Benz">Mercedes-Benz</option>
-                                                    <option value="Audi">Audi</option>
-                                                    <option value="Ferrari">Ferrari</option>
-                                                    <option value="Lamborghini">Lamborghini</option>
-                                                    <option value="Jeep">Jeep</option>
-                                                    <option value="Land Rover">Land Rover</option>
-                                                    <option value="BYD">BYD</option>
-                                                    <option value="Tesla">Tesla</option>
-                                                    <option value="Mitsubishi">Mitsubishi</option>
-                                                    <option value="Hyundai">Hyundai</option>
-                                                    <option value="Isuzu">Isuzu</option>
-                                                    <option value="Suzuki">Suzuki</option>
+                                                    @if(isset($vehicleModels) && count($vehicleModels) > 0)
+                                                        @php
+                                                            $uniqueBrands = [];
+                                                            foreach ($vehicleModels as $key => $val) {
+                                                                if (is_array($val) || $val instanceof \Illuminate\Support\Collection) {
+                                                                    $uniqueBrands[] = $key;
+                                                                } elseif (is_object($val) && isset($val->brand)) {
+                                                                    $uniqueBrands[] = $val->brand;
+                                                                }
+                                                            }
+                                                            $uniqueBrands = array_unique($uniqueBrands);
+                                                        @endphp
+                                                        @foreach($uniqueBrands as $bName)
+                                                            <option value="{{ $bName }}">{{ $bName }}</option>
+                                                        @endforeach
+                                                    @else
+                                                        <option value="Toyota">Toyota</option>
+                                                        <option value="Porsche">Porsche</option>
+                                                        <option value="Ford">Ford</option>
+                                                        <option value="Chevrolet">Chevrolet</option>
+                                                        <option value="Dodge">Dodge</option>
+                                                        <option value="Nissan">Nissan</option>
+                                                        <option value="Honda">Honda</option>
+                                                        <option value="Subaru">Subaru</option>
+                                                        <option value="Mazda">Mazda</option>
+                                                        <option value="BMW">BMW</option>
+                                                        <option value="Mercedes-Benz">Mercedes-Benz</option>
+                                                        <option value="Audi">Audi</option>
+                                                        <option value="Ferrari">Ferrari</option>
+                                                        <option value="Lamborghini">Lamborghini</option>
+                                                        <option value="Jeep">Jeep</option>
+                                                        <option value="Land Rover">Land Rover</option>
+                                                        <option value="BYD">BYD</option>
+                                                        <option value="Tesla">Tesla</option>
+                                                        <option value="Mitsubishi">Mitsubishi</option>
+                                                        <option value="Hyundai">Hyundai</option>
+                                                        <option value="Isuzu">Isuzu</option>
+                                                        <option value="Suzuki">Suzuki</option>
+                                                    @endif
                                                 </select>
                                             </div>
 
@@ -497,7 +756,7 @@
                                                     <option value="Crossover">Crossover</option>
                                                     <option value="SUV">SUV</option>
                                                     <option value="MPV">MPV</option>
-                                                    <option value="Pickup">Pickup</option>
+                                                    <option value="Pickup Truck">Pickup Truck</option>
                                                     <option value="Van">Van</option>
                                                     <option value="Sports Car">Sports Car</option>
                                                     <option value="Supercar">Supercar</option>
@@ -600,7 +859,7 @@
                                                                         <span class="fw-bold text-speed-blue fs-6">₱{{ number_format($flatPrice, 2) }}</span>
                                                                     @else
                                                                         <span class="text-secondary small d-block">Price Varies</span>
-                                                                        <span class="badge bg-info bg-opacity-20 text-speed-blue border border-info border-opacity-30 rounded-pill">By Vehicle Type</span>
+                                                                        <span class="badge badge-vehicle-type rounded-pill">By Vehicle Type</span>
                                                                     @endif
                                                                 </div>
                                                             </div>
@@ -737,184 +996,205 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-    // Vehicle models updated with their matching vehicle types and year ranges from VehicleModelSeeder
+    // --- LIGHT / DARK MODE THEME TOGGLE ---
+    window.toggleSpeedLaneTheme = function() {
+        const isLight = document.documentElement.classList.toggle('light-theme');
+        localStorage.setItem('speedlane_theme', isLight ? 'light' : 'dark');
+        updateThemeIcon(isLight);
+    };
+
+    function updateThemeIcon(isLight) {
+        const icon = document.getElementById('theme-toggle-icon');
+        if (icon) {
+            if (isLight) {
+                icon.className = 'bi bi-moon-stars-fill text-primary';
+            } else {
+                icon.className = 'bi bi-sun-fill text-warning';
+            }
+        }
+    }
+
+    // Initialize theme icon on load
+    updateThemeIcon(document.documentElement.classList.contains('light-theme'));
+
+    // Default Vehicle Models mapped exactly according to vehicle_models.sql structure
     const DEFAULT_MODELS = {
         "Toyota": [
-            { name: "Vios", type: "Sedan", year_start: 2013, year_end: 2026 },
-            { name: "Corolla Altis", type: "Sedan", year_start: 2014, year_end: 2026 },
-            { name: "Camry", type: "Sedan", year_start: 2015, year_end: 2026 },
-            { name: "Wigo", type: "Hatchback", year_start: 2014, year_end: 2026 },
-            { name: "Yaris Cross", type: "Crossover", year_start: 2023, year_end: 2026 },
-            { name: "Avanza", type: "MPV", year_start: 2012, year_end: 2026 },
-            { name: "Veloz", type: "MPV", year_start: 2022, year_end: 2026 },
-            { name: "Innova", type: "MPV", year_start: 2016, year_end: 2026 },
-            { name: "Innova Zenix", type: "MPV", year_start: 2023, year_end: 2026 },
-            { name: "Fortuner", type: "SUV", year_start: 2016, year_end: 2026 },
-            { name: "RAV4", type: "SUV", year_start: 2019, year_end: 2026 },
-            { name: "Corolla Cross", type: "Crossover", year_start: 2020, year_end: 2026 },
-            { name: "Land Cruiser Prado", type: "SUV", year_start: 2010, year_end: 2026 },
-            { name: "Land Cruiser 300", type: "SUV", year_start: 2021, year_end: 2026 },
-            { name: "Hilux", type: "Pickup", year_start: 2015, year_end: 2026 },
-            { name: "Hiace Commuter", type: "Van", year_start: 2014, year_end: 2026 },
-            { name: "Hiace GL Grandia", type: "Van", year_start: 2019, year_end: 2026 },
-            { name: "Super Grandia", type: "Van", year_start: 2019, year_end: 2026 },
-            { name: "Alphard", type: "Van", year_start: 2015, year_end: 2026 },
-            { name: "GR Supra", type: "Sports Car", year_start: 2019, year_end: 2026 },
-            { name: "GR86", type: "Sports Car", year_start: 2022, year_end: 2026 },
-            { name: "GR Yaris", type: "Sports Car", year_start: 2021, year_end: 2026 }
+            { name: "Vios", vehicle_type: "Sedan", year_start: 2013, year_end: 2026 },
+            { name: "Corolla Altis", vehicle_type: "Sedan", year_start: 2014, year_end: 2026 },
+            { name: "Camry", vehicle_type: "Sedan", year_start: 2015, year_end: 2026 },
+            { name: "Wigo", vehicle_type: "Hatchback", year_start: 2014, year_end: 2026 },
+            { name: "Yaris Cross", vehicle_type: "Crossover", year_start: 2023, year_end: 2026 },
+            { name: "Avanza", vehicle_type: "MPV", year_start: 2012, year_end: 2026 },
+            { name: "Veloz", vehicle_type: "MPV", year_start: 2022, year_end: 2026 },
+            { name: "Innova", vehicle_type: "MPV", year_start: 2016, year_end: 2026 },
+            { name: "Innova Zenix", vehicle_type: "MPV", year_start: 2023, year_end: 2026 },
+            { name: "Fortuner", vehicle_type: "SUV", year_start: 2016, year_end: 2026 },
+            { name: "RAV4", vehicle_type: "SUV", year_start: 2019, year_end: 2026 },
+            { name: "Corolla Cross", vehicle_type: "Crossover", year_start: 2020, year_end: 2026 },
+            { name: "Land Cruiser Prado", vehicle_type: "SUV", year_start: 2010, year_end: 2026 },
+            { name: "Land Cruiser 300", vehicle_type: "SUV", year_start: 2021, year_end: 2026 },
+            { name: "Hilux", vehicle_type: "Pickup Truck", year_start: 2015, year_end: 2026 },
+            { name: "Hiace Commuter", vehicle_type: "Van", year_start: 2014, year_end: 2026 },
+            { name: "Hiace GL Grandia", vehicle_type: "Van", year_start: 2019, year_end: 2026 },
+            { name: "Super Grandia", vehicle_type: "Van", year_start: 2019, year_end: 2026 },
+            { name: "Alphard", vehicle_type: "Van", year_start: 2015, year_end: 2026 },
+            { name: "GR Supra", vehicle_type: "Sports Car", year_start: 2019, year_end: 2026 },
+            { name: "GR86", vehicle_type: "Sports Car", year_start: 2022, year_end: 2026 },
+            { name: "GR Yaris", vehicle_type: "Sports Car", year_start: 2021, year_end: 2026 }
         ],
         "Porsche": [
-            { name: "911 Carrera / GT3", type: "Sports Car", year_start: 2012, year_end: 2026 },
-            { name: "718 Cayman", type: "Sports Car", year_start: 2016, year_end: 2026 },
-            { name: "718 Boxster", type: "Sports Car", year_start: 2016, year_end: 2026 },
-            { name: "Taycan", type: "Sports Car", year_start: 2020, year_end: 2026 },
-            { name: "Panamera", type: "Sedan", year_start: 2017, year_end: 2026 },
-            { name: "Macan", type: "SUV", year_start: 2015, year_end: 2026 },
-            { name: "Cayenne", type: "SUV", year_start: 2011, year_end: 2026 }
+            { name: "911 Carrera / GT3", vehicle_type: "Sports Car", year_start: 2012, year_end: 2026 },
+            { name: "718 Cayman", vehicle_type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "718 Boxster", vehicle_type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "Taycan", vehicle_type: "Sports Car", year_start: 2020, year_end: 2026 },
+            { name: "Panamera", vehicle_type: "Sedan", year_start: 2017, year_end: 2026 },
+            { name: "Macan", vehicle_type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "Cayenne", vehicle_type: "SUV", year_start: 2011, year_end: 2026 }
         ],
         "Ford": [
-            { name: "Mustang GT / Dark Horse", type: "Sports Car", year_start: 2015, year_end: 2026 },
-            { name: "Territory", type: "Crossover", year_start: 2020, year_end: 2026 },
-            { name: "Everest", type: "SUV", year_start: 2015, year_end: 2026 },
-            { name: "Ranger", type: "Pickup", year_start: 2015, year_end: 2026 },
-            { name: "Ranger Raptor", type: "Pickup", year_start: 2018, year_end: 2026 },
-            { name: "Explorer", type: "SUV", year_start: 2016, year_end: 2026 },
-            { name: "Expedition", type: "SUV", year_start: 2018, year_end: 2026 }
+            { name: "Mustang", vehicle_type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "Territory", vehicle_type: "Crossover", year_start: 2020, year_end: 2026 },
+            { name: "Everest", vehicle_type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "Ranger", vehicle_type: "Pickup Truck", year_start: 2015, year_end: 2026 },
+            { name: "Ranger Raptor", vehicle_type: "Pickup Truck", year_start: 2018, year_end: 2026 },
+            { name: "Explorer", vehicle_type: "SUV", year_start: 2016, year_end: 2026 },
+            { name: "Expedition", vehicle_type: "SUV", year_start: 2018, year_end: 2026 }
         ],
         "Chevrolet": [
-            { name: "Corvette C8", type: "Sports Car", year_start: 2020, year_end: 2026 },
-            { name: "Camaro", type: "Sports Car", year_start: 2016, year_end: 2026 },
-            { name: "Trailblazer", type: "SUV", year_start: 2017, year_end: 2026 },
-            { name: "Tracker", type: "Crossover", year_start: 2021, year_end: 2026 },
-            { name: "Suburban", type: "SUV", year_start: 2015, year_end: 2026 },
-            { name: "Tahoe", type: "SUV", year_start: 2021, year_end: 2026 }
+            { name: "Corvette C8", vehicle_type: "Sports Car", year_start: 2020, year_end: 2026 },
+            { name: "Camaro", vehicle_type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "Trailblazer", vehicle_type: "SUV", year_start: 2017, year_end: 2026 },
+            { name: "Tracker", vehicle_type: "Crossover", year_start: 2021, year_end: 2026 },
+            { name: "Suburban", vehicle_type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "Tahoe", vehicle_type: "SUV", year_start: 2021, year_end: 2026 }
         ],
         "Dodge": [
-            { name: "Challenger SRT / Hellcat", type: "Sports Car", year_start: 2015, year_end: 2026 },
-            { name: "Charger", type: "Sports Car", year_start: 2015, year_end: 2026 },
-            { name: "Durango", type: "SUV", year_start: 2014, year_end: 2026 }
+            { name: "Challenger SRT / Hellcat", vehicle_type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "Charger", vehicle_type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "Durango", vehicle_type: "SUV", year_start: 2014, year_end: 2026 }
         ],
         "Nissan": [
-            { name: "GT-R (R35)", type: "Supercar", year_start: 2008, year_end: 2026 },
-            { name: "Z", type: "Sports Car", year_start: 2023, year_end: 2026 },
-            { name: "Almera", type: "Sedan", year_start: 2015, year_end: 2026 },
-            { name: "Kicks e-POWER", type: "Crossover", year_start: 2022, year_end: 2026 },
-            { name: "Terra", type: "SUV", year_start: 2018, year_end: 2026 },
-            { name: "Navara", type: "Pickup", year_start: 2015, year_end: 2026 },
-            { name: "Urvan NV350", type: "Van", year_start: 2015, year_end: 2026 },
-            { name: "Patrol Royale", type: "SUV", year_start: 2014, year_end: 2026 }
+            { name: "GT-R (R35)", vehicle_type: "Supercar", year_start: 2008, year_end: 2026 },
+            { name: "Z", vehicle_type: "Sports Car", year_start: 2023, year_end: 2026 },
+            { name: "Almera", vehicle_type: "Sedan", year_start: 2015, year_end: 2026 },
+            { name: "Kicks e-POWER", vehicle_type: "Crossover", year_start: 2022, year_end: 2026 },
+            { name: "Terra", vehicle_type: "SUV", year_start: 2018, year_end: 2026 },
+            { name: "Navara", vehicle_type: "Pickup Truck", year_start: 2015, year_end: 2026 },
+            { name: "Urvan NV350", vehicle_type: "Van", year_start: 2015, year_end: 2026 },
+            { name: "Patrol Royale", vehicle_type: "SUV", year_start: 2014, year_end: 2026 }
         ],
         "Honda": [
-            { name: "Civic Type R (FL5 / FK8)", type: "Sports Car", year_start: 2017, year_end: 2026 },
-            { name: "NSX", type: "Supercar", year_start: 2017, year_end: 2024 },
-            { name: "City", type: "Sedan", year_start: 2014, year_end: 2026 },
-            { name: "City Hatchback", type: "Hatchback", year_start: 2021, year_end: 2026 },
-            { name: "Civic", type: "Sedan", year_start: 2016, year_end: 2026 },
-            { name: "Accord", type: "Sedan", year_start: 2015, year_end: 2026 },
-            { name: "Brio", type: "Hatchback", year_start: 2014, year_end: 2026 },
-            { name: "BR-V", type: "MPV", year_start: 2016, year_end: 2026 },
-            { name: "HR-V", type: "Crossover", year_start: 2015, year_end: 2026 },
-            { name: "CR-V", type: "SUV", year_start: 2017, year_end: 2026 }
+            { name: "Civic Type R (FL5 / FK8)", vehicle_type: "Sports Car", year_start: 2017, year_end: 2026 },
+            { name: "NSX", vehicle_type: "Supercar", year_start: 2017, year_end: 2024 },
+            { name: "City", vehicle_type: "Sedan", year_start: 2014, year_end: 2026 },
+            { name: "City Hatchback", vehicle_type: "Hatchback", year_start: 2021, year_end: 2026 },
+            { name: "Civic", vehicle_type: "Sedan", year_start: 2016, year_end: 2026 },
+            { name: "Accord", vehicle_type: "Sedan", year_start: 2015, year_end: 2026 },
+            { name: "Brio", vehicle_type: "Hatchback", year_start: 2014, year_end: 2026 },
+            { name: "BR-V", vehicle_type: "MPV", year_start: 2016, year_end: 2026 },
+            { name: "HR-V", vehicle_type: "Crossover", year_start: 2015, year_end: 2026 },
+            { name: "CR-V", vehicle_type: "SUV", year_start: 2017, year_end: 2026 }
         ],
         "Subaru": [
-            { name: "BRZ", type: "Sports Car", year_start: 2013, year_end: 2026 },
-            { name: "WRX / WRX STI", type: "Sports Car", year_start: 2015, year_end: 2026 },
-            { name: "XV / Crosstrek", type: "Crossover", year_start: 2012, year_end: 2026 },
-            { name: "Forester", type: "SUV", year_start: 2014, year_end: 2026 },
-            { name: "Outback", type: "Crossover", year_start: 2015, year_end: 2026 }
+            { name: "BRZ", vehicle_type: "Sports Car", year_start: 2013, year_end: 2026 },
+            { name: "WRX / WRX STI", vehicle_type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "XV / Crosstrek", vehicle_type: "Crossover", year_start: 2012, year_end: 2026 },
+            { name: "Forester", vehicle_type: "SUV", year_start: 2014, year_end: 2026 },
+            { name: "Outback", vehicle_type: "Crossover", year_start: 2015, year_end: 2026 }
         ],
         "Mazda": [
-            { name: "MX-5 Miata", type: "Sports Car", year_start: 2015, year_end: 2026 },
-            { name: "Mazda 3", type: "Sedan", year_start: 2014, year_end: 2026 },
-            { name: "Mazda 6", type: "Sedan", year_start: 2014, year_end: 2026 },
-            { name: "CX-30", type: "Crossover", year_start: 2020, year_end: 2026 },
-            { name: "CX-5", type: "SUV", year_start: 2013, year_end: 2026 },
-            { name: "CX-60 / CX-90", type: "SUV", year_start: 2023, year_end: 2026 },
-            { name: "BT-50", type: "Pickup", year_start: 2013, year_end: 2026 }
+            { name: "MX-5 Miata", vehicle_type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "Mazda 3", vehicle_type: "Sedan", year_start: 2014, year_end: 2026 },
+            { name: "Mazda 6", vehicle_type: "Sedan", year_start: 2014, year_end: 2026 },
+            { name: "CX-30", vehicle_type: "Crossover", year_start: 2020, year_end: 2026 },
+            { name: "CX-5", vehicle_type: "SUV", year_start: 2013, year_end: 2026 },
+            { name: "CX-60 / CX-90", vehicle_type: "SUV", year_start: 2023, year_end: 2026 },
+            { name: "BT-50", vehicle_type: "Pickup Truck", year_start: 2013, year_end: 2026 }
         ],
         "BMW": [
-            { name: "M3 / M4", type: "Sports Car", year_start: 2015, year_end: 2026 },
-            { name: "M2 / M5", type: "Sports Car", year_start: 2016, year_end: 2026 },
-            { name: "Z4 Roadster", type: "Sports Car", year_start: 2019, year_end: 2026 },
-            { name: "3 Series", type: "Sedan", year_start: 2012, year_end: 2026 },
-            { name: "5 Series", type: "Sedan", year_start: 2010, year_end: 2026 },
-            { name: "7 Series", type: "Sedan", year_start: 2016, year_end: 2026 },
-            { name: "X1 / X3", type: "SUV", year_start: 2015, year_end: 2026 },
-            { name: "X5 / X7", type: "SUV", year_start: 2013, year_end: 2026 }
+            { name: "M3 / M4", vehicle_type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "M2 / M5", vehicle_type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "Z4 Roadster", vehicle_type: "Sports Car", year_start: 2019, year_end: 2026 },
+            { name: "3 Series", vehicle_type: "Sedan", year_start: 2012, year_end: 2026 },
+            { name: "5 Series", vehicle_type: "Sedan", year_start: 2010, year_end: 2026 },
+            { name: "7 Series", vehicle_type: "Sedan", year_start: 2016, year_end: 2026 },
+            { name: "X1 / X3", vehicle_type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "X5 / X7", vehicle_type: "SUV", year_start: 2013, year_end: 2026 }
         ],
         "Mercedes-Benz": [
-            { name: "AMG GT / SL Roadster", type: "Sports Car", year_start: 2016, year_end: 2026 },
-            { name: "C-Class / C63 AMG", type: "Sedan", year_start: 2014, year_end: 2026 },
-            { name: "E-Class", type: "Sedan", year_start: 2016, year_end: 2026 },
-            { name: "S-Class", type: "Sedan", year_start: 2013, year_end: 2026 },
-            { name: "GLA / GLC / GLE", type: "SUV", year_start: 2015, year_end: 2026 },
-            { name: "G-Class (G-Wagon)", type: "SUV", year_start: 2013, year_end: 2026 }
+            { name: "AMG GT / SL Roadster", vehicle_type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "C-Class / C63 AMG", vehicle_type: "Sedan", year_start: 2014, year_end: 2026 },
+            { name: "E-Class", vehicle_type: "Sedan", year_start: 2016, year_end: 2026 },
+            { name: "S-Class", vehicle_type: "Sedan", year_start: 2013, year_end: 2026 },
+            { name: "GLA / GLC / GLE", vehicle_type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "G-Class (G-Wagon)", vehicle_type: "SUV", year_start: 2013, year_end: 2026 }
         ],
         "Audi": [
-            { name: "R8", type: "Supercar", year_start: 2015, year_end: 2024 },
-            { name: "TT / RS3", type: "Sports Car", year_start: 2015, year_end: 2026 },
-            { name: "A4 / A6", type: "Sedan", year_start: 2016, year_end: 2026 },
-            { name: "Q3 / Q5 / Q7 / Q8", type: "SUV", year_start: 2015, year_end: 2026 }
+            { name: "R8", vehicle_type: "Supercar", year_start: 2015, year_end: 2024 },
+            { name: "TT / RS3", vehicle_type: "Sports Car", year_start: 2015, year_end: 2026 },
+            { name: "A4 / A6", vehicle_type: "Sedan", year_start: 2016, year_end: 2026 },
+            { name: "Q3 / Q5 / Q7 / Q8", vehicle_type: "SUV", year_start: 2015, year_end: 2026 }
         ],
         "Ferrari": [
-            { name: "488 / F8 Tributo / 296 GTB", type: "Supercar", year_start: 2016, year_end: 2026 },
-            { name: "Roma / Portofino", type: "Sports Car", year_start: 2018, year_end: 2026 },
-            { name: "Purosangue", type: "SUV", year_start: 2023, year_end: 2026 }
+            { name: "488 / F8 Tributo / 296 GTB", vehicle_type: "Supercar", year_start: 2016, year_end: 2026 },
+            { name: "Roma / Portofino", vehicle_type: "Sports Car", year_start: 2018, year_end: 2026 },
+            { name: "Purosangue", vehicle_type: "SUV", year_start: 2023, year_end: 2026 }
         ],
         "Lamborghini": [
-            { name: "Huracan / Revuelto", type: "Supercar", year_start: 2015, year_end: 2026 },
-            { name: "Urus", type: "SUV", year_start: 2018, year_end: 2026 }
+            { name: "Huracan / Revuelto", vehicle_type: "Supercar", year_start: 2015, year_end: 2026 },
+            { name: "Urus", vehicle_type: "SUV", year_start: 2018, year_end: 2026 }
         ],
         "Jeep": [
-            { name: "Wrangler Rubicon", type: "SUV", year_start: 2012, year_end: 2026 },
-            { name: "Gladiator", type: "Pickup", year_start: 2020, year_end: 2026 },
-            { name: "Grand Cherokee", type: "SUV", year_start: 2015, year_end: 2026 }
+            { name: "Wrangler Rubicon", vehicle_type: "SUV", year_start: 2012, year_end: 2026 },
+            { name: "Gladiator", vehicle_type: "Pickup Truck", year_start: 2020, year_end: 2026 },
+            { name: "Grand Cherokee", vehicle_type: "SUV", year_start: 2015, year_end: 2026 }
         ],
         "Land Rover": [
-            { name: "Defender 90/110/130", type: "SUV", year_start: 2020, year_end: 2026 },
-            { name: "Range Rover / Sport", type: "SUV", year_start: 2014, year_end: 2026 },
-            { name: "Evoque / Velar", type: "SUV", year_start: 2015, year_end: 2026 }
+            { name: "Defender 90/110/130", vehicle_type: "SUV", year_start: 2020, year_end: 2026 },
+            { name: "Range Rover / Sport", vehicle_type: "SUV", year_start: 2014, year_end: 2026 },
+            { name: "Evoque / Velar", vehicle_type: "SUV", year_start: 2015, year_end: 2026 }
         ],
         "BYD": [
-            { name: "Seal", type: "Sports Car", year_start: 2023, year_end: 2026 },
-            { name: "Atto 3", type: "Crossover", year_start: 2022, year_end: 2026 },
-            { name: "Dolphin", type: "Hatchback", year_start: 2023, year_end: 2026 },
-            { name: "Han", type: "Sedan", year_start: 2022, year_end: 2026 }
+            { name: "Seal", vehicle_type: "Sports Car", year_start: 2023, year_end: 2026 },
+            { name: "Atto 3", vehicle_type: "Crossover", year_start: 2022, year_end: 2026 },
+            { name: "Dolphin", vehicle_type: "Hatchback", year_start: 2023, year_end: 2026 },
+            { name: "Han", vehicle_type: "Sedan", year_start: 2022, year_end: 2026 }
         ],
         "Tesla": [
-            { name: "Model 3 / Performance", type: "Sedan", year_start: 2017, year_end: 2026 },
-            { name: "Model Y", type: "Crossover", year_start: 2020, year_end: 2026 },
-            { name: "Model S Plaid", type: "Sports Car", year_start: 2016, year_end: 2026 },
-            { name: "Model X", type: "SUV", year_start: 2016, year_end: 2026 },
-            { name: "Cybertruck", type: "Pickup", year_start: 2023, year_end: 2026 }
+            { name: "Model 3 / Performance", vehicle_type: "Sedan", year_start: 2017, year_end: 2026 },
+            { name: "Model Y", vehicle_type: "Crossover", year_start: 2020, year_end: 2026 },
+            { name: "Model S Plaid", vehicle_type: "Sports Car", year_start: 2016, year_end: 2026 },
+            { name: "Model X", vehicle_type: "SUV", year_start: 2016, year_end: 2026 },
+            { name: "Cybertruck", vehicle_type: "Pickup Truck", year_start: 2023, year_end: 2026 }
         ],
         "Mitsubishi": [
-            { name: "Montero Sport", type: "SUV", year_start: 2015, year_end: 2026 },
-            { name: "Xpander", type: "MPV", year_start: 2018, year_end: 2026 },
-            { name: "Strada", type: "Pickup", year_start: 2015, year_end: 2026 },
-            { name: "Mirage G4", type: "Sedan", year_start: 2013, year_end: 2026 },
-            { name: "L300", type: "Van", year_start: 2010, year_end: 2026 },
-            { name: "Pajero", type: "SUV", year_start: 2008, year_end: 2021 }
+            { name: "Montero Sport", vehicle_type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "Xpander", vehicle_type: "MPV", year_start: 2018, year_end: 2026 },
+            { name: "Strada", vehicle_type: "Pickup Truck", year_start: 2015, year_end: 2026 },
+            { name: "Mirage G4", vehicle_type: "Sedan", year_start: 2013, year_end: 2026 },
+            { name: "L300", vehicle_type: "Van", year_start: 2010, year_end: 2026 },
+            { name: "Pajero", vehicle_type: "SUV", year_start: 2008, year_end: 2021 }
         ],
         "Hyundai": [
-            { name: "Tucson", type: "SUV", year_start: 2015, year_end: 2026 },
-            { name: "Creta", type: "Crossover", year_start: 2022, year_end: 2026 },
-            { name: "Stargazer", type: "MPV", year_start: 2022, year_end: 2026 },
-            { name: "Accent", type: "Sedan", year_start: 2011, year_end: 2023 },
-            { name: "H-100", type: "Van", year_start: 2010, year_end: 2026 }
+            { name: "Tucson", vehicle_type: "SUV", year_start: 2015, year_end: 2026 },
+            { name: "Creta", vehicle_type: "Crossover", year_start: 2022, year_end: 2026 },
+            { name: "Stargazer", vehicle_type: "MPV", year_start: 2022, year_end: 2026 },
+            { name: "Accent", vehicle_type: "Sedan", year_start: 2011, year_end: 2023 },
+            { name: "H-100", vehicle_type: "Van", year_start: 2010, year_end: 2026 }
         ],
         "Isuzu": [
-            { name: "D-Max", type: "Pickup", year_start: 2013, year_end: 2026 },
-            { name: "mu-X", type: "SUV", year_start: 2014, year_end: 2026 },
-            { name: "N-Series", type: "Van", year_start: 2010, year_end: 2026 }
+            { name: "D-Max", vehicle_type: "Pickup Truck", year_start: 2013, year_end: 2026 },
+            { name: "mu-X", vehicle_type: "SUV", year_start: 2014, year_end: 2026 },
+            { name: "N-Series", vehicle_type: "Van", year_start: 2010, year_end: 2026 }
         ],
         "Suzuki": [
-            { name: "Ertiga", type: "MPV", year_start: 2014, year_end: 2026 },
-            { name: "Jimny", type: "SUV", year_start: 2018, year_end: 2026 },
-            { name: "Swift", type: "Hatchback", year_start: 2011, year_end: 2026 },
-            { name: "Dzire", type: "Sedan", year_start: 2013, year_end: 2026 },
-            { name: "XL7", type: "MPV", year_start: 2020, year_end: 2026 },
-            { name: "APV", type: "Van", year_start: 2008, year_end: 2026 }
+            { name: "Ertiga", vehicle_type: "MPV", year_start: 2014, year_end: 2026 },
+            { name: "Jimny", vehicle_type: "SUV", year_start: 2018, year_end: 2026 },
+            { name: "Swift", vehicle_type: "Hatchback", year_start: 2011, year_end: 2026 },
+            { name: "Dzire", vehicle_type: "Sedan", year_start: 2013, year_end: 2026 },
+            { name: "XL7", vehicle_type: "MPV", year_start: 2020, year_end: 2026 },
+            { name: "APV", vehicle_type: "Van", year_start: 2008, year_end: 2026 }
         ]
     };
 
@@ -960,7 +1240,6 @@
                 if (!plate || !brand || !model || !type || !year || !mechanic) {
                     alert(`Please complete all required vehicle details for Vehicle #${vehicleNum} (Plate, Brand, Model, Type, Year, Mechanic).`);
                     
-                    // Open collapse if hidden
                     const collapseBody = card.querySelector('.vehicle-collapse-body');
                     if (collapseBody && !collapseBody.classList.contains('show')) {
                         const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseBody);
@@ -1232,14 +1511,13 @@
                 previewTotal.textContent = '₱' + grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
 
-            // HEADER SUMMARY UPDATED
             const vehiclesHeaderSummary = document.getElementById('vehiclesHeaderSummary');
             if (vehiclesHeaderSummary) {
                 vehiclesHeaderSummary.textContent = `(${vehicleCards.length} vehicle${vehicleCards.length > 1 ? 's' : ''})`;
             }
         }
 
-        // --- BRAND TO MODEL DROPDOWN POPULATOR WITH AUTO-TYPE & YEAR RANGE DATA ---
+        // --- BRAND TO MODEL DROPDOWN POPULATOR BASED ON vehicle_models TABLE DATA ---
         function updateModelDropdown(brandSelect) {
             const card = brandSelect.closest('.vehicle-card');
             const modelSelect = card.querySelector('.model-select');
@@ -1257,17 +1535,26 @@
             }
 
             let models = [];
-            if (window.VEHICLE_MODELS && window.VEHICLE_MODELS[brand] && window.VEHICLE_MODELS[brand].length > 0) {
-                models = window.VEHICLE_MODELS[brand];
-            } else if (DEFAULT_MODELS[brand]) {
+
+            // Retrieve from DB data variable if available (supports both grouped and flat collection)
+            if (window.VEHICLE_MODELS) {
+                if (Array.isArray(window.VEHICLE_MODELS) && window.VEHICLE_MODELS.length > 0) {
+                    models = window.VEHICLE_MODELS.filter(m => m.brand === brand);
+                } else if (typeof window.VEHICLE_MODELS === 'object' && window.VEHICLE_MODELS[brand]) {
+                    models = window.VEHICLE_MODELS[brand];
+                }
+            }
+
+            // Fallback to DEFAULT_MODELS if empty
+            if ((!models || models.length === 0) && DEFAULT_MODELS[brand]) {
                 models = DEFAULT_MODELS[brand];
             }
 
-            if (models.length > 0) {
+            if (models && models.length > 0) {
                 models.forEach(m => {
                     const opt = document.createElement('option');
                     let name = typeof m === 'object' ? (m.name || m.vehicle_model || '') : m;
-                    let vType = typeof m === 'object' ? (m.type || m.vehicle_type || '') : '';
+                    let vType = typeof m === 'object' ? (m.vehicle_type || m.type || '') : '';
                     let yStart = typeof m === 'object' ? (m.year_start || m.start_year || 1990) : 1990;
                     let yEnd = typeof m === 'object' ? (m.year_end || m.end_year || new Date().getFullYear()) : new Date().getFullYear();
 
@@ -1308,7 +1595,7 @@
         if (generateCodeBtn) {
             generateCodeBtn.addEventListener('click', function() {
                 if (!validateVehicleServiceInfo()) {
-                    return; // Halt code generation if information is incomplete
+                    return;
                 }
 
                 const newCode = generateTrackingCode();
@@ -1429,7 +1716,7 @@
                         typeSelect.dispatchEvent(new Event('change'));
                     }
 
-                    // Dynamically update Year dropdown based on model range
+                    // Dynamically update Year dropdown based on model range from vehicle_models schema
                     if (yearSelect && selectedOpt) {
                         const yStart = parseInt(selectedOpt.getAttribute('data-year-start')) || 1990;
                         const yEnd = parseInt(selectedOpt.getAttribute('data-year-end')) || new Date().getFullYear();

@@ -4,12 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedLane - Transaction Records & Reports</title>
+
+    <!-- Early Theme Check Script (Defaults to Light Theme) -->
+    <script>
+        const savedTheme = localStorage.getItem('speedlane_theme');
+        // Default to Light Mode unless explicitly set to 'dark'
+        if (savedTheme !== 'dark') {
+            document.documentElement.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+        }
+    </script>
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
     <!-- Custom Admin CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <!-- Light Mode Toggle CSS -->
+    <link rel="stylesheet" href="{{ asset('css/theme-toggle.css') }}">
     <style>
         :root {
             --speed-pink: #f42582;
@@ -27,6 +41,7 @@
             min-height: 100vh;
             background: radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%) !important;
             background-attachment: fixed;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Color Utility Classes */
@@ -174,6 +189,253 @@
             background: rgba(255, 107, 129, 0.2) !important;
             color: #ffffff !important;
             border-color: #ff6b81 !important;
+        }
+
+        /* Dark Theme Toggle Button */
+        #theme-toggle-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.25s ease;
+            color: #ffffff;
+        }
+
+        #theme-toggle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* LIGHT MODE HIGH-CONTRAST OVERRIDES */
+        html.light-theme {
+            --speed-dark-bg: #f8fafc;
+            --speed-card-bg: #ffffff;
+            --speed-card-border: rgba(0, 0, 0, 0.08);
+            --speed-sidebar-bg: #f8fafc;
+        }
+
+        html.light-theme body {
+            background: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
+        /* Text Color Adaptations for Light Mode */
+        html.light-theme .text-white {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .text-secondary {
+            color: #475569 !important;
+        }
+
+        html.light-theme .text-light {
+            color: #334155 !important;
+        }
+
+        html.light-theme .text-muted {
+            color: #64748b !important;
+        }
+
+        html.light-theme .opacity-75 {
+            opacity: 1 !important;
+        }
+
+        /* Override Dark Background Utilities in Light Mode */
+        html.light-theme .bg-black,
+        html.light-theme [class*="bg-black"] {
+            background-color: #f1f5f9 !important;
+            color: #1e293b !important;
+        }
+
+        /* Borders Adaptations for Light Mode */
+        html.light-theme .border-secondary,
+        html.light-theme [class*="border-secondary"] {
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .border-end-md {
+            border-color: #cbd5e1 !important;
+        }
+
+        /* Badges Adaptations for Light Mode */
+        html.light-theme .badge.bg-black,
+        html.light-theme .badge.bg-secondary,
+        html.light-theme .badge.text-secondary {
+            background-color: #e2e8f0 !important;
+            color: #334155 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        html.light-theme .navbar-speed {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Clear Readable Badges in Light Mode */
+        html.light-theme .badge-super-admin {
+            background-color: #fce7f3 !important;
+            color: #be185d !important;
+            border: 1px solid #f472b6 !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-admin {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            border: 1px solid #38bdf8 !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-mechanic {
+            background-color: #e0f2fe !important;
+            color: #0284c7 !important;
+            border: 1px solid #38bdf8 !important;
+            font-weight: 700 !important;
+        }
+
+        /* Clear Readable Logout Button in Light Mode */
+        html.light-theme .btn-logout {
+            color: #e11d48 !important;
+            border: 1px solid #fda4af !important;
+            background: #fff1f2 !important;
+            font-weight: 600;
+        }
+
+        html.light-theme .btn-logout:hover {
+            background: #ffe4e6 !important;
+            color: #9f1239 !important;
+            border-color: #f43f5e !important;
+        }
+
+        /* Clear Readable Theme Toggle Button in Light Mode */
+        html.light-theme #theme-toggle-btn {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme #theme-toggle-btn:hover {
+            background-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .admin-sidebar {
+            background-color: #f8fafc !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-theme .admin-nav-link {
+            color: #475569 !important;
+            font-weight: 600;
+        }
+
+        html.light-theme .admin-nav-link:hover {
+            color: #0f172a !important;
+            background: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .admin-nav-link.active {
+            background: linear-gradient(90deg, rgba(244, 37, 130, 0.12) 0%, rgba(0, 162, 255, 0.12) 100%) !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(244, 37, 130, 0.4) !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .speed-card {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-theme .speed-card h2,
+        html.light-theme .speed-card h3,
+        html.light-theme .speed-card h4,
+        html.light-theme .speed-card h5,
+        html.light-theme .speed-card h6 {
+            color: #0f172a !important;
+        }
+
+        html.light-theme main h3 {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .form-control-dark, 
+        html.light-theme .form-select-dark {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .form-control-dark::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        html.light-theme .input-group-text-dark {
+            background-color: #e2e8f0 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-right: none !important;
+        }
+
+        /* Modal Light Mode Adaptations */
+        html.light-theme .modal-content-dark {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .modal-header,
+        html.light-theme .modal-footer {
+            border-color: #e2e8f0 !important;
+        }
+
+        html.light-theme .modal-title {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .modal-body {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .report-card-option {
+            background-color: #ffffff !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .report-card-option strong {
+            color: #0f172a !important;
+        }
+
+        /* Table Light Mode Adaptations */
+        html.light-theme .custom-admin-table {
+            color: #1e293b !important;
+        }
+
+        html.light-theme .custom-admin-table th {
+            background-color: #f1f5f9 !important;
+            color: #334155 !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        html.light-theme .custom-admin-table td {
+            color: #1e293b !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        html.light-theme .custom-admin-table tfoot td {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(50%);
+        }
+
+        html.light-theme .btn-outline-light {
+            color: #334155 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .btn-outline-light:hover {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
         }
 
         /* Custom Table Styling for Dark Theme */
@@ -333,6 +595,11 @@
                         <i class="bi bi-box-arrow-right"></i> Logout
                     </button>
                 </form>
+
+                <!-- Light / Dark Mode Toggle Button -->
+                <button id="theme-toggle-btn" type="button" class="btn d-flex align-items-center justify-content-center rounded-circle p-2" style="width: 40px; height: 40px;" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode" onclick="toggleSpeedLaneTheme()">
+                    <i id="theme-toggle-icon" class="bi bi-sun-fill text-warning"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -432,11 +699,17 @@
                                 <label class="form-label small fw-semibold text-light opacity-75 mb-1">Vehicle Type</label>
                                 <select name="vehicle_type" class="form-select form-select-sm form-select-dark">
                                     <option value="">All Vehicles</option>
-                                    @if(isset($vehicleTypes) && count($vehicleTypes) > 0)
-                                        @foreach($vehicleTypes as $vType)
-                                            <option value="{{ $vType }}" {{ request('vehicle_type') == $vType ? 'selected' : '' }}>{{ $vType }}</option>
-                                        @endforeach
-                                    @endif
+                                    @php
+                                        $vTypesList = (isset($vehicleTypes) && count($vehicleTypes) > 0) 
+                                            ? $vehicleTypes 
+                                            : ['Hatchback', 'Sedan', 'Coupe', 'Crossover', 'MPV', 'Wagon', 'SUV', 'Pickup Truck', 'Sports Car', 'Van', Supercar];
+                                    @endphp
+                                    @foreach($vTypesList as $vType)
+                                        @php 
+                                            $vTypeName = is_object($vType) ? ($vType->vehicle_type ?? $vType->name ?? '') : (is_array($vType) ? ($vType['vehicle_type'] ?? $vType['name'] ?? '') : $vType); 
+                                        @endphp
+                                        <option value="{{ $vTypeName }}" {{ request('vehicle_type') == $vTypeName ? 'selected' : '' }}>{{ $vTypeName }}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -444,11 +717,17 @@
                                 <label class="form-label small fw-semibold text-light opacity-75 mb-1">Vehicle Brand</label>
                                 <select name="brand" class="form-select form-select-sm form-select-dark">
                                     <option value="">All Brands</option>
-                                    @if(isset($vehicleBrands) && count($vehicleBrands) > 0)
-                                        @foreach($vehicleBrands as $b)
-                                            <option value="{{ $b }}" {{ request('brand') == $b || request('vehicle_brand') == $b ? 'selected' : '' }}>{{ $b }}</option>
-                                        @endforeach
-                                    @endif
+                                    @php
+                                        $vBrandsList = (isset($vehicleBrands) && count($vehicleBrands) > 0) 
+                                            ? $vehicleBrands 
+                                            : ['Toyota', 'Porsche', 'Ford', 'Chevrolet'];
+                                    @endphp
+                                    @foreach($vBrandsList as $b)
+                                        @php 
+                                            $bName = is_object($b) ? ($b->brand ?? $b->name ?? '') : (is_array($b) ? ($b['brand'] ?? $b['name'] ?? '') : $b); 
+                                        @endphp
+                                        <option value="{{ $bName }}" {{ (request('brand') == $bName || request('vehicle_brand') == $bName) ? 'selected' : '' }}>{{ $bName }}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -456,14 +735,17 @@
                                 <label class="form-label small fw-semibold text-light opacity-75 mb-1">Service Type</label>
                                 <select name="service_type" class="form-select form-select-sm form-select-dark">
                                     <option value="">All Services</option>
-                                    @if(isset($availableServices) && count($availableServices) > 0)
-                                        @foreach($availableServices as $srv)
-                                            @php $srvName = is_object($srv) ? $srv->name : (is_array($srv) ? ($srv['name'] ?? '') : $srv); @endphp
-                                            <option value="{{ $srvName }}" {{ request('service_type') == $srvName ? 'selected' : '' }}>
-                                                {{ $srvName }}
-                                            </option>
-                                        @endforeach
-                                    @endif
+                                    @php
+                                        $vServicesList = (isset($availableServices) && count($availableServices) > 0) 
+                                            ? $availableServices 
+                                            : ['Ceramic Coating', 'Graphene Coating', 'PPF', 'Interior Detailing', 'Exterior Detailing', 'Washover', 'Undercoat'];
+                                    @endphp
+                                    @foreach($vServicesList as $srv)
+                                        @php $srvName = is_object($srv) ? ($srv->name ?? '') : (is_array($srv) ? ($srv['name'] ?? '') : $srv); @endphp
+                                        <option value="{{ $srvName }}" {{ request('service_type') == $srvName ? 'selected' : '' }}>
+                                            {{ $srvName }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -1144,12 +1426,15 @@
                                     <label class="form-label extra-small text-secondary fw-bold mb-1">Service Package</label>
                                     <select name="service_type" class="form-select form-select-sm form-select-dark">
                                         <option value="">All Offered Services</option>
-                                        @if(isset($availableServices) && count($availableServices) > 0)
-                                            @foreach($availableServices as $srv)
-                                                @php $sName = is_object($srv) ? $srv->name : (is_array($srv) ? ($srv['name'] ?? '') : $srv); @endphp
-                                                <option value="{{ $sName }}">{{ $sName }}</option>
-                                            @endforeach
-                                        @endif
+                                        @php
+                                            $modalServicesList = (isset($availableServices) && count($availableServices) > 0) 
+                                                ? $availableServices 
+                                                : ['Ceramic Coating', 'Graphene Coating', 'PPF', 'Interior Detailing', 'Exterior Detailing', 'Washover', 'Undercoat'];
+                                        @endphp
+                                        @foreach($modalServicesList as $srv)
+                                            @php $sName = is_object($srv) ? ($srv->name ?? '') : (is_array($srv) ? ($srv['name'] ?? '') : $srv); @endphp
+                                            <option value="{{ $sName }}">{{ $sName }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
 
@@ -1158,11 +1443,15 @@
                                     <label class="form-label extra-small text-secondary fw-bold mb-1">Vehicle Segment</label>
                                     <select name="vehicle_type" class="form-select form-select-sm form-select-dark">
                                         <option value="">All Vehicles</option>
-                                        @if(isset($vehicleTypes) && count($vehicleTypes) > 0)
-                                            @foreach($vehicleTypes as $vSeg)
-                                                <option value="{{ $vSeg }}">{{ $vSeg }}</option>
-                                            @endforeach
-                                        @endif
+                                        @php
+                                            $modalTypesList = (isset($vehicleTypes) && count($vehicleTypes) > 0) 
+                                                ? $vehicleTypes 
+                                                : ['Hatchback', 'Sedan', 'Coupe', 'Crossover', 'MPV', 'Wagon', 'SUV', 'Pickup Truck', 'Sports Car', 'Van', Supercar];
+                                        @endphp
+                                        @foreach($modalTypesList as $vSeg)
+                                            @php $vSegName = is_object($vSeg) ? ($vSeg->vehicle_type ?? $vSeg->name ?? '') : (is_array($vSeg) ? ($vSeg['vehicle_type'] ?? $vSeg['name'] ?? '') : $vSeg); @endphp
+                                            <option value="{{ $vSegName }}">{{ $vSegName }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
 
@@ -1171,11 +1460,15 @@
                                     <label class="form-label extra-small text-secondary fw-bold mb-1">Vehicle Brand</label>
                                     <select name="brand" class="form-select form-select-sm form-select-dark">
                                         <option value="">All Brands</option>
-                                        @if(isset($vehicleBrands) && count($vehicleBrands) > 0)
-                                            @foreach($vehicleBrands as $b)
-                                                <option value="{{ $b }}">{{ $b }}</option>
-                                            @endforeach
-                                        @endif
+                                        @php
+                                            $modalBrandsList = (isset($vehicleBrands) && count($vehicleBrands) > 0) 
+                                                ? $vehicleBrands 
+                                                : ['Toyota', 'Porsche', 'Ford', 'Chevrolet'];
+                                        @endphp
+                                        @foreach($modalBrandsList as $b)
+                                            @php $bSegName = is_object($b) ? ($b->brand ?? $b->name ?? '') : (is_array($b) ? ($b['brand'] ?? $b['name'] ?? '') : $b); @endphp
+                                            <option value="{{ $bSegName }}">{{ $bSegName }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
 
@@ -1257,6 +1550,8 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Light Mode Toggle JS -->
+    <script src="{{ asset('js/theme-toggle.js') }}"></script>
 
     <script>
         // Print Helper function to target exact element without printing whole UI

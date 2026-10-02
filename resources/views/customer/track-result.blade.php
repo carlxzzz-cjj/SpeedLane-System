@@ -9,6 +9,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedLane - Service Status</title>
 
+    <!-- Early Theme Check Script (Defaults to Light Theme) -->
+    <script>
+        const savedTheme = localStorage.getItem('speedlane_theme');
+        // Default to Light Mode unless explicitly set to 'dark'
+        if (savedTheme !== 'dark') {
+            document.documentElement.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+        }
+    </script>
+
     <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons CDN -->
@@ -16,6 +27,8 @@
     
     <!-- Custom External CSS -->
     <link rel="stylesheet" href="{{ asset('css/customer.css') }}">
+    <!-- Light Mode Toggle CSS -->
+    <link rel="stylesheet" href="{{ asset('css/theme-toggle.css') }}">
     
     <style>
         :root {
@@ -33,6 +46,7 @@
             min-height: 100vh;
             background: radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%) !important;
             background-attachment: fixed;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Color Utility Classes */
@@ -56,6 +70,13 @@
             background-color: rgba(0, 162, 255, 0.18) !important;
             color: #99dbff !important;
             border: 1px solid rgba(0, 162, 255, 0.4) !important;
+            font-weight: 600;
+        }
+
+        .badge-estimate {
+            background-color: rgba(245, 158, 11, 0.18) !important;
+            color: #fbbf24 !important;
+            border: 1px solid rgba(245, 158, 11, 0.4) !important;
             font-weight: 600;
         }
 
@@ -154,6 +175,161 @@
             background-color: rgba(255, 255, 255, 0.12);
             z-index: 0;
         }
+
+        /* Dark Theme Toggle Button */
+        #theme-toggle-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        #theme-toggle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* LIGHT MODE HIGH-CONTRAST OVERRIDES */
+        html.light-theme {
+            --speed-dark-bg: #f8fafc;
+            --speed-card-bg: #ffffff;
+            --speed-card-border: rgba(0, 0, 0, 0.08);
+        }
+
+        html.light-theme body {
+            background: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
+        html.light-theme .navbar-speed {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        html.light-theme #theme-toggle-btn {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme #theme-toggle-btn:hover {
+            background-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .speed-card {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-theme .text-white {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .text-secondary {
+            color: #64748b !important;
+        }
+
+        html.light-theme .text-speed-blue {
+            color: #0284c7 !important;
+        }
+
+        html.light-theme .text-speed-pink {
+            color: #db2777 !important;
+        }
+
+        html.light-theme .text-success {
+            color: #16a34a !important;
+        }
+
+        /* Light Mode Badges & Buttons */
+        html.light-theme .badge-status-completed,
+        html.light-theme .btn-status-completed {
+            background-color: #dcfce7 !important;
+            color: #15803d !important;
+            border: 1px solid #86efac !important;
+        }
+
+        html.light-theme .badge-status-blue,
+        html.light-theme .btn-status-progress {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            border: 1px solid #38bdf8 !important;
+        }
+
+        html.light-theme .tracking-code-badge {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            border-color: #7dd3fc !important;
+        }
+
+        html.light-theme .tracking-code-none {
+            background-color: #f1f5f9 !important;
+            color: #64748b !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .btn-action-dark {
+            background-color: #e2e8f0 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .btn-action-dark:hover {
+            background-color: #cbd5e1 !important;
+            color: #000000 !important;
+        }
+
+        /* Inner Boxes & Cards in Light Mode */
+        html.light-theme .inner-dark-box {
+            background-color: #f8fafc !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+        }
+
+        html.light-theme .hover-shadow {
+            background-color: #f8fafc !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-theme .hover-shadow:hover {
+            background-color: #f1f5f9 !important;
+            border-color: rgba(0, 162, 255, 0.4) !important;
+        }
+
+        /* Timeline in Light Mode */
+        html.light-theme .timeline-step:not(:last-child)::before {
+            background-color: rgba(0, 0, 0, 0.12) !important;
+        }
+
+        html.light-theme .timeline-step i {
+            background-color: #ffffff !important;
+        }
+
+        /* Technician Progress Note in Light Mode */
+        html.light-theme .tech-note-box {
+            background-color: #e0f2fe !important;
+            border-color: #7dd3fc !important;
+        }
+
+        html.light-theme .tech-note-box p {
+            color: #0f172a !important;
+        }
+
+        /* Empty State Icon Wrapper */
+        html.light-theme .empty-state-icon-wrapper {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .empty-state-icon-wrapper i {
+            color: #64748b !important;
+        }
+
+        /* Estimate Badge in Light Mode */
+        html.light-theme .badge-estimate {
+            background-color: #fef3c7 !important;
+            color: #b45309 !important;
+            border-color: #fcd34d !important;
+        }
     </style>
 </head>
 <body class="min-vh-100 d-flex flex-column justify-content-between">
@@ -169,16 +345,21 @@
                 </span>
             </a>
 
-            <div>
+            <div class="d-flex align-items-center gap-3">
                 @if(isset($transactions) && $transactions->count() > 0)
-                    <span class="badge bg-black bg-opacity-50 text-speed-blue font-monospace border border-secondary border-opacity-25 px-3 py-2 fs-6 rounded-pill">
+                    <span class="badge bg-black bg-opacity-50 text-speed-blue font-monospace border border-secondary border-opacity-25 px-3 py-2 fs-6 rounded-pill tracking-code-badge">
                         Tracking Code: {{ $trackingCode }}
                     </span>
                 @else
-                    <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25 px-3 py-2 fs-6 rounded-pill">
+                    <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25 px-3 py-2 fs-6 rounded-pill tracking-code-none">
                         No Record Found
                     </span>
                 @endif
+
+                <!-- Light / Dark Mode Toggle Button -->
+                <button id="theme-toggle-btn" type="button" class="btn d-flex align-items-center justify-content-center rounded-circle p-2" style="width: 40px; height: 40px;" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode" onclick="toggleSpeedLaneTheme()">
+                    <i id="theme-toggle-icon" class="bi bi-sun-fill text-warning"></i>
+                </button>
             </div>
 
         </div>
@@ -286,7 +467,7 @@
                         </div>
 
                         <!-- Dynamic Cost Label & Badge Switch -->
-                        <div class="p-3 rounded-3 border border-secondary border-opacity-25" style="background-color: #06080d;">
+                        <div class="p-3 rounded-3 border border-secondary border-opacity-25 inner-dark-box" style="background-color: #06080d;">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="text-secondary extra-small font-monospace text-uppercase fw-semibold">
                                     {{ $allCompleted ? 'Final Total Cost' : 'Total Estimated Cost' }}
@@ -296,7 +477,7 @@
                                         <i class="bi bi-patch-check-fill me-1"></i>Final Bill
                                     </span>
                                 @else
-                                    <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-30 extra-small">
+                                    <span class="badge badge-estimate extra-small">
                                         <i class="bi bi-hourglass-split me-1"></i>Estimate
                                     </span>
                                 @endif
@@ -363,7 +544,7 @@
                         <h5 class="fw-bold text-white mb-0">
                             Vehicle #{{ $index + 1 }}: {{ $item->vehicle_name ?? $item->vehicle_model ?? $item->vehicle_brand ?? 'Vehicle' }}
                         </h5>
-                        <span class="badge bg-black bg-opacity-50 text-speed-blue font-monospace fs-6 px-3 py-1.5 border border-secondary border-opacity-25">{{ $item->plate_number }}</span>
+                        <span class="badge bg-black bg-opacity-50 text-speed-blue font-monospace fs-6 px-3 py-1.5 border border-secondary border-opacity-25 tracking-code-badge">{{ $item->plate_number }}</span>
                     </div>
 
                     <!-- Details -->
@@ -385,7 +566,7 @@
                                 @if($isVehicleCompleted)
                                     <span class="badge badge-status-completed ms-1 extra-small">Final</span>
                                 @else
-                                    <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25 ms-1 extra-small">Estimated</span>
+                                    <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25 ms-1 extra-small tracking-code-none">Estimated</span>
                                 @endif
                             </span>
                         </div>
@@ -448,7 +629,7 @@
                             }
                         @endphp
 
-                        <div class="p-3 rounded-3 border border-secondary border-opacity-25 mb-3" style="background-color: rgba(6, 8, 13, 0.6);">
+                        <div class="p-3 rounded-3 border border-secondary border-opacity-25 mb-3 inner-dark-box" style="background-color: rgba(6, 8, 13, 0.6);">
                             <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
                                 <span class="fw-bold text-white">
                                     <i class="bi bi-tools text-speed-pink me-1"></i> {{ $sName }}
@@ -527,7 +708,7 @@
 
                                                 <!-- Render Admin / Technician Remarks Note if entered in update.blade -->
                                                 @if($isCurrent && !empty($sNote))
-                                                    <div class="mt-2 p-2.5 rounded-3 border border-info border-opacity-30 text-white shadow-sm" style="background-color: rgba(0, 162, 255, 0.08);">
+                                                    <div class="mt-2 p-2.5 rounded-3 border border-info border-opacity-30 text-white shadow-sm tech-note-box" style="background-color: rgba(0, 162, 255, 0.08);">
                                                         <div class="d-flex align-items-center gap-1.5 fw-bold text-speed-blue mb-1 extra-small">
                                                             <i class="bi bi-chat-left-text-fill"></i> Technician Progress Note
                                                         </div>
@@ -558,7 +739,7 @@
             <!-- Empty State -->
             <div class="card speed-card border-0 shadow-sm rounded-4 p-5 text-center mb-4">
                 <div class="py-4">
-                    <div class="bg-black bg-opacity-40 text-secondary d-inline-flex p-3 rounded-circle mb-3 border border-secondary border-opacity-25">
+                    <div class="bg-black bg-opacity-40 text-secondary d-inline-flex p-3 rounded-circle mb-3 border border-secondary border-opacity-25 empty-state-icon-wrapper">
                         <i class="bi bi-search fs-1 text-secondary"></i>
                     </div>
                     <h5 class="fw-bold text-white mb-2">No Service Record Found</h5>
@@ -581,7 +762,7 @@
                 <!-- Phone Link -->
                 <div class="col-md-6">
                     <a href="tel:+639171234567" class="text-decoration-none">
-                        <div class="rounded-3 p-3 d-flex align-items-center gap-3 border border-secondary border-opacity-25 hover-shadow" style="background-color: rgba(6, 8, 13, 0.6);">
+                        <div class="rounded-3 p-3 d-flex align-items-center gap-3 border border-secondary border-opacity-25 hover-shadow inner-dark-box" style="background-color: rgba(6, 8, 13, 0.6);">
                             <i class="bi bi-telephone-fill text-speed-pink fs-5"></i>
                             <div>
                                 <span class="extra-small text-secondary d-block">Phone Support</span>
@@ -594,7 +775,7 @@
                 <!-- Email Link -->
                 <div class="col-md-6">
                     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@speedlane.com" target="_blank" class="text-decoration-none">
-                        <div class="rounded-3 p-3 d-flex align-items-center gap-3 border border-secondary border-opacity-25 hover-shadow" style="background-color: rgba(6, 8, 13, 0.6);">
+                        <div class="rounded-3 p-3 d-flex align-items-center gap-3 border border-secondary border-opacity-25 hover-shadow inner-dark-box" style="background-color: rgba(6, 8, 13, 0.6);">
                             <i class="bi bi-envelope-fill text-speed-blue fs-5"></i>
                             <div>
                                 <span class="extra-small text-secondary d-block">Email Support</span>
@@ -613,5 +794,8 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Light Mode Toggle JS -->
+    <script src="{{ asset('js/theme-toggle.js') }}"></script>
+   
 </body>
 </html>

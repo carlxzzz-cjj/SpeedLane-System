@@ -1,0 +1,117 @@
+/* ============================================================
+   SPEEDLANE LIGHT THEME OVERRIDES
+   ============================================================ */
+
+/* 1. Theme Variables & Base */
+html.light-theme {
+    --speed-dark: #f8fafc;
+    --speed-card-bg: #ffffff;
+    --speed-card-border: rgba(0, 0, 0, 0.1);
+}
+
+html.light-theme body {
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+}
+
+/* 2. Glassmorphism Navbar */
+html.light-theme .navbar-speed {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light-theme .brand-subtext {
+    color: #475569 !important;
+}
+
+html.light-theme .navbar-toggler {
+    border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+html.light-theme .navbar-toggler-icon {
+    filter: invert(0) !important;
+}
+
+html.light-theme .btn-outline-light {
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+
+html.light-theme .btn-outline-light:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+/* 3. Hero Section & Text Contrast */
+html.light-theme .hero-section {
+    background: radial-gradient(circle at 50% 20%, rgba(244, 37, 130, 0.08) 0%, rgba(0, 162, 255, 0.05) 40%, #f8fafc 80%) !important;
+}
+
+html.light-theme .hero-title,
+html.light-theme .hero-title span,
+html.light-theme h1,
+html.light-theme h2,
+html.light-theme h3,
+html.light-theme h4,
+html.light-theme h5,
+html.light-theme h6,
+html.light-theme .tracking-card-title {
+    color: #0f172a !important;
+    text-shadow: none !important;
+}
+
+html.light-theme .text-secondary {
+    color: #64748b !important;
+}
+
+/* 4. Cards & Inputs */
+html.light-theme .tracking-card,
+html.light-theme .service-card {
+    background-color: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light-theme .tracking-input {
+    background-color: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+html.light-theme .tracking-input::placeholder {
+    color: #94a3b8 !important;
+}
+
+html.light-theme .service-badge {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 5. Carousel Captions */
+html.light-theme .carousel-caption-custom {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-left-color: var(--speed-pink) !important;
+}
+
+html.light-theme .carousel-caption-custom h5,
+html.light-theme .carousel-caption-custom p {
+    color: #0f172a !important;
+}
+
+/* 6. Footer Section */
+html.light-theme footer#contact {
+    background-color: #f1f5f9 !important;
+    border-top: 1px solid #e2e8f0 !important;
+}
+
+html.light-theme .footer-link {
+    color: #475569 !important;
+}
+
+html.light-theme .footer-link:hover {
+    color: var(--speed-blue) !important;
+}
+
+/* Ensure Brand Colors Remain Vivid */
+html.light-theme .text-speed-pink { color: var(--speed-pink) !important; }
+html.light-theme .text-speed-blue { color: var(--speed-blue) !important; }

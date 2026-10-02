@@ -8,6 +8,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <!-- Early Theme Check Script (Defaults to Light Theme) -->
+    <script>
+        const savedTheme = localStorage.getItem('speedlane_theme');
+        // Default to Light Mode unless explicitly set to 'dark'
+        if (savedTheme !== 'dark') {
+            document.documentElement.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+        }
+    </script>
+
     <title>SpeedLane - Service Progress Updates</title>
 
     <!-- Bootstrap 5 CSS CDN -->
@@ -17,6 +29,8 @@
     
     <!-- Custom Admin CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <!-- Light Mode Toggle CSS -->
+    <link rel="stylesheet" href="{{ asset('css/theme-toggle.css') }}">
 
     <style>
         :root {
@@ -35,6 +49,7 @@
             min-height: 100vh;
             background: radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%) !important;
             background-attachment: fixed;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Color Utility Classes */
@@ -42,6 +57,19 @@
         .text-speed-blue { color: var(--speed-blue) !important; }
         .bg-speed-pink { background-color: var(--speed-pink) !important; }
         .bg-speed-blue { background-color: var(--speed-blue) !important; }
+
+        /* Dedicated Plate Number Badge */
+        .badge-plate {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            border: 1px solid #334155 !important;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            padding: 0.35em 0.65em;
+            display: inline-block;
+            border-radius: 0.375rem;
+        }
 
         /* Role Badge Styling */
         .badge-super-admin {
@@ -150,10 +178,15 @@
             box-shadow: 0 4px 15px rgba(244, 37, 130, 0.3);
         }
 
+        .btn-speed-gradient * {
+            color: #ffffff !important;
+        }
+
         .btn-speed-gradient:hover {
             opacity: 0.95;
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
+            color: #ffffff !important;
         }
 
         /* Form Controls Dark */
@@ -247,6 +280,243 @@
             color: #ffffff !important;
             border-color: #ff6b81 !important;
         }
+
+        /* Dark Theme Toggle Button */
+        #theme-toggle-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        #theme-toggle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* LIGHT MODE HIGH-CONTRAST OVERRIDES */
+        html.light-theme {
+            --speed-dark-bg: #f8fafc;
+            --speed-card-bg: #ffffff;
+            --speed-card-border: rgba(0, 0, 0, 0.08);
+            --speed-sidebar-bg: #f8fafc;
+        }
+
+        html.light-theme body {
+            background: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
+        html.light-theme .navbar-speed {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Clear Readable Badges in Light Mode */
+        html.light-theme .badge-queued {
+            background-color: #fef3c7 !important;
+            color: #b45309 !important;
+            border: 1px solid #fde68a !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-completed {
+            background-color: #dcfce7 !important;
+            color: #15803d !important;
+            border: 1px solid #86efac !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-in-progress {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            border: 1px solid #7dd3fc !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-plate {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            border: 1px solid #334155 !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        html.light-theme .badge-super-admin {
+            background-color: #fce7f3 !important;
+            color: #be185d !important;
+            border: 1px solid #f472b6 !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-admin {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            border: 1px solid #38bdf8 !important;
+            font-weight: 700 !important;
+        }
+
+        /* Action Buttons High Contrast in Light Mode */
+        html.light-theme .btn-speed-gradient,
+        html.light-theme .btn-speed-gradient * {
+            color: #ffffff !important;
+        }
+
+        html.light-theme .btn-speed-gradient {
+            box-shadow: 0 4px 14px rgba(244, 37, 130, 0.3) !important;
+        }
+
+        html.light-theme .btn-outline-info {
+            color: #0284c7 !important;
+            border-color: #0284c7 !important;
+            background-color: rgba(2, 132, 199, 0.08) !important;
+            font-weight: 600 !important;
+        }
+
+        html.light-theme .btn-outline-info:hover {
+            background-color: #0284c7 !important;
+            color: #ffffff !important;
+        }
+
+        html.light-theme .btn-outline-info:hover * {
+            color: #ffffff !important;
+        }
+
+        /* Clear Readable Logout Button in Light Mode */
+        html.light-theme .btn-logout {
+            color: #e11d48 !important;
+            border: 1px solid #fda4af !important;
+            background: #fff1f2 !important;
+            font-weight: 600;
+        }
+
+        html.light-theme .btn-logout:hover {
+            background: #ffe4e6 !important;
+            color: #9f1239 !important;
+            border-color: #f43f5e !important;
+        }
+
+        /* Clear Readable Theme Toggle Button in Light Mode */
+        html.light-theme #theme-toggle-btn {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme #theme-toggle-btn:hover {
+            background-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .admin-sidebar {
+            background-color: #f8fafc !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-theme .admin-nav-link {
+            color: #475569 !important;
+            font-weight: 600;
+        }
+
+        html.light-theme .admin-nav-link:hover {
+            color: #0f172a !important;
+            background: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .admin-nav-link.active {
+            background: linear-gradient(90deg, rgba(244, 37, 130, 0.12) 0%, rgba(0, 162, 255, 0.12) 100%) !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(244, 37, 130, 0.4) !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .speed-card {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-theme .form-control-dark, 
+        html.light-theme .form-select-dark {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .input-group-text-dark {
+            background-color: #e2e8f0 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-right: none !important;
+            color: #475569 !important;
+        }
+
+        html.light-theme .modal-content-dark {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .modal-title {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .table-dark-custom {
+            --bs-table-color: #0f172a;
+            --bs-table-hover-bg: rgba(0, 0, 0, 0.02);
+            --bs-table-border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        html.light-theme .table-dark-custom thead th {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+
+        html.light-theme .card-dark-nested {
+            background-color: #f8fafc !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-theme .card-dark-item {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-theme h3,
+        html.light-theme h4,
+        html.light-theme h5,
+        html.light-theme h6,
+        html.light-theme .modal-title {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .table-dark-custom td.text-white,
+        html.light-theme .table-dark-custom td .text-white,
+        html.light-theme .modal-body .text-white,
+        html.light-theme .card-dark-nested .text-white {
+            color: #0f172a !important;
+        }
+
+        /* Explicitly keep white text for gradient buttons, plate badges, and brand icons in light mode */
+        html.light-theme .btn-speed-gradient,
+        html.light-theme .btn-speed-gradient *,
+        html.light-theme .badge-plate,
+        html.light-theme .badge-plate *,
+        html.light-theme .bg-speed-pink,
+        html.light-theme .bg-speed-pink * {
+            color: #ffffff !important;
+        }
+
+        html.light-theme .btn-outline-secondary {
+            color: #475569 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .btn-outline-secondary:hover {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(50%);
+        }
     </style>
 </head>
 <body>
@@ -286,6 +556,11 @@
                         <i class="bi bi-box-arrow-right"></i> Logout
                     </button>
                 </form>
+
+                <!-- Light / Dark Mode Toggle Button -->
+                <button id="theme-toggle-btn" type="button" class="btn d-flex align-items-center justify-content-center rounded-circle p-2" style="width: 40px; height: 40px;" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode" onclick="toggleSpeedLaneTheme()">
+                    <i id="theme-toggle-icon" class="bi bi-sun-fill text-warning"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -348,30 +623,80 @@
                                 </div>
                             </div>
 
-                            <!-- Vehicle Type Filter -->
+                            <!-- Vehicle Type Filter (Based on vehicle_models database table) -->
                             <div class="col-md-2">
                                 <label class="form-label small fw-semibold text-secondary mb-1">Vehicle Type</label>
                                 <select name="vehicle_type" class="form-select form-select-sm form-select-dark">
                                     <option value="">All Vehicles</option>
-                                    <option value="Sedan" {{ request('vehicle_type') == 'Sedan' ? 'selected' : '' }}>Sedan</option>
-                                    <option value="SUV" {{ request('vehicle_type') == 'SUV' ? 'selected' : '' }}>SUV</option>
-                                    <option value="Pickup / Truck" {{ request('vehicle_type') == 'Pickup / Truck' ? 'selected' : '' }}>Pickup / Truck</option>
-                                    <option value="Van / MPV" {{ request('vehicle_type') == 'Van / MPV' ? 'selected' : '' }}>Van / MPV</option>
+                                    @php
+                                        if (isset($availableVehicleTypes) && count($availableVehicleTypes) > 0) {
+                                            $vehicleTypesList = $availableVehicleTypes;
+                                        } elseif (isset($vehicleTypes) && count($vehicleTypes) > 0) {
+                                            $vehicleTypesList = $vehicleTypes;
+                                        } else {
+                                            try {
+                                                $vehicleTypesList = \Illuminate\Support\Facades\DB::table('vehicle_models')
+                                                    ->whereNotNull('vehicle_type')
+                                                    ->distinct()
+                                                    ->pluck('vehicle_type')
+                                                    ->filter()
+                                                    ->values()
+                                                    ->toArray();
+                                            } catch (\Exception $e) {
+                                                $vehicleTypesList = [];
+                                            }
+                                            if (empty($vehicleTypesList)) {
+                                                $vehicleTypesList = ['Sedan', 'Hatchback', 'Crossover', 'MPV', 'SUV', 'Pickup', 'Van', 'Sports Car', 'Supercar'];
+                                            }
+                                        }
+                                    @endphp
+                                    @foreach($vehicleTypesList as $vType)
+                                        @php
+                                            $vTypeName = is_object($vType) ? ($vType->vehicle_type ?? $vType->name ?? '') : $vType;
+                                        @endphp
+                                        @if(!empty($vTypeName))
+                                            <option value="{{ $vTypeName }}" {{ request('vehicle_type') == $vTypeName ? 'selected' : '' }}>
+                                                {{ $vTypeName }}
+                                            </option>
+                                        @endif
+                                    @endforeach
                                 </select>
                             </div>
 
-                            <!-- Service Type Filter -->
+                            <!-- Service Type Filter (Based on services database table) -->
                             <div class="col-md-2">
                                 <label class="form-label small fw-semibold text-secondary mb-1">Service Type</label>
                                 <select name="service_type" class="form-select form-select-sm form-select-dark">
                                     <option value="">All Services</option>
-                                    @if(isset($availableServices))
-                                        @foreach($availableServices as $srv)
-                                            <option value="{{ $srv->name ?? $srv }}" {{ request('service_type') == ($srv->name ?? $srv) ? 'selected' : '' }}>
-                                                {{ $srv->name ?? $srv }}
+                                    @php
+                                        if (isset($availableServices) && count($availableServices) > 0) {
+                                            $servicesList = $availableServices;
+                                        } else {
+                                            try {
+                                                $servicesList = \Illuminate\Support\Facades\DB::table('services')
+                                                    ->distinct()
+                                                    ->pluck('name')
+                                                    ->filter()
+                                                    ->values()
+                                                    ->toArray();
+                                            } catch (\Exception $e) {
+                                                $servicesList = [];
+                                            }
+                                            if (empty($servicesList)) {
+                                                $servicesList = ['Ceramic Coating', 'Graphene Coating', 'PPF'];
+                                            }
+                                        }
+                                    @endphp
+                                    @foreach($servicesList as $srv)
+                                        @php
+                                            $srvName = is_object($srv) ? ($srv->name ?? '') : $srv;
+                                        @endphp
+                                        @if(!empty($srvName))
+                                            <option value="{{ $srvName }}" {{ request('service_type') == $srvName ? 'selected' : '' }}>
+                                                {{ $srvName }}
                                             </option>
-                                        @endforeach
-                                    @endif
+                                        @endif
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -386,7 +711,7 @@
                                 <button type="submit" class="btn btn-speed-gradient btn-sm rounded-3 w-100 fw-semibold">
                                     <i class="bi bi-funnel me-1"></i> Search
                                 </button>
-                                <a href="{{ route('admin.update') }}" class="btn btn-outline-secondary btn-sm rounded-3 px-3 text-white border-secondary border-opacity-50" title="Reset Filters">
+                                <a href="{{ route('admin.update') }}" class="btn btn-outline-secondary btn-sm rounded-3 px-3 border-secondary border-opacity-50" title="Reset Filters">
                                     <i class="bi bi-arrow-counterclockwise"></i>
                                 </a>
                             </div>
@@ -613,7 +938,7 @@
                                         <td class="fw-semibold text-white">{{ $service->customer_name }}</td>
                                         <td class="text-secondary">{{ $contactPhone }}</td>
                                         <td class="text-secondary">{{ $vehicleSummary }}</td>
-                                        <td><span class="badge bg-dark text-white border border-secondary">{{ $plates }}</span></td>
+                                        <td><span class="badge badge-plate">{{ $plates }}</span></td>
                                         <td class="text-secondary">{{ $mechanics ?: 'Unassigned' }}</td>
                                         <td>
                                             <div class="text-white">{{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y') }}</div>
@@ -665,7 +990,7 @@
                                                             <div class="card-dark-nested rounded-3 p-3 mb-3">
                                                                 <div class="fw-bold text-white mb-2 d-flex justify-content-between align-items-center">
                                                                     <span><i class="bi bi-car-front text-speed-blue me-1"></i> Vehicle: {{ implode(' ', array_filter([$vData['vehicle_make'], $vData['vehicle_model']])) }}</span>
-                                                                    <span class="badge bg-dark border border-secondary">{{ $vData['plate_number'] }}</span>
+                                                                    <span class="badge badge-plate">{{ $vData['plate_number'] }}</span>
                                                                 </div>
 
                                                                 @foreach($vData['service_items'] as $sIdx => $item)
@@ -846,7 +1171,7 @@
 
                                                     </div>
                                                     <div class="modal-footer border-top-0 pt-0">
-                                                        <button type="button" class="btn btn-outline-secondary btn-sm px-3 rounded-3 text-white border-secondary border-opacity-50" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm px-3 rounded-3 border-secondary border-opacity-50" data-bs-dismiss="modal">Cancel</button>
                                                         <button type="submit" class="btn btn-speed-gradient btn-sm px-4 fw-bold rounded-3">
                                                             <i class="bi bi-check2-circle me-1"></i> Save Changes
                                                         </button>
@@ -885,7 +1210,7 @@
                     <!-- Dynamic details populated via JavaScript -->
                 </div>
                 <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-outline-secondary btn-sm px-4 rounded-3 text-white border-secondary border-opacity-50" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-4 rounded-3 border-secondary border-opacity-50" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -893,6 +1218,8 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Light Mode Toggle JS -->
+    <script src="{{ asset('js/theme-toggle.js') }}"></script>
 
     <!-- Interactive Script -->
     <script>
@@ -1134,11 +1461,20 @@
                                 if (v.service_items && v.service_items.length > 0) {
                                     v.service_items.forEach(s => {
                                         const sPrice = (v.selected_services_prices && (v.selected_services_prices[s.name] !== undefined ? v.selected_services_prices[s.name] : v.selected_services_prices[s.name.trim()])) || 0;
+                                        
+                                        let stClass = 'badge-in-progress';
+                                        const stLower = (s.status || '').toLowerCase();
+                                        if (stLower.includes('pending') || stLower.includes('queue')) {
+                                            stClass = 'badge-queued';
+                                        } else if (stLower.includes('completed') || stLower.includes('ready')) {
+                                            stClass = 'badge-completed';
+                                        }
+
                                         servicesHTML += `
                                             <div class="border-bottom border-secondary border-opacity-25 py-2">
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <span class="fw-semibold text-white">${s.name}</span>
-                                                    <span class="badge badge-in-progress">${s.status || 'Pending Queue'}</span>
+                                                    <span class="badge ${stClass}">${s.status || 'Pending Queue'}</span>
                                                 </div>
                                                 ${s.note ? `<div class="small text-secondary mt-1"><i class="bi bi-chat-left-text me-1"></i>Note: ${s.note}</div>` : ''}
                                                 <div class="small font-monospace text-end text-speed-pink fw-bold mt-1">₱${parseFloat(sPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
@@ -1163,7 +1499,7 @@
                                                 <h6 class="fw-bold text-white mb-0"><i class="bi bi-car-front text-speed-blue me-1"></i> ${vehTitle}</h6>
                                                 <small class="text-secondary"><i class="bi bi-person-badge me-1"></i>Tech: ${v.mechanic_assigned || 'Unassigned'}</small>
                                             </div>
-                                            <span class="badge bg-dark border border-secondary font-monospace text-white">${v.plate_number || 'N/A'}</span>
+                                            <span class="badge badge-plate font-monospace">${v.plate_number || 'N/A'}</span>
                                         </div>
                                         <div class="mb-2">
                                             <span class="text-uppercase text-secondary fw-bold small d-block mb-1" style="font-size: 0.75rem;">Services & Status</span>

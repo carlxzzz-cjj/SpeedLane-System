@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedLane - Admin Dashboard</title>
 
+    <!-- Early Theme Check Script (Defaults to Light Theme) -->
+    <script>
+        const savedTheme = localStorage.getItem('speedlane_theme');
+        // Default to Light Mode unless explicitly set to 'dark'
+        if (savedTheme !== 'dark') {
+            document.documentElement.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+        }
+    </script>
+
     <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -13,6 +24,8 @@
     
     <!-- Custom External Admin CSS Link -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <!-- Light Mode Toggle CSS -->
+    <link rel="stylesheet" href="{{ asset('css/theme-toggle.css') }}">
 
     <style>
         :root {
@@ -24,6 +37,7 @@
             --speed-sidebar-bg: #0a0d16;
         }
 
+        /* Dark Theme Default */
         body {
             background-color: var(--speed-dark-bg) !important;
             color: #e2e8f0;
@@ -31,6 +45,223 @@
             min-height: 100vh;
             background: radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%) !important;
             background-attachment: fixed;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Dark Theme Role Badges */
+        .badge-super-admin {
+            background-color: rgba(244, 37, 130, 0.2) !important;
+            color: #ff99cc !important;
+            border: 1px solid rgba(244, 37, 130, 0.5) !important;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-admin {
+            background-color: rgba(0, 162, 255, 0.2) !important;
+            color: #80d4ff !important;
+            border: 1px solid rgba(0, 162, 255, 0.5) !important;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Dark Theme Logout Button */
+        .btn-logout {
+            color: #ff6b81 !important;
+            border: 1px solid rgba(255, 107, 129, 0.4) !important;
+            background: rgba(255, 107, 129, 0.08) !important;
+            transition: all 0.25s ease;
+            font-weight: 600;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 107, 129, 0.25) !important;
+            color: #ffffff !important;
+            border-color: #ff6b81 !important;
+        }
+
+        /* Dark Theme Toggle Button */
+        #theme-toggle-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        #theme-toggle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* LIGHT MODE HIGH-CONTRAST OVERRIDES */
+        html.light-theme {
+            --speed-dark-bg: #f8fafc;
+            --speed-card-bg: #ffffff;
+            --speed-card-border: rgba(0, 0, 0, 0.08);
+            --speed-sidebar-bg: #f8fafc;
+        }
+
+        html.light-theme body {
+            background: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
+        html.light-theme .navbar-speed {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Clear Readable Badges in Light Mode */
+        html.light-theme .badge-super-admin {
+            background-color: #fce7f3 !important;
+            color: #be185d !important;
+            border: 1px solid #f472b6 !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-admin {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            border: 1px solid #38bdf8 !important;
+            font-weight: 700 !important;
+        }
+
+        /* Clear Readable Logout Button in Light Mode */
+        html.light-theme .btn-logout {
+            color: #e11d48 !important;
+            border: 1px solid #fda4af !important;
+            background: #fff1f2 !important;
+            font-weight: 600;
+        }
+
+        html.light-theme .btn-logout:hover {
+            background: #ffe4e6 !important;
+            color: #9f1239 !important;
+            border-color: #f43f5e !important;
+        }
+
+        /* Clear Readable Theme Toggle Button in Light Mode */
+        html.light-theme #theme-toggle-btn {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme #theme-toggle-btn:hover {
+            background-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .admin-sidebar {
+            background-color: #f8fafc !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-theme .admin-nav-link {
+            color: #475569 !important;
+            font-weight: 600;
+        }
+
+        html.light-theme .admin-nav-link:hover {
+            color: #0f172a !important;
+            background: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .admin-nav-link.active {
+            background: linear-gradient(90deg, rgba(244, 37, 130, 0.12) 0%, rgba(0, 162, 255, 0.12) 100%) !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(244, 37, 130, 0.4) !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .speed-card {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-theme .speed-card h2,
+        html.light-theme .speed-card h4,
+        html.light-theme .speed-card h6 {
+            color: #0f172a !important;
+        }
+
+        /* Light Mode Quick Action Buttons */
+        html.light-theme .quick-action-card-btn {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #1e293b !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        html.light-theme .quick-action-card-btn:hover {
+            background-color: #f8fafc !important;
+            border-color: var(--speed-blue) !important;
+            color: #0f172a !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 162, 255, 0.15) !important;
+        }
+
+        html.light-theme .form-control-dark {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .input-group-text-dark {
+            background-color: #e2e8f0 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-right: none !important;
+        }
+
+        html.light-theme .modal-content-dark {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .modal-title {
+            color: #0f172a !important;
+        }
+
+        /* Modal Cancel Button Dynamic Theme */
+        .btn-modal-cancel {
+            color: #cbd5e1 !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            transition: all 0.2s ease;
+        }
+
+        .btn-modal-cancel:hover {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+        }
+
+        html.light-theme .btn-modal-cancel {
+            color: #334155 !important;
+            border: 1px solid #cbd5e1 !important;
+            background-color: #f1f5f9 !important;
+        }
+
+        html.light-theme .btn-modal-cancel:hover {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        /* Light Mode Alerts */
+        html.light-theme .alert-success {
+            background-color: #dcfce7 !important;
+            color: #15803d !important;
+            border-color: #86efac !important;
+        }
+
+        html.light-theme .alert-danger {
+            background-color: #fee2e2 !important;
+            color: #b91c1c !important;
+            border-color: #fca5a5 !important;
+        }
+
+        html.light-theme .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(50%);
         }
 
         /* Color Utility Classes */
@@ -38,23 +269,6 @@
         .text-speed-blue { color: var(--speed-blue) !important; }
         .bg-speed-pink { background-color: var(--speed-pink) !important; }
         .bg-speed-blue { background-color: var(--speed-blue) !important; }
-
-        /* Role Badge Styling (High Contrast Fix) */
-        .badge-super-admin {
-            background-color: rgba(244, 37, 130, 0.18) !important;
-            color: #ffb3d9 !important;
-            border: 1px solid rgba(244, 37, 130, 0.5) !important;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-
-        .badge-admin {
-            background-color: rgba(0, 162, 255, 0.18) !important;
-            color: #99dbff !important;
-            border: 1px solid rgba(0, 162, 255, 0.5) !important;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
 
         /* Top Navigation Header */
         .navbar-speed {
@@ -125,6 +339,7 @@
             opacity: 0.95;
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
+            color: #ffffff !important;
         }
 
         .quick-action-card-btn {
@@ -165,7 +380,7 @@
         }
 
         .form-control-dark::placeholder {
-            color: #475569 !important;
+            color: #64748b !important;
         }
 
         .input-group-text-dark {
@@ -189,67 +404,58 @@
         .extra-small {
             font-size: 0.75rem;
         }
-
-        /* High Visibility Logout Button */
-        .btn-logout {
-            color: #ff6b81 !important;
-            border: 1px solid rgba(255, 107, 129, 0.4) !important;
-            background: rgba(255, 107, 129, 0.05);
-            transition: all 0.25s ease;
-        }
-
-        .btn-logout:hover {
-            background: rgba(255, 107, 129, 0.2) !important;
-            color: #ffffff !important;
-            border-color: #ff6b81 !important;
-        }
     </style>
 </head>
 <body>
 
     <!-- TOP NAVIGATION HEADER BAR -->
-<header class="navbar navbar-expand-lg navbar-dark navbar-speed px-4 py-2 sticky-top">
-    <div class="container-fluid">
-        
-        <!-- Brand Logo & App Subtitle -->
-        <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('admin.dashboard') }}">
-            <div class="bg-speed-pink text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                <i class="bi bi-car-front-fill fs-6"></i>
-            </div>
-            <div>
-                <span class="brand-logo-text d-block">
-                    <span class="text-speed-pink">SPEED</span><span class="text-speed-blue">LANE</span>
-                </span>
-                <span class="brand-subtext d-block">ADMIN OVERVIEW</span>
-            </div>
-        </a>
-
-        <!-- Right Nav Alignment -->
-        <div class="d-flex align-items-center gap-3 ms-auto">
+    <header class="navbar navbar-expand-lg navbar-dark navbar-speed px-4 py-2 sticky-top">
+        <div class="container-fluid">
             
-            {{-- ROLE BADGE --}}
-            @if(auth()->check() && auth()->user()->isSuperAdmin())
-                <span class="badge badge-super-admin px-3 py-2 rounded-pill">
-                    <i class="bi bi-shield-check me-1"></i> Super Admin
-                </span>
-            @else
-                <span class="badge badge-admin px-3 py-2 rounded-pill">
-                    <i class="bi bi-person-badge me-1"></i> Admin
-                </span>
-            @endif
+            <!-- Brand Logo & App Subtitle -->
+            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('admin.dashboard') }}">
+                <div class="bg-speed-pink text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                    <i class="bi bi-car-front-fill fs-6"></i>
+                </div>
+                <div>
+                    <span class="brand-logo-text d-block">
+                        <span class="text-speed-pink">SPEED</span><span class="text-speed-blue">LANE</span>
+                    </span>
+                    <span class="brand-subtext d-block">ADMIN OVERVIEW</span>
+                </div>
+            </a>
 
-            <!-- Logout Action Form -->
-            <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
-                @csrf
-                <button type="submit" class="btn btn-logout btn-sm px-3 rounded-3 d-flex align-items-center gap-1">
-                    <i class="bi bi-box-arrow-right"></i> Logout
+            <!-- Right Nav Alignment -->
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                
+                {{-- ROLE BADGE --}}
+                @if(auth()->check() && auth()->user()->isSuperAdmin())
+                    <span class="badge badge-super-admin px-3 py-2 rounded-pill">
+                        <i class="bi bi-shield-check me-1"></i> Super Admin
+                    </span>
+                @else
+                    <span class="badge badge-admin px-3 py-2 rounded-pill">
+                        <i class="bi bi-person-badge me-1"></i> Admin
+                    </span>
+                @endif
+
+                <!-- Logout Action Form -->
+                <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
+                    @csrf
+                    <button type="submit" class="btn btn-logout btn-sm px-3 py-1.5 rounded-3 d-flex align-items-center gap-1">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </form>
+
+                <!-- Light / Dark Mode Toggle Button -->
+                <button id="theme-toggle-btn" type="button" class="btn d-flex align-items-center justify-content-center rounded-circle p-2" style="width: 40px; height: 40px;" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode" onclick="toggleSpeedLaneTheme()">
+                    <i id="theme-toggle-icon" class="bi bi-sun-fill text-warning"></i>
                 </button>
-            </form>
+
+            </div>
 
         </div>
-
-    </div>
-</header>
+    </header>
 
     <!-- MAIN LAYOUT WRAPPER -->
     <div class="container-fluid">
@@ -480,7 +686,7 @@
                     </div>
                     
                     <div class="modal-footer border-top-0 pt-0">
-                        <button type="button" class="btn btn-outline-secondary rounded-3 fw-semibold px-4 text-white border-secondary border-opacity-50" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-modal-cancel rounded-3 fw-semibold px-4" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-speed-gradient rounded-3 fw-semibold px-4">
                             <i class="bi bi-check-lg me-1"></i> Create Account
                         </button>
@@ -492,5 +698,7 @@
     @endif
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Light Mode Toggle JS -->
+    <script src="{{ asset('js/theme-toggle.js') }}"></script>
 </body>
 </html>

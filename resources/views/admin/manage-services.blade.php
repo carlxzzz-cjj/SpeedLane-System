@@ -5,12 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedLane - Manage Services & Staff</title>
 
+    <!-- Early Theme Check Script (Defaults to Light Theme) -->
+    <script>
+        const savedTheme = localStorage.getItem('speedlane_theme');
+        // Default to Light Mode unless explicitly set to 'dark'
+        if (savedTheme !== 'dark') {
+            document.documentElement.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+        }
+    </script>
+
     <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
     <!-- Custom Admin External Stylesheet -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <!-- Light Mode Toggle CSS -->
+    <link rel="stylesheet" href="{{ asset('css/theme-toggle.css') }}">
 
     <style>
         :root {
@@ -29,6 +42,7 @@
             min-height: 100vh;
             background: radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%) !important;
             background-attachment: fixed;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Color Utility Classes */
@@ -37,7 +51,18 @@
         .bg-speed-pink { background-color: var(--speed-pink) !important; }
         .bg-speed-blue { background-color: var(--speed-blue) !important; }
 
-        /* Role & Status Badges - High Contrast & Matching register-service.blade */
+        /* Dark Theme Toggle Button */
+        #theme-toggle-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        #theme-toggle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Role & Status Badges - Dark Mode Defaults */
         .badge-super-admin {
             background-color: rgba(244, 37, 130, 0.18) !important;
             color: #ffb3d9 !important;
@@ -98,6 +123,304 @@
             color: #cbd5e1 !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
             font-weight: 600;
+        }
+
+        /* LIGHT MODE HIGH-CONTRAST OVERRIDES */
+        html.light-theme {
+            --speed-dark-bg: #f8fafc;
+            --speed-card-bg: #ffffff;
+            --speed-card-border: rgba(0, 0, 0, 0.08);
+            --speed-sidebar-bg: #f8fafc;
+        }
+
+        html.light-theme body {
+            background: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
+        html.light-theme .navbar-speed {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        html.light-theme #theme-toggle-btn {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme #theme-toggle-btn:hover {
+            background-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .admin-sidebar {
+            background-color: #f8fafc !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-theme .admin-nav-link {
+            color: #475569 !important;
+            font-weight: 600;
+        }
+
+        html.light-theme .admin-nav-link:hover {
+            color: #0f172a !important;
+            background: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .admin-nav-link.active {
+            background: linear-gradient(90deg, rgba(244, 37, 130, 0.12) 0%, rgba(0, 162, 255, 0.12) 100%) !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(244, 37, 130, 0.4) !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .speed-card {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-theme h2,
+        html.light-theme h3,
+        html.light-theme h4,
+        html.light-theme h5,
+        html.light-theme h6,
+        html.light-theme .text-white {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .text-secondary {
+            color: #64748b !important;
+        }
+
+        /* Light Mode Badges */
+        html.light-theme .badge-super-admin {
+            background-color: #fce7f3 !important;
+            color: #be185d !important;
+            border: 1px solid #f472b6 !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-admin {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            border: 1px solid #38bdf8 !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-staff,
+        html.light-theme .badge-flat-rate {
+            background-color: #f1f5f9 !important;
+            color: #334155 !important;
+            border: 1px solid #cbd5e1 !important;
+            font-weight: 600 !important;
+        }
+
+        html.light-theme .badge-single-select {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            border: 1px solid #38bdf8 !important;
+            font-weight: 600 !important;
+        }
+
+        html.light-theme .badge-multi-select {
+            background-color: #fce7f3 !important;
+            color: #be185d !important;
+            border: 1px solid #f472b6 !important;
+            font-weight: 600 !important;
+        }
+
+        html.light-theme .badge-status-active {
+            background-color: #dcfce7 !important;
+            color: #15803d !important;
+            border: 1px solid #86efac !important;
+        }
+
+        html.light-theme .badge-status-disabled {
+            background-color: #f1f5f9 !important;
+            color: #64748b !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        /* Light Mode Logout Button */
+        html.light-theme .btn-logout {
+            color: #e11d48 !important;
+            border: 1px solid #fda4af !important;
+            background: #fff1f2 !important;
+            font-weight: 600;
+        }
+
+        html.light-theme .btn-logout:hover {
+            background: #ffe4e6 !important;
+            color: #9f1239 !important;
+            border-color: #f43f5e !important;
+        }
+
+        /* Light Mode Navigation Tabs */
+        html.light-theme #manageTab .nav-link {
+            color: #64748b;
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+        }
+
+        html.light-theme #manageTab .nav-link:hover {
+            background-color: #e2e8f0;
+            color: #0f172a;
+        }
+
+        html.light-theme #manageTab .nav-link.active {
+            background: linear-gradient(90deg, rgba(244, 37, 130, 0.15) 0%, rgba(0, 162, 255, 0.15) 100%) !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(244, 37, 130, 0.4) !important;
+            font-weight: 700;
+        }
+
+        /* Light Mode Service Cards & Options */
+        html.light-theme .service-option-card {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+        }
+
+        html.light-theme .service-option-card:hover {
+            background-color: #f1f5f9;
+            border-color: var(--speed-blue);
+        }
+
+        html.light-theme .bg-black.bg-opacity-40 {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        /* Light Mode Inputs & Dropdowns */
+        html.light-theme .form-control-dark,
+        html.light-theme .form-select-dark {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .form-control-dark:focus,
+        html.light-theme .form-select-dark:focus {
+            border-color: var(--speed-blue) !important;
+            box-shadow: 0 0 12px rgba(0, 162, 255, 0.25) !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .form-control-dark::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        html.light-theme .input-group-text-dark {
+            background-color: #e2e8f0 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-right: none !important;
+            color: #475569 !important;
+        }
+
+        /* Light Mode Tables */
+        html.light-theme .table-dark-custom {
+            --bs-table-color: #1e293b;
+            border-color: #e2e8f0;
+        }
+
+        html.light-theme .table-dark-custom thead {
+            background-color: #f1f5f9;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        html.light-theme .table-dark-custom th {
+            color: #475569;
+            border-bottom-width: 1px;
+        }
+
+        html.light-theme .table-dark-custom td {
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+
+        /* Light Mode Modals */
+        html.light-theme .modal-content-dark {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .modal-content-dark .modal-header,
+        html.light-theme .modal-content-dark .modal-footer {
+            border-color: #e2e8f0 !important;
+        }
+
+        html.light-theme .btn-dark-cancel {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #334155 !important;
+        }
+
+        html.light-theme .btn-dark-cancel:hover {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(50%);
+        }
+
+        html.light-theme .alert-dark {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        /* Light Mode Action Buttons */
+        html.light-theme .btn-outline-info-custom {
+            color: #0284c7 !important;
+            border: 1px solid #38bdf8 !important;
+            background: #f0f9ff !important;
+        }
+
+        html.light-theme .btn-outline-info-custom:hover {
+            background: #e0f2fe !important;
+            color: #0369a1 !important;
+            border-color: #0284c7 !important;
+        }
+
+        html.light-theme .btn-outline-warning-custom {
+            color: #d97706 !important;
+            border: 1px solid #fcd34d !important;
+            background: #fffbeb !important;
+        }
+
+        html.light-theme .btn-outline-warning-custom:hover {
+            background: #fef3c7 !important;
+            color: #b45309 !important;
+            border-color: #d97706 !important;
+        }
+
+        html.light-theme .btn-outline-success-custom {
+            color: #16a34a !important;
+            border: 1px solid #86efac !important;
+            background: #f0fdf4 !important;
+        }
+
+        html.light-theme .btn-outline-success-custom:hover {
+            background: #dcfce7 !important;
+            color: #15803d !important;
+            border-color: #16a34a !important;
+        }
+
+        html.light-theme .btn-outline-danger-custom {
+            color: #dc2626 !important;
+            border: 1px solid #fca5a5 !important;
+            background: #fef2f2 !important;
+        }
+
+        html.light-theme .btn-outline-danger-custom:hover {
+            background: #fee2e2 !important;
+            color: #991b1b !important;
+            border-color: #dc2626 !important;
         }
 
         /* Header Navigation */
@@ -403,6 +726,11 @@
                     </button>
                 </form>
 
+                <!-- Light / Dark Mode Toggle Button -->
+                <button id="theme-toggle-btn" type="button" class="btn d-flex align-items-center justify-content-center rounded-circle p-2" style="width: 40px; height: 40px;" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode" onclick="toggleSpeedLaneTheme()">
+                    <i id="theme-toggle-icon" class="bi bi-sun-fill text-warning"></i>
+                </button>
+
             </div>
 
         </div>
@@ -516,9 +844,14 @@
                                     <select id="vehicleFilterSelect" class="form-select form-select-dark rounded-3">
                                         <option value="">Filter by Vehicle: All Types</option>
                                         <option value="Sedan">Sedan</option>
+                                        <option value="Hatchback">Hatchback</option>
+                                        <option value="Crossover">Crossover</option>
+                                        <option value="MPV">MPV</option>
                                         <option value="SUV">SUV</option>
-                                        <option value="Pickup Truck">Pickup Truck</option>
+                                        <option value="Pickup">Pickup Truck</option>
                                         <option value="Van">Van</option>
+                                        <option value="Sports Car">Sports Car</option>
+                                        <option value="Supercar">Supercar</option>
                                         <option value="All">All Vehicles Only</option>
                                     </select>
                                 </div>
@@ -595,21 +928,30 @@
                                                 <span class="fw-bold text-speed-blue fs-4 font-monospace">₱{{ number_format($service->flat_price, 2) }}</span>
                                             </div>
                                         @else
-                                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2.5">
-                                                @foreach($service->options as $opt)
-                                                    <div class="col">
-                                                        <div class="service-option-card p-3 rounded-3 d-flex justify-content-between align-items-center h-100">
-                                                            <div class="d-flex align-items-center gap-2 me-2">
-                                                                <i class="bi bi-circle-fill text-speed-pink" style="font-size: 8px;"></i>
-                                                                <div>
-                                                                    <span class="fw-semibold text-white fs-6 d-block">{{ $opt->name }}</span>
+                                            @if($service->options->count() > 0)
+                                                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2.5">
+                                                    @foreach($service->options as $opt)
+                                                        <div class="col">
+                                                            <div class="service-option-card p-3 rounded-3 d-flex justify-content-between align-items-center h-100">
+                                                                <div class="d-flex align-items-center gap-2 me-2">
+                                                                    <i class="bi bi-circle-fill text-speed-pink" style="font-size: 8px;"></i>
+                                                                    <div>
+                                                                        <span class="fw-semibold text-white fs-6 d-block">{{ $opt->name }}</span>
+                                                                    </div>
                                                                 </div>
+                                                                <span class="fw-bold text-speed-blue fs-5 font-monospace ms-auto">₱{{ number_format($opt->price, 2) }}</span>
                                                             </div>
-                                                            <span class="fw-bold text-speed-blue fs-5 font-monospace ms-auto">₱{{ number_format($opt->price, 2) }}</span>
                                                         </div>
-                                                    </div>
-                                                @endforeach
-                                            </div>
+                                                    @endforeach
+                                                </div>
+                                            @elseif($service->flat_price !== null)
+                                                <div class="p-3 rounded-3 bg-black bg-opacity-40 border border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                                                    <span class="fw-bold text-white fs-6">
+                                                        <i class="bi bi-tag-fill me-2 text-speed-pink"></i>Base / Service Price
+                                                    </span>
+                                                    <span class="fw-bold text-speed-blue fs-4 font-monospace">₱{{ number_format($service->flat_price, 2) }}</span>
+                                                </div>
+                                            @endif
                                         @endif
                                     </div>
                                 </div>
@@ -637,9 +979,14 @@
                                                         <select name="vehicle_type" class="form-select form-select-dark">
                                                             <option value="All" {{ ($service->vehicle_type ?? 'All') === 'All' ? 'selected' : '' }}>All Vehicle Types</option>
                                                             <option value="Sedan" {{ ($service->vehicle_type ?? '') === 'Sedan' ? 'selected' : '' }}>Sedan</option>
+                                                            <option value="Hatchback" {{ ($service->vehicle_type ?? '') === 'Hatchback' ? 'selected' : '' }}>Hatchback</option>
+                                                            <option value="Crossover" {{ ($service->vehicle_type ?? '') === 'Crossover' ? 'selected' : '' }}>Crossover</option>
+                                                            <option value="MPV" {{ ($service->vehicle_type ?? '') === 'MPV' ? 'selected' : '' }}>MPV</option>
                                                             <option value="SUV" {{ ($service->vehicle_type ?? '') === 'SUV' ? 'selected' : '' }}>SUV</option>
                                                             <option value="Pickup Truck" {{ ($service->vehicle_type ?? '') === 'Pickup Truck' ? 'selected' : '' }}>Pickup Truck</option>
                                                             <option value="Van" {{ ($service->vehicle_type ?? '') === 'Van' ? 'selected' : '' }}>Van</option>
+                                                            <option value="Sports Car" {{ ($service->vehicle_type ?? '') === 'Sports Car' ? 'selected' : '' }}>Sports Car</option>
+                                                            <option value="Supercar" {{ ($service->vehicle_type ?? '') === 'Supercar' ? 'selected' : '' }}>Supercar</option>
                                                         </select>
                                                     </div>
 
@@ -660,8 +1007,8 @@
                                                         </select>
                                                     </div>
 
-                                                    <div class="mb-3" id="flatPriceBox{{ $service->id }}" style="display: {{ $service->selection_type === 'flat' ? 'block' : 'none' }};">
-                                                        <label class="form-label small fw-semibold text-secondary">Flat Price (₱)</label>
+                                                    <div class="mb-3" id="flatPriceBox{{ $service->id }}" style="display: {{ ($service->selection_type === 'flat' || $service->selection_type === 'single') ? 'block' : 'none' }};">
+                                                        <label class="form-label small fw-semibold text-secondary">Flat / Base Price (₱)</label>
                                                         <input type="number" step="0.01" name="flat_price" class="form-control form-control-dark" value="{{ $service->flat_price }}">
                                                     </div>
 
@@ -982,9 +1329,14 @@
                             <select name="vehicle_type" class="form-select form-select-dark" required>
                                 <option value="All" selected>All Vehicle Types</option>
                                 <option value="Sedan">Sedan</option>
+                                <option value="Hatchback">Hatchback</option>
+                                <option value="Crossover">Crossover</option>
+                                <option value="MPV">MPV</option>
                                 <option value="SUV">SUV</option>
                                 <option value="Pickup Truck">Pickup Truck</option>
                                 <option value="Van">Van</option>
+                                <option value="Sports Car">Sports Car</option>
+                                <option value="Supercar">Supercar</option>
                             </select>
                         </div>
 
@@ -1005,14 +1357,14 @@
                             </select>
                         </div>
 
-                        <div class="mb-3" id="flatPriceBox" style="display: none;">
-                            <label class="form-label small fw-semibold text-secondary">Flat Price (₱) <span class="text-speed-pink">*</span></label>
+                        <div class="mb-3" id="flatPriceBox" style="display: block;">
+                            <label class="form-label small fw-semibold text-secondary">Flat / Base Price (₱)</label>
                             <input type="number" step="0.01" name="flat_price" class="form-control form-control-dark" placeholder="3500.00">
                         </div>
 
                         <div class="mb-3" id="optionsBox">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="form-label small fw-semibold text-secondary mb-0">Pricing Options & Sub-services <span class="text-speed-pink">*</span></label>
+                                <label class="form-label small fw-semibold text-secondary mb-0">Pricing Options & Sub-services</label>
                                 <button type="button" class="btn btn-sm btn-outline-info-custom rounded-3" onclick="addOptionRow('addOptionsContainer')">
                                     <i class="bi bi-plus-lg me-1"></i> Add Sub-service / Rate
                                 </button>
@@ -1020,10 +1372,10 @@
                             <div id="addOptionsContainer">
                                 <div class="row g-2 mb-2 option-row">
                                     <div class="col-7">
-                                        <input type="text" name="options[0][name]" class="form-control form-control-sm form-control-dark rounded-2" placeholder="Option Name (e.g. Basic Wash)" required>
+                                        <input type="text" name="options[0][name]" class="form-control form-control-sm form-control-dark rounded-2" placeholder="Option Name (e.g. Basic Wash)">
                                     </div>
                                     <div class="col-4">
-                                        <input type="number" step="0.01" name="options[0][price]" class="form-control form-control-sm form-control-dark rounded-2" placeholder="Price (₱)" required>
+                                        <input type="number" step="0.01" name="options[0][price]" class="form-control form-control-sm form-control-dark rounded-2" placeholder="Price (₱)">
                                     </div>
                                     <div class="col-1 text-center">
                                         <button type="button" class="btn btn-sm btn-outline-danger-custom w-100 rounded-2" onclick="removeOptionRow(this)"><i class="bi bi-trash"></i></button>
@@ -1148,8 +1500,10 @@
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS Bundle -->
+   <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Light Mode Toggle JS -->
+    <script src="{{ asset('js/theme-toggle.js') }}"></script>
 
     <script>
         function toggleAddServiceFields(value) {
@@ -1159,6 +1513,9 @@
             if (value === 'flat') {
                 flatBox.style.display = 'block';
                 optionsBox.style.display = 'none';
+            } else if (value === 'single') {
+                flatBox.style.display = 'block';
+                optionsBox.style.display = 'block';
             } else {
                 flatBox.style.display = 'none';
                 optionsBox.style.display = 'block';
@@ -1172,6 +1529,9 @@
             if (value === 'flat') {
                 flatBox.style.display = 'block';
                 optionsBox.style.display = 'none';
+            } else if (value === 'single') {
+                flatBox.style.display = 'block';
+                optionsBox.style.display = 'block';
             } else {
                 flatBox.style.display = 'none';
                 optionsBox.style.display = 'block';
@@ -1185,10 +1545,10 @@
             row.className = 'row g-2 mb-2 option-row';
             row.innerHTML = `
                 <div class="col-7">
-                    <input type="text" name="options[${index}][name]" class="form-control form-control-sm form-control-dark rounded-2" placeholder="Option Name (e.g. Standard Package)" required>
+                    <input type="text" name="options[${index}][name]" class="form-control form-control-sm form-control-dark rounded-2" placeholder="Option Name (e.g. Standard Package)">
                 </div>
                 <div class="col-4">
-                    <input type="number" step="0.01" name="options[${index}][price]" class="form-control form-control-sm form-control-dark rounded-2" placeholder="Price (₱)" required>
+                    <input type="number" step="0.01" name="options[${index}][price]" class="form-control form-control-sm form-control-dark rounded-2" placeholder="Price (₱)">
                 </div>
                 <div class="col-1 text-center">
                     <button type="button" class="btn btn-sm btn-outline-danger-custom w-100 rounded-2" onclick="removeOptionRow(this)"><i class="bi bi-trash"></i></button>

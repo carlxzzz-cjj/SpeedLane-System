@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpeedLane AutoSpa - Home</title>
 
+    <!-- Early Theme Check Script (Defaults to Light Theme) -->
+    <script>
+        const savedTheme = localStorage.getItem('speedlane_theme');
+        // Default to Light Mode unless explicitly set to 'dark'
+        if (savedTheme !== 'dark') {
+            document.documentElement.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+        }
+    </script>
+
     <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons CDN -->
@@ -12,6 +23,8 @@
 
     <!-- Custom CSS Link -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <!-- Light Mode Toggle CSS -->
+    <link rel="stylesheet" href="{{ asset('css/theme-toggle.css') }}">
 
     <style>
         :root {
@@ -27,11 +40,152 @@
             color: #e2e8f0;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Gradient & Typography Colors */
-        .text-speed-pink { color: var(--speed-pink) !important; }
-        .text-speed-blue { color: var(--speed-blue) !important; }
+        /* Light Mode Styling Overrides */
+        html.light-theme {
+            --speed-dark: #f8fafc;
+            --speed-card-bg: #ffffff;
+            --speed-card-border: rgba(0, 0, 0, 0.1);
+        }
+
+        html.light-theme body {
+            background-color: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
+        html.light-theme .navbar-speed {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-theme .admin-login-btn {
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .admin-login-btn:hover {
+            background-color: #e2e8f0 !important;
+        }
+
+        html.light-theme #theme-toggle-btn {
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .hero-section {
+            background: radial-gradient(circle at 50% 20%, rgba(244, 37, 130, 0.08) 0%, rgba(0, 162, 255, 0.06) 40%, rgba(248, 250, 252, 1) 80%) !important;
+        }
+
+        /* "Premier Auto Care & Detailing" Badge Light/Dark Mode Styling */
+        .hero-pill-badge {
+            background-color: #11141d;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--speed-blue) !important;
+            transition: all 0.3s ease;
+        }
+
+        html.light-theme .hero-pill-badge {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 162, 255, 0.3) !important;
+            color: #0077cc !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        html.light-theme .hero-subtitle {
+            color: #475569 !important;
+        }
+
+        html.light-theme .tracking-card {
+            background: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        /* Visible Track Your Vehicle Title in Light/Dark Theme */
+        .tracking-card-title {
+            color: #ffffff !important;
+        }
+
+        html.light-theme .tracking-card-title {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .tracking-label {
+            color: #64748b !important;
+        }
+
+        html.light-theme .tracking-input {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme #services h2 {
+            color: #0f172a !important;
+        }
+
+        html.light-theme #services p.text-secondary {
+            color: #64748b !important;
+        }
+
+        html.light-theme .service-card {
+            background: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+        }
+
+        html.light-theme .service-card h4 {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .service-card p {
+            color: #64748b !important;
+        }
+
+        /* Service Showcase Gallery Light Mode Overrides */
+        html.light-theme #showcase {
+            background-color: #f1f5f9 !important;
+        }
+
+        html.light-theme #showcase h2 {
+            color: #0f172a !important;
+        }
+
+        html.light-theme #showcase p.text-secondary {
+            color: #64748b !important;
+        }
+
+        html.light-theme .carousel-caption-custom {
+            background: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        html.light-theme .carousel-caption-custom h5 {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .carousel-caption-custom p {
+            color: #475569 !important;
+        }
+
+        /* Enforce Brand Colors in both Light & Dark modes */
+        .text-speed-pink,
+        html.light-theme .text-speed-pink,
+        html.light-theme .hero-title .text-speed-pink,
+        html.light-theme .brand-logo-text .text-speed-pink { 
+            color: var(--speed-pink) !important; 
+        }
+
+        .text-speed-blue,
+        html.light-theme .text-speed-blue,
+        html.light-theme .hero-title .text-speed-blue,
+        html.light-theme .brand-logo-text .text-speed-blue { 
+            color: var(--speed-blue) !important; 
+        }
+
         .bg-speed-pink { background-color: var(--speed-pink) !important; }
         .bg-speed-blue { background-color: var(--speed-blue) !important; }
 
@@ -188,9 +342,9 @@
 </head>
 <body>
 
-    <!-- Header Navigation (Simplified - Links Removed as Requested) -->
+    <!-- Header Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-speed py-3">
-        <div class="container">
+        <div class="container d-flex align-items-center justify-content-between">
             <!-- Logo Section -->
             <a class="navbar-brand d-flex align-items-center gap-2" href="/">
                 <div class="p-2 rounded-3 bg-speed-pink d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
@@ -209,15 +363,20 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Nav Content: Only Admin Login Button inside Hamburger Menu -->
+            <!-- Nav Content: Theme Toggle + Admin Login Button -->
             <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-lg-center">
-                    <li class="nav-item w-100 w-lg-auto">
-                        <a class="btn btn-outline-light fw-bold px-4 py-2 rounded-3 admin-login-btn d-inline-flex align-items-center gap-2 w-100 justify-content-center" href="/admin/login">
-                            <i class="bi bi-shield-lock-fill text-speed-pink"></i> Admin Login
-                        </a>
-                    </li>
-                </ul>
+                <div class="ms-auto d-flex align-items-center gap-3 flex-row justify-content-end">
+                  
+                    <!-- Admin Login Button -->
+                    <a class="btn btn-outline-light fw-bold px-4 py-2 rounded-3 admin-login-btn d-inline-flex align-items-center gap-2 text-nowrap" href="/admin/login">
+                        <i class="bi bi-shield-lock-fill text-speed-pink"></i> Admin Login
+                    </a>
+
+                      <!-- Light / Dark Mode Toggle Button (Positioned RIGHT of Admin Login) -->
+                    <button id="theme-toggle-btn" type="button" class="btn btn-outline-light d-flex align-items-center justify-content-center rounded-circle p-2" style="width: 40px; height: 40px;" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode" onclick="toggleSpeedLaneTheme()">
+                        <i id="theme-toggle-icon" class="bi bi-sun-fill text-warning"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
@@ -227,15 +386,18 @@
         <div class="container text-center">
             <div class="row justify-content-center mb-4">
                 <div class="col-lg-10">
-                    <span class="badge rounded-pill px-3 py-2 bg-dark border border-secondary text-speed-blue fw-semibold mb-3">
+                    <!-- Premier Auto Care & Detailing Pill Badge -->
+                    <span class="badge rounded-pill px-3 py-2 hero-pill-badge fw-semibold mb-3">
                         <i class="bi bi-lightning-charge-fill me-1 text-speed-pink"></i> Premier Auto Care & Detailing
                     </span>
                     
                     <!-- Title Header -->
-                    <h1 class="hero-title fw-bold mb-3 display-4" style="color: #ffffff !important;">
-                        <span style="color: #ffffff !important; text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);">SpeedLane</span> 
-                        <span class="text-speed-pink">Service</span> 
-                        <span class="text-speed-blue">Tracker</span>
+                    <h1 class="hero-title mb-3 display-4">
+                        <span class="brand-logo-text" style="font-size: inherit;">
+                            <span class="text-speed-pink">SPEED</span><span class="text-speed-blue">LANE</span> 
+                            <span class="text-speed-pink">Service</span> 
+                            <span class="text-speed-blue">Tracker</span>
+                        </span>
                     </h1>
 
                     <!-- Subtitle Header -->
@@ -249,7 +411,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-7 col-lg-5">
                     <div class="tracking-card text-start p-4 p-md-5 rounded-4">
-                        <h5 class="tracking-card-title d-flex align-items-center fw-bold text-white mb-4 fs-5">
+                        <h5 class="tracking-card-title d-flex align-items-center fw-bold mb-4 fs-5">
                             <i class="bi bi-search text-speed-blue me-2 fs-4"></i> Track Your Vehicle
                         </h5>
 
@@ -264,7 +426,6 @@
                         <form id="trackingForm" action="/track" method="GET">
                             <div class="mb-4">
                                 <label for="trackingCode" class="form-label tracking-label fw-medium text-secondary small text-uppercase">Enter Tracking Code</label>
-                                <!-- FIXED: Added name="tracking_code" -->
                                 <input type="text" 
                                        name="tracking_code" 
                                        class="form-control tracking-input text-uppercase rounded-3" 
@@ -286,12 +447,12 @@
         </div>
     </main>
 
-    <!-- Services Section (Updated with Images & Expanded List) -->
+    <!-- Services Section -->
     <section id="services" class="py-5 border-top border-dark">
         <div class="container py-4">
             <div class="text-center mb-5">
                 <span class="text-speed-blue fw-bold text-uppercase tracking-wider">Premium Solutions</span>
-                <h2 class="text-white fw-bold display-6 mt-1">Our Elite Auto Care Services</h2>
+                <h2 class="fw-bold display-6 mt-1">Our Elite Auto Care Services</h2>
                 <p class="text-secondary mx-auto" style="max-width: 600px;">Crafted with cutting-edge technology and precision craftsmanship to protect and restore your vehicle.</p>
             </div>
 
@@ -304,7 +465,7 @@
                             <span class="service-badge text-speed-pink"><i class="bi bi-shield-fill-check me-1"></i> Ultra Grade</span>
                         </div>
                         <div class="p-4">
-                            <h4 class="text-white fw-bold fs-5 mb-2">Graphene Coating</h4>
+                            <h4 class="fw-bold fs-5 mb-2">Graphene Coating</h4>
                             <p class="text-secondary small mb-0">Next-generation graphene matrix technology offering maximum heat reduction, water-spot prevention, and extreme 10H scratch resistance.</p>
                         </div>
                     </div>
@@ -318,7 +479,7 @@
                             <span class="service-badge text-speed-blue"><i class="bi bi-stars me-1"></i> High Gloss</span>
                         </div>
                         <div class="p-4">
-                            <h4 class="text-white fw-bold fs-5 mb-2">Ceramic Coating</h4>
+                            <h4 class="fw-bold fs-5 mb-2">Ceramic Coating</h4>
                             <p class="text-secondary small mb-0">High-grade 9H nano-ceramic protection delivering deep mirror reflections, hydrophobic water sheeting, and multi-year paint protection.</p>
                         </div>
                     </div>
@@ -332,7 +493,7 @@
                             <span class="service-badge text-speed-pink"><i class="bi bi-shield-lock-fill me-1"></i> Self-Healing</span>
                         </div>
                         <div class="p-4">
-                            <h4 class="text-white fw-bold fs-5 mb-2">Paint Protection Film (PPF)</h4>
+                            <h4 class="fw-bold fs-5 mb-2">Paint Protection Film (PPF)</h4>
                             <p class="text-secondary small mb-0">Ultra-clear TPU self-healing armor that shields your car's bodywork against rock chips, scratches, chemical stains, and UV fading.</p>
                         </div>
                     </div>
@@ -346,7 +507,7 @@
                             <span class="service-badge text-speed-blue"><i class="bi bi-palette-fill me-1"></i> Full Renewal</span>
                         </div>
                         <div class="p-4">
-                            <h4 class="text-white fw-bold fs-5 mb-2">Complete Washover</h4>
+                            <h4 class="fw-bold fs-5 mb-2">Complete Washover</h4>
                             <p class="text-secondary small mb-0">Full body automotive refinishing, panel dent repair, color change, and polyurethane clear coat application in our oven bake booth.</p>
                         </div>
                     </div>
@@ -360,7 +521,7 @@
                             <span class="service-badge text-speed-pink"><i class="bi bi-magic me-1"></i> Deep Clean</span>
                         </div>
                         <div class="p-4">
-                            <h4 class="text-white fw-bold fs-5 mb-2">Interior Deep Detailing</h4>
+                            <h4 class="fw-bold fs-5 mb-2">Interior Deep Detailing</h4>
                             <p class="text-secondary small mb-0">Full steam extraction, carpet shampooing, leather conditioning, dashboard treatment, and anti-bacterial cabin sanitation.</p>
                         </div>
                     </div>
@@ -374,7 +535,7 @@
                             <span class="service-badge text-speed-blue"><i class="bi bi-gem me-1"></i> Paint Correction</span>
                         </div>
                         <div class="p-4">
-                            <h4 class="text-white fw-bold fs-5 mb-2">Exterior Detailing</h4>
+                            <h4 class="fw-bold fs-5 mb-2">Exterior Detailing</h4>
                             <p class="text-secondary small mb-0">Multi-stage machine paint correction, swirl & hologram removal, clay bar decontamination, and high-gloss sealant finish.</p>
                         </div>
                     </div>
@@ -388,7 +549,7 @@
                             <span class="service-badge text-speed-pink"><i class="bi bi-cpu-fill me-1"></i> Precision Care</span>
                         </div>
                         <div class="p-4">
-                            <h4 class="text-white fw-bold fs-5 mb-2">Engine Bay Detailing</h4>
+                            <h4 class="fw-bold fs-5 mb-2">Engine Bay Detailing</h4>
                             <p class="text-secondary small mb-0">Safe low-moisture engine bay degreasing, grime removal, and non-greasy protective dressing for plastics and hoses.</p>
                         </div>
                     </div>
@@ -402,7 +563,7 @@
                             <span class="service-badge text-speed-blue"><i class="bi bi-eye-fill me-1"></i> Clarity Restoration</span>
                         </div>
                         <div class="p-4">
-                            <h4 class="text-white fw-bold fs-5 mb-2">Glass Coating & Headlight Restoration</h4>
+                            <h4 class="fw-bold fs-5 mb-2">Glass Coating & Headlight Restoration</h4>
                             <p class="text-secondary small mb-0">Watermark stain removal, hydrophobic windshield rain-repellent coating, and UV lens wet-sanding for crystal clear night visibility.</p>
                         </div>
                     </div>
@@ -415,7 +576,7 @@
     <section id="showcase" class="py-5 bg-black bg-opacity-50">
         <div class="container py-4">
             <div class="text-center mb-4">
-                <h2 class="text-white fw-bold display-6">Service Showcase Gallery</h2>
+                <h2 class="fw-bold display-6">Service Showcase Gallery</h2>
                 <p class="text-secondary">Take a glimpse inside SpeedLane AutoSpa General Santos</p>
             </div>
 
@@ -431,8 +592,8 @@
                         <img src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1200&q=80" class="d-block w-100" alt="Ceramic Coating Treatment">
                         <div class="carousel-caption d-none d-md-block text-start">
                             <div class="carousel-caption-custom">
-                                <h5 class="text-white fw-bold fs-4">Precision Ceramic Coating</h5>
-                                <p class="text-light mb-0">Unmatched mirror shine and long-lasting surface protection.</p>
+                                <h5 class="fw-bold fs-4">Precision Ceramic Coating</h5>
+                                <p class="mb-0">Unmatched mirror shine and long-lasting surface protection.</p>
                             </div>
                         </div>
                     </div>
@@ -441,8 +602,8 @@
                         <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80" class="d-block w-100" alt="Luxury Vehicles Services">
                         <div class="carousel-caption d-none d-md-block text-start">
                             <div class="carousel-caption-custom" style="border-left-color: var(--speed-blue);">
-                                <h5 class="text-white fw-bold fs-4">Luxury Vehicle Care</h5>
-                                <p class="text-light mb-0">Expert care engineered specifically for exotic and luxury vehicles.</p>
+                                <h5 class="fw-bold fs-4">Luxury Vehicle Care</h5>
+                                <p class="mb-0">Expert care engineered specifically for exotic and luxury vehicles.</p>
                             </div>
                         </div>
                     </div>
@@ -451,8 +612,8 @@
                         <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80" class="d-block w-100" alt="Real-Time Service Progress">
                         <div class="carousel-caption d-none d-md-block text-start">
                             <div class="carousel-caption-custom">
-                                <h5 class="text-white fw-bold fs-4">Real-Time Queue Tracking</h5>
-                                <p class="text-light mb-0">Always stay informed on your vehicle's current status.</p>
+                                <h5 class="fw-bold fs-4">Real-Time Queue Tracking</h5>
+                                <p class="mb-0">Always stay informed on your vehicle's current status.</p>
                             </div>
                         </div>
                     </div>
@@ -491,7 +652,7 @@
 
                 <!-- Clickable Contact Information -->
                 <div class="col-lg-7">
-                    <h6 class="text-white fw-bold text-uppercase mb-3">Get In Touch</h6>
+                    <h6 class="fw-bold text-uppercase mb-3">Get In Touch</h6>
                     <ul class="list-unstyled small d-flex flex-column gap-3">
                         <li>
                             <a href="https://maps.google.com/?q=General+Santos+City" target="_blank" class="footer-link d-flex align-items-start gap-2">
@@ -532,5 +693,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS Link -->
     <script src="{{ asset('js/main.js') }}"></script>
+    <!-- Light Mode Toggle JS -->
+    <script src="{{ asset('js/theme-toggle.js') }}"></script>
 </body>
 </html>

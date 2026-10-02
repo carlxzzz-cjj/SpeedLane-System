@@ -1,4 +1,3 @@
-<!-- FILE: resources/views/admin/login.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +6,17 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>SpeedLane - Admin Login</title>
 
+    <!-- Early Theme Check Script (Defaults to Light Theme) -->
+    <script>
+        const savedTheme = localStorage.getItem('speedlane_theme');
+        // Default to Light Mode unless explicitly set to 'dark'
+        if (savedTheme !== 'dark') {
+            document.documentElement.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+        }
+    </script>
+
     <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons CDN -->
@@ -14,6 +24,8 @@
     
     <!-- External Admin CSS File Link -->
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <!-- Light Mode Toggle CSS -->
+    <link rel="stylesheet" href="{{ asset('css/theme-toggle.css') }}">
 
     <style>
         :root {
@@ -24,7 +36,7 @@
             --speed-card-border: rgba(255, 255, 255, 0.07);
         }
 
-        /* Pure Dark Background matching Home Page */
+        /* Dark Theme Default */
         body {
             background-color: var(--speed-dark-bg) !important;
             color: #e2e8f0;
@@ -33,6 +45,148 @@
             background: radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%) !important;
             background-attachment: fixed;
             margin: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Light Mode Styling Overrides */
+        html.light-theme {
+            --speed-dark-bg: #f8fafc;
+            --speed-card-bg: #ffffff;
+            --speed-card-border: rgba(0, 0, 0, 0.1);
+        }
+
+        html.light-theme body {
+            background: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
+        html.light-theme .navbar-speed {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        html.light-theme h2.text-white,
+        html.light-theme .admin-login-card h6 {
+            color: #0f172a !important;
+        }
+
+        html.light-theme .admin-login-card {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        html.light-theme .form-control-dark {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .form-control-dark:focus {
+            color: #0f172a !important;
+            background-color: #ffffff !important;
+        }
+
+        html.light-theme .input-group-text-dark {
+            background-color: #e2e8f0 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-right: none !important;
+        }
+
+        html.light-theme .modal-content-dark {
+            background-color: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .modal-title {
+            color: #0f172a !important;
+        }
+
+        /* Back Button Dynamic Themes */
+        .back-btn {
+            background-color: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            transition: all 0.25s ease;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+        }
+
+        html.light-theme .back-btn {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .back-btn:hover {
+            background-color: #cbd5e1 !important;
+        }
+
+        /* Theme Toggle Button */
+        #theme-toggle-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        #theme-toggle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        html.light-theme #theme-toggle-btn {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme #theme-toggle-btn:hover {
+            background-color: #cbd5e1 !important;
+        }
+
+        /* Modal Cancel Button Dynamic Theme */
+        .btn-modal-cancel {
+            color: #cbd5e1 !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            transition: all 0.2s ease;
+        }
+
+        .btn-modal-cancel:hover {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+        }
+
+        html.light-theme .btn-modal-cancel {
+            color: #334155 !important;
+            border: 1px solid #cbd5e1 !important;
+            background-color: #f1f5f9 !important;
+        }
+
+        html.light-theme .btn-modal-cancel:hover {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        /* Light Mode Alerts */
+        html.light-theme .alert-success {
+            background-color: #dcfce7 !important;
+            color: #15803d !important;
+            border-color: #86efac !important;
+        }
+
+        html.light-theme .alert-danger {
+            background-color: #fee2e2 !important;
+            color: #b91c1c !important;
+            border-color: #fca5a5 !important;
+        }
+
+        html.light-theme .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(50%);
         }
 
         /* Typography & Utility Colors */
@@ -83,7 +237,7 @@
         }
 
         .form-control-dark::placeholder {
-            color: #475569 !important;
+            color: #64748b !important;
         }
 
         .input-group-text-dark {
@@ -100,7 +254,7 @@
         .btn-speed-gradient {
             background: linear-gradient(90deg, var(--speed-pink) 0%, var(--speed-blue) 100%);
             border: none;
-            color: #ffffff;
+            color: #ffffff !important;
             font-weight: 700;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(244, 37, 130, 0.3);
@@ -110,7 +264,7 @@
             opacity: 0.95;
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
-            color: #ffffff;
+            color: #ffffff !important;
         }
 
         /* Icon Badge Header */
@@ -147,6 +301,14 @@
         .forgot-link:hover {
             color: var(--speed-pink);
         }
+
+        html.light-theme .forgot-link {
+            color: #0284c7 !important;
+        }
+
+        html.light-theme .forgot-link:hover {
+            color: #d946ef !important;
+        }
     </style>
 </head>
 <body>
@@ -155,8 +317,8 @@
     <div class="navbar-speed py-3 px-4 mb-5">
         <div class="container d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3">
-                <a href="/" class="text-white text-decoration-none d-flex align-items-center justify-content-center p-2 rounded-circle bg-dark border border-secondary border-opacity-25" style="width: 36px; height: 36px;">
-                    <i class="bi bi-arrow-left text-speed-pink"></i>
+                <a href="/" class="back-btn text-decoration-none d-flex align-items-center justify-content-center rounded-circle" style="width: 38px; height: 38px;" title="Back to Home">
+                    <i class="bi bi-arrow-left text-speed-pink fs-6"></i>
                 </a>
                 <div class="d-flex align-items-center gap-2">
                     <div class="p-2 rounded-3 bg-speed-pink d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
@@ -170,6 +332,11 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Light / Dark Mode Toggle Button -->
+            <button id="theme-toggle-btn" type="button" class="btn d-flex align-items-center justify-content-center rounded-circle p-2" style="width: 40px; height: 40px;" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode" onclick="toggleSpeedLaneTheme()">
+                <i id="theme-toggle-icon" class="bi bi-sun-fill text-warning"></i>
+            </button>
         </div>
     </div>
 
@@ -295,7 +462,7 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-end gap-2 mt-4">
-                            <button type="button" class="btn btn-outline-secondary rounded-3 text-white border-secondary border-opacity-50" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-modal-cancel rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" id="btnSendOtp" class="btn btn-speed-gradient rounded-3 px-4 fw-semibold">
                                 <span id="btnSendOtpText">Send OTP Code</span>
                                 <span id="btnSendOtpSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
@@ -337,7 +504,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end gap-2 mt-4">
-                            <button type="button" class="btn btn-outline-secondary rounded-3 text-white border-secondary border-opacity-50" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-modal-cancel rounded-3 px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" id="btnResetPassword" class="btn btn-success rounded-3 px-4 fw-semibold">
                                 <span id="btnResetText">Update Password</span>
                                 <span id="btnResetSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
@@ -352,6 +519,8 @@
 
     <!-- Bootstrap 5 JS Bundle CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Light Mode Toggle JS -->
+    <script src="{{ asset('js/theme-toggle.js') }}"></script>
 
     <!-- Modal Workflow JavaScript -->
     <script>

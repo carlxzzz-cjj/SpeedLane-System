@@ -102,8 +102,7 @@ class ManageServiceController extends Controller
                 'description'    => $request->description,
                 'notice'         => $request->notice,
                 'selection_type' => $request->selection_type,
-                'flat_price'     => $request->selection_type === 'flat' ? $request->flat_price : null,
-            ]);
+'flat_price'     => in_array($request->selection_type, ['flat', 'single']) ? $request->flat_price : null,            ]);
 
             if ($request->selection_type !== 'flat') {
                 $service->options()->delete();

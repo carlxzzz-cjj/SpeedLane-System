@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>SpeedLane AutoSpa - {{ $title ?? 'Executive Report' }}</title>
+    <title>SPEEDLANE - {{ $title ?? 'Executive Report' }}</title>
     <style>
         @page {
             size: A4 portrait;
@@ -30,9 +30,16 @@
         .brand-title {
             font-size: 20px;
             font-weight: bold;
+            font-style: italic;
             color: #0f172a;
             text-transform: uppercase;
             letter-spacing: -0.3px;
+        }
+        .brand-address {
+            font-size: 8.5px;
+            color: #64748b;
+            margin-top: 2px;
+            margin-bottom: 3px;
         }
         .sub-title {
             font-size: 9.5px;
@@ -309,7 +316,12 @@
     <table class="header-table">
         <tr>
             <td style="width: 60%;">
-                <div class="brand-title">SpeedLane AutoSpa</div>
+                <div class="brand-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#0f172a" viewBox="0 0 16 16" style="vertical-align: -2px; margin-right: 4px;">
+                        <path d="M2.52 3.515A2.5 2.5 0 0 1 4.82 2h6.362c.969 0 1.838.567 2.298 1.515l.792 1.628c.08.164.248.272.43.272h.3c.552 0 1 .448 1 1v2c0 .28-.112.534-.293.719C16.452 9.387 16 10.138 16 11v1a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H3v1a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1v-1c0-.862-.452-1.613-.654-1.881A1.002 1.002 0 0 1 0 8V6c0-.552.448-1 1-1h.3c.182 0 .35-.108.43-.272l.79-1.628zM4 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM3.82 4l-.5 1h9.36l-.5-1H3.82z"/>
+                    </svg><span style="color: #f42582;">SPEED</span><span style="color: #00a2ff;">LANE</span>
+                </div>
+                <div class="brand-address">23 Ramos St., Brgy. Dadiangas East, General Santos City, Philippines, 9500</div>
                 <div class="sub-title">
                     {{ $isFinancial ? 'Executive Financial Summary' : 'Executive Business & Intelligence Analytics' }}
                 </div>
@@ -349,7 +361,6 @@
                     <th>Status</th>
                     <th>Date Registered</th>
                     <th>Date Completed</th>
-                    <th>Price Adjustment / Note</th>
                     <th class="text-end">Total Amount</th>
                 </tr>
             </thead>
@@ -367,16 +378,15 @@
                         <td class="text-center fw-bold">{{ $trxObj->status }}</td>
                         <td>{{ $getDateRegistered($trx) }}</td>
                         <td>{{ $getDateCompleted($trx) }}</td>
-                        <td style="color: #64748b;">{{ $trxObj->price_adjustment_note ?? '-' }}</td>
                         <td class="text-end font-mono fw-bold">{!! $formatMoney($trxObj->total_cost ?? 0) !!}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" class="text-center">No financial records match the criteria.</td></tr>
+                    <tr><td colspan="8" class="text-center">No financial records match the criteria.</td></tr>
                 @endforelse
             </tbody>
             <tfoot>
                 <tr style="background-color: #f8fafc; font-weight: bold;">
-                    <td colspan="8" class="text-end" style="font-size: 8.5px; text-transform: uppercase;">Total Realized Revenue:</td>
+                    <td colspan="7" class="text-end" style="font-size: 8.5px; text-transform: uppercase;">Total Realized Revenue:</td>
                     <td class="text-end font-mono text-primary-val">{!! $formatMoney($grossRevenue) !!}</td>
                 </tr>
             </tfoot>
