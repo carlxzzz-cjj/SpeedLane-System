@@ -309,6 +309,11 @@
         html.light-theme .forgot-link:hover {
             color: #d946ef !important;
         }
+
+  body {
+    zoom: 80%; /* Adjusts the render scale across modern browsers */
+  }
+<
     </style>
 </head>
 <body>

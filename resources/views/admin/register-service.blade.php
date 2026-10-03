@@ -509,6 +509,9 @@
         html.light-theme .btn-close-white {
             filter: invert(1) grayscale(100%) brightness(50%);
         }
+           body {
+    zoom: 80%; /* Adjusts the render scale across modern browsers */
+  }
     </style>
 </head>
 

@@ -404,6 +404,9 @@
         .extra-small {
             font-size: 0.75rem;
         }
+        body {
+    zoom: 80%; /* Adjusts the render scale across modern browsers */
+  }
     </style>
 </head>
 <body>

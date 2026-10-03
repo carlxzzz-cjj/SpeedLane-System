@@ -553,6 +553,9 @@
                 display: none !important; 
             }
         }
+           body {
+    zoom: 80%; /* Adjusts the render scale across modern browsers */
+  }
     </style>
 </head>
 <body>

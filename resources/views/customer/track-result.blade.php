@@ -330,6 +330,9 @@
             color: #b45309 !important;
             border-color: #fcd34d !important;
         }
+          body {
+    zoom: 85%; /* Adjusts the render scale across modern browsers */
+  }
     </style>
 </head>
 <body class="min-vh-100 d-flex flex-column justify-content-between">

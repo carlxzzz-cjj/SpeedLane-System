@@ -555,6 +555,10 @@
         html.light-theme .navbar-toggler-icon {
             filter: invert(0);
         }
+
+  body {
+    zoom: 80%; /* Adjusts the render scale across modern browsers */
+  }
     </style>
 </head>
 <body>

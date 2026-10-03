@@ -683,6 +683,9 @@
         .letter-spacing-otp {
             letter-spacing: 0.5rem;
         }
+           body {
+    zoom: 80%; /* Adjusts the render scale across modern browsers */
+  }
     </style>
 </head>
 <body>
