@@ -189,7 +189,13 @@
             color: #ffffff !important;
         }
 
-        /* Form Controls Dark */
+        /* Form Controls Dark & Label Styling */
+        .filter-label {
+            color: #cbd5e1 !important;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
         .form-control-dark, .form-select-dark {
             background-color: #06080d !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -434,6 +440,11 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
         }
 
+        html.light-theme .filter-label {
+            color: #334155 !important;
+            opacity: 1 !important;
+        }
+
         html.light-theme .form-control-dark, 
         html.light-theme .form-select-dark {
             background-color: #f1f5f9 !important;
@@ -610,88 +621,115 @@
                     </div>
                 @endif
 
-                <!-- Search and Filter Bar Card -->
+                @php
+                    // Dynamic extraction of Vehicle Types, Vehicle Brands, and Services from active queue records combined with full defaults
+                    $extractedTypes = collect();
+                    $extractedBrands = collect();
+                    $extractedServices = collect();
+
+                    if (isset($services)) {
+                        foreach ($services as $srvItem) {
+                            $vList = $srvItem->vehicles ?? collect();
+                            if ($vList->count() > 0) {
+                                foreach ($vList as $vObj) {
+                                    $t = $vObj->vehicle_type ?? $vObj->type ?? '';
+                                    if (!empty($t)) $extractedTypes->push($t);
+
+                                    $b = $vObj->vehicle_brand ?? $vObj->brand ?? $vObj->vehicle_make ?? '';
+                                    if (!empty($b)) $extractedBrands->push($b);
+
+                                    $sRaw = is_array($vObj->selected_services) ? $vObj->selected_services : (is_string($vObj->selected_services) ? json_decode($vObj->selected_services, true) : []);
+                                    if (is_array($sRaw)) {
+                                        foreach ($sRaw as $sr) {
+                                            $sName = is_array($sr) ? ($sr['name'] ?? $sr['service_name'] ?? '') : (string)$sr;
+                                            if (!empty($sName)) $extractedServices->push($sName);
+                                        }
+                                    }
+                                }
+                            } else {
+                                $t = $srvItem->vehicle_type ?? $srvItem->type ?? '';
+                                if (!empty($t)) $extractedTypes->push($t);
+
+                                $b = $srvItem->vehicle_brand ?? $srvItem->brand ?? $srvItem->vehicle_make ?? '';
+                                if (!empty($b)) $extractedBrands->push($b);
+
+                                $sRaw = is_array($srvItem->selected_services) ? $srvItem->selected_services : (is_string($srvItem->selected_services) ? json_decode($srvItem->selected_services, true) : []);
+                                if (is_array($sRaw)) {
+                                    foreach ($sRaw as $sr) {
+                                        $sName = is_array($sr) ? ($sr['name'] ?? $sr['service_name'] ?? '') : (string)$sr;
+                                        if (!empty($sName)) $extractedServices->push($sName);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $defaultTypes = ['Hatchback', 'Sedan', 'Coupe', 'Crossover', 'MPV', 'Wagon', 'SUV', 'Pickup Truck', 'Sports Car', 'Van', 'Supercar'];
+                    $defaultBrands = ['Toyota', 'Honda', 'Mitsubishi', 'Nissan', 'Ford', 'Hyundai', 'Suzuki', 'Isuzu', 'Mazda', 'BMW', 'Mercedes-Benz', 'Audi', 'Lexus', 'Porsche', 'Chevrolet', 'Kia', 'Subaru', 'Volkswagen', 'Jeep', 'Land Rover', 'Dodge', 'Tesla', 'Geely', 'MG', 'Changan', 'BYD'];
+                    $defaultServices = ['Ceramic Coating', 'Graphene Coating', 'PPF', 'Interior Detailing', 'Exterior Detailing', 'Washover', 'Undercoat', 'Engine Bay Detailing', 'Glass Detailing', 'Headlight Restoration', 'Paint Correction', 'Basic Wash', 'Premium Wash', 'Wheel & Rim Detailing'];
+
+                    $vTypesList = (isset($vehicleTypes) && count($vehicleTypes) > 0) 
+                        ? $vehicleTypes 
+                        : $extractedTypes->merge($defaultTypes)->unique()->filter()->values();
+
+                    $vBrandsList = (isset($vehicleBrands) && count($vehicleBrands) > 0) 
+                        ? $vehicleBrands 
+                        : ((isset($brands) && count($brands) > 0) ? $brands : $extractedBrands->merge($defaultBrands)->unique()->filter()->values());
+
+                    $vServicesList = (isset($availableServices) && count($availableServices) > 0) 
+                        ? $availableServices 
+                        : $extractedServices->merge($defaultServices)->unique()->filter()->values();
+                @endphp
+
+                <!-- Dynamic Search and Filter Bar -->
                 <div class="card speed-card rounded-4 p-3 mb-4">
-                    <form method="GET" action="{{ route('admin.update') }}">
+                    <form method="GET" action="{{ route('admin.update') }}" id="searchFilterForm">
                         <div class="row g-2">
-                            <!-- Search Input -->
-                            <div class="col-md-4">
-                                <label class="form-label small fw-semibold text-secondary mb-1">Search Keywords</label>
+                            <div class="col-md-3">
+                                <label class="form-label filter-label mb-1">Search Records</label>
                                 <div class="input-group input-group-sm">
-                                    <span class="input-group-text input-group-text-dark"><i class="bi bi-search text-secondary"></i></span>
-                                    <input type="text" name="search" id="serviceSearchInput" class="form-control form-control-dark" placeholder="Customer name, tracking code, plate..." value="{{ request('search') }}">
+                                    <span class="input-group-text input-group-text-dark text-secondary"><i class="bi bi-search"></i></span>
+                                    <input type="text" name="search" id="transactionSearchInput" class="form-control form-control-sm form-control-dark" placeholder="Customer, mechanic, plate, code..." value="{{ request('search') }}">
                                 </div>
                             </div>
 
-                            <!-- Vehicle Type Filter (Based on vehicle_models database table) -->
                             <div class="col-md-2">
-                                <label class="form-label small fw-semibold text-secondary mb-1">Vehicle Type</label>
-                                <select name="vehicle_type" class="form-select form-select-sm form-select-dark">
+                                <label class="form-label filter-label mb-1">Vehicle Type</label>
+                                <select name="vehicle_type" id="filterVehicleType" class="form-select form-select-sm form-select-dark">
                                     <option value="">All Vehicles</option>
-                                    @php
-                                        if (isset($availableVehicleTypes) && count($availableVehicleTypes) > 0) {
-                                            $vehicleTypesList = $availableVehicleTypes;
-                                        } elseif (isset($vehicleTypes) && count($vehicleTypes) > 0) {
-                                            $vehicleTypesList = $vehicleTypes;
-                                        } else {
-                                            try {
-                                                $vehicleTypesList = \Illuminate\Support\Facades\DB::table('vehicle_models')
-                                                    ->whereNotNull('vehicle_type')
-                                                    ->distinct()
-                                                    ->pluck('vehicle_type')
-                                                    ->filter()
-                                                    ->values()
-                                                    ->toArray();
-                                            } catch (\Exception $e) {
-                                                $vehicleTypesList = [];
-                                            }
-                                            if (empty($vehicleTypesList)) {
-                                                $vehicleTypesList = ['Sedan', 'Hatchback', 'Crossover', 'MPV', 'SUV', 'Pickup', 'Van', 'Sports Car', 'Supercar'];
-                                            }
-                                        }
-                                    @endphp
-                                    @foreach($vehicleTypesList as $vType)
-                                        @php
-                                            $vTypeName = is_object($vType) ? ($vType->vehicle_type ?? $vType->name ?? '') : $vType;
+                                    @foreach($vTypesList as $vType)
+                                        @php 
+                                            $vTypeName = is_object($vType) ? ($vType->vehicle_type ?? $vType->name ?? '') : (is_array($vType) ? ($vType['vehicle_type'] ?? $vType['name'] ?? '') : $vType); 
                                         @endphp
-                                        @if(!empty($vTypeName))
-                                            <option value="{{ $vTypeName }}" {{ request('vehicle_type') == $vTypeName ? 'selected' : '' }}>
-                                                {{ $vTypeName }}
-                                            </option>
+                                        @if(!empty(trim($vTypeName)))
+                                            <option value="{{ $vTypeName }}" {{ request('vehicle_type') == $vTypeName ? 'selected' : '' }}>{{ $vTypeName }}</option>
                                         @endif
                                     @endforeach
                                 </select>
                             </div>
 
-                            <!-- Service Type Filter (Based on services database table) -->
                             <div class="col-md-2">
-                                <label class="form-label small fw-semibold text-secondary mb-1">Service Type</label>
-                                <select name="service_type" class="form-select form-select-sm form-select-dark">
-                                    <option value="">All Services</option>
-                                    @php
-                                        if (isset($availableServices) && count($availableServices) > 0) {
-                                            $servicesList = $availableServices;
-                                        } else {
-                                            try {
-                                                $servicesList = \Illuminate\Support\Facades\DB::table('services')
-                                                    ->distinct()
-                                                    ->pluck('name')
-                                                    ->filter()
-                                                    ->values()
-                                                    ->toArray();
-                                            } catch (\Exception $e) {
-                                                $servicesList = [];
-                                            }
-                                            if (empty($servicesList)) {
-                                                $servicesList = ['Ceramic Coating', 'Graphene Coating', 'PPF'];
-                                            }
-                                        }
-                                    @endphp
-                                    @foreach($servicesList as $srv)
-                                        @php
-                                            $srvName = is_object($srv) ? ($srv->name ?? '') : $srv;
+                                <label class="form-label filter-label mb-1">Vehicle Brand</label>
+                                <select name="brand" id="filterBrand" class="form-select form-select-sm form-select-dark">
+                                    <option value="">All Brands</option>
+                                    @foreach($vBrandsList as $b)
+                                        @php 
+                                            $bName = is_object($b) ? ($b->brand ?? $b->name ?? '') : (is_array($b) ? ($b['brand'] ?? $b['name'] ?? '') : $b); 
                                         @endphp
-                                        @if(!empty($srvName))
+                                        @if(!empty(trim($bName)))
+                                            <option value="{{ $bName }}" {{ (request('brand') == $bName || request('vehicle_brand') == $bName) ? 'selected' : '' }}>{{ $bName }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label filter-label mb-1">Service Type</label>
+                                <select name="service_type" id="filterServiceType" class="form-select form-select-sm form-select-dark">
+                                    <option value="">All Services</option>
+                                    @foreach($vServicesList as $srv)
+                                        @php $srvName = is_object($srv) ? ($srv->name ?? '') : (is_array($srv) ? ($srv['name'] ?? '') : $srv); @endphp
+                                        @if(!empty(trim($srvName)))
                                             <option value="{{ $srvName }}" {{ request('service_type') == $srvName ? 'selected' : '' }}>
                                                 {{ $srvName }}
                                             </option>
@@ -700,18 +738,16 @@
                                 </select>
                             </div>
 
-                            <!-- Date Filter -->
-                            <div class="col-md-2">
-                                <label class="form-label small fw-semibold text-secondary mb-1">Date</label>
-                                <input type="date" name="date" class="form-control form-control-sm form-control-dark" value="{{ request('date') }}">
+                            <div class="col-md-1">
+                                <label class="form-label filter-label mb-1">Date</label>
+                                <input type="date" name="date" id="filterDate" class="form-control form-control-sm form-control-dark" value="{{ request('date') }}">
                             </div>
 
-                            <!-- Filter & Reset Action Buttons -->
                             <div class="col-md-2 d-flex align-items-end gap-2">
                                 <button type="submit" class="btn btn-speed-gradient btn-sm rounded-3 w-100 fw-semibold">
-                                    <i class="bi bi-funnel me-1"></i> Search
+                                    <i class="bi bi-funnel"></i> Filter
                                 </button>
-                                <a href="{{ route('admin.update') }}" class="btn btn-outline-secondary btn-sm rounded-3 px-3 border-secondary border-opacity-50" title="Reset Filters">
+                                <a href="{{ route('admin.update') }}" id="resetFilterBtn" class="btn btn-outline-light btn-sm rounded-3 px-3" title="Reset Filters">
                                     <i class="bi bi-arrow-counterclockwise"></i>
                                 </a>
                             </div>
@@ -921,19 +957,42 @@
                                             $statusLabel = 'In Progress';
                                             $statusBadgeClass = 'badge-in-progress';
                                         }
+
+                                        // Data values for row-level filtering
+                                        $rowTypesArr = [];
+                                        $rowBrandsArr = [];
+                                        $rowServicesArr = [];
+
+                                        foreach ($formattedVehicles as $fVeh) {
+                                            if (!empty($fVeh['vehicle_type'])) $rowTypesArr[] = $fVeh['vehicle_type'];
+                                            if (!empty($fVeh['vehicle_make'])) $rowBrandsArr[] = $fVeh['vehicle_make'];
+                                            foreach ($fVeh['service_items'] as $fSrv) {
+                                                if (!empty($fSrv['name'])) $rowServicesArr[] = $fSrv['name'];
+                                            }
+                                        }
+
+                                        $rowTypesStr = implode('||', array_unique($rowTypesArr));
+                                        $rowBrandsStr = implode('||', array_unique($rowBrandsArr));
+                                        $rowServicesStr = implode('||', array_unique($rowServicesArr));
+                                        $rowDateYmd = \Carbon\Carbon::parse($service->created_at)->format('Y-m-d');
                                     @endphp
 
-                                    <tr data-order-json="{{ json_encode([
-                                        'id'                => $service->id,
-                                        'tracking_code'     => $service->tracking_code,
-                                        'customer_name'     => $service->customer_name,
-                                        'contact_number'    => $contactPhone,
-                                        'date_registered'   => $formattedDate,
-                                        'plate_number'      => $plates,
-                                        'mechanic_assigned' => $mechanics,
-                                        'total_cost'        => $overallGrandTotal,
-                                        'vehicles'          => $formattedVehicles
-                                    ]) }}">
+                                    <tr class="service-table-row"
+                                        data-vehicle-types="{{ strtolower($rowTypesStr) }}"
+                                        data-brands="{{ strtolower($rowBrandsStr) }}"
+                                        data-service-types="{{ strtolower($rowServicesStr) }}"
+                                        data-date="{{ $rowDateYmd }}"
+                                        data-order-json="{{ json_encode([
+                                            'id'                => $service->id,
+                                            'tracking_code'     => $service->tracking_code,
+                                            'customer_name'     => $service->customer_name,
+                                            'contact_number'    => $contactPhone,
+                                            'date_registered'   => $formattedDate,
+                                            'plate_number'      => $plates,
+                                            'mechanic_assigned' => $mechanics,
+                                            'total_cost'        => $overallGrandTotal,
+                                            'vehicles'          => $formattedVehicles
+                                        ]) }}">
                                         <td class="fw-bold text-speed-blue">{{ $service->tracking_code }}</td>
                                         <td class="fw-semibold text-white">{{ $service->customer_name }}</td>
                                         <td class="text-secondary">{{ $contactPhone }}</td>
@@ -1224,18 +1283,98 @@
     <!-- Interactive Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Live table search filter
-            const searchInput = document.getElementById('serviceSearchInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    const filter = this.value.toLowerCase().trim();
-                    const rows = document.querySelectorAll('#servicesTable tbody tr');
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        row.style.display = text.includes(filter) ? '' : 'none';
-                    });
+            // Live table search and dropdown filter logic
+            const searchInput = document.getElementById('transactionSearchInput') || document.getElementById('serviceSearchInput');
+            const vehicleTypeSelect = document.getElementById('filterVehicleType');
+            const brandSelect = document.getElementById('filterBrand');
+            const serviceTypeSelect = document.getElementById('filterServiceType');
+            const dateInput = document.getElementById('filterDate');
+            const filterForm = document.getElementById('searchFilterForm');
+            const resetFilterBtn = document.getElementById('resetFilterBtn');
+
+            function applyTableFilters() {
+                const searchText = searchInput ? searchInput.value.toLowerCase().trim() : '';
+                const selectedType = vehicleTypeSelect ? vehicleTypeSelect.value.toLowerCase().trim() : '';
+                const selectedBrand = brandSelect ? brandSelect.value.toLowerCase().trim() : '';
+                const selectedService = serviceTypeSelect ? serviceTypeSelect.value.toLowerCase().trim() : '';
+                const selectedDate = dateInput ? dateInput.value.trim() : '';
+
+                const rows = document.querySelectorAll('#servicesTable tbody tr.service-table-row');
+                let visibleCount = 0;
+
+                rows.forEach(row => {
+                    const rowText = row.textContent.toLowerCase();
+                    const rowTypes = (row.getAttribute('data-vehicle-types') || '').toLowerCase();
+                    const rowBrands = (row.getAttribute('data-brands') || '').toLowerCase();
+                    const rowServices = (row.getAttribute('data-service-types') || '').toLowerCase();
+                    const rowDate = row.getAttribute('data-date') || '';
+
+                    const matchesSearch = !searchText || rowText.includes(searchText);
+                    const matchesType = !selectedType || rowTypes.includes(selectedType);
+                    const matchesBrand = !selectedBrand || rowBrands.includes(selectedBrand);
+                    const matchesService = !selectedService || rowServices.includes(selectedService);
+                    const matchesDate = !selectedDate || rowDate === selectedDate;
+
+                    if (matchesSearch && matchesType && matchesBrand && matchesService && matchesDate) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Display dynamic empty filter row if all rows are hidden
+                let noMatchRow = document.getElementById('noMatchingFilterRow');
+                if (visibleCount === 0 && rows.length > 0) {
+                    if (!noMatchRow) {
+                        noMatchRow = document.createElement('tr');
+                        noMatchRow.id = 'noMatchingFilterRow';
+                        noMatchRow.innerHTML = `
+                            <td colspan="9" class="text-center py-5 text-secondary">
+                                <i class="bi bi-funnel fs-2 d-block mb-2 text-secondary opacity-50"></i>
+                                No active service records match your selected search/filter criteria.
+                            </td>
+                        `;
+                        document.querySelector('#servicesTable tbody').appendChild(noMatchRow);
+                    } else {
+                        noMatchRow.style.display = '';
+                    }
+                } else if (noMatchRow) {
+                    noMatchRow.style.display = 'none';
+                }
+            }
+
+            // Attach event listeners for real-time live filtering
+            if (searchInput) searchInput.addEventListener('input', applyTableFilters);
+            if (vehicleTypeSelect) vehicleTypeSelect.addEventListener('change', applyTableFilters);
+            if (brandSelect) brandSelect.addEventListener('change', applyTableFilters);
+            if (serviceTypeSelect) serviceTypeSelect.addEventListener('change', applyTableFilters);
+            if (dateInput) dateInput.addEventListener('change', applyTableFilters);
+
+            if (filterForm) {
+                filterForm.addEventListener('submit', function(e) {
+                    applyTableFilters();
                 });
             }
+
+            if (resetFilterBtn) {
+                resetFilterBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (searchInput) searchInput.value = '';
+                    if (vehicleTypeSelect) vehicleTypeSelect.selectedIndex = 0;
+                    if (brandSelect) brandSelect.selectedIndex = 0;
+                    if (serviceTypeSelect) serviceTypeSelect.selectedIndex = 0;
+                    if (dateInput) dateInput.value = '';
+
+                    if (window.history.pushState) {
+                        window.history.pushState(null, '', window.location.pathname);
+                    }
+                    applyTableFilters();
+                });
+            }
+
+            // Initial execution on load
+            applyTableFilters();
 
             // Function to sync cost editable state & required remarks per card
             function syncCardState(card) {
