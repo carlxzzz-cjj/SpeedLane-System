@@ -582,10 +582,12 @@
             color: #e2e8f0;
         }
 
-        /* Modal Backdrop & Clean Dark Shadow Overrides */
+       /* Modal Backdrop & Clean Dark Shadow Overrides */
         .modal-backdrop {
             background-color: #000000 !important;
             opacity: 0.6 !important;
+            width: 125vw !important;
+            height: 125vh !important;
         }
 
         .modal-content-dark {
@@ -696,6 +698,8 @@
         }
     </style>
 </head>
+
+
 <body>
 
     <!-- TOP NAVIGATION HEADER BAR -->
@@ -1034,10 +1038,10 @@
                                                             @foreach($service->options as $index => $option)
                                                                 <div class="row g-2 mb-2 option-row">
                                                                     <div class="col-7">
-                                                                        <input type="text" name="options[{{ $index }}][name]" class="form-control form-control-sm form-control-dark rounded-2" value="{{ $option->name }}" placeholder="Option Name (e.g. Standard Package)" required>
+                                                                        <input type="text" name="options[{{ $index }}][name]" class="form-control form-control-sm form-control-dark rounded-2" value="{{ $option->name }}" placeholder="Option Name (e.g. Standard Package)" {{ $service->selection_type === 'flat' ? 'disabled' : '' }} required>
                                                                     </div>
                                                                     <div class="col-4">
-                                                                        <input type="number" step="0.01" name="options[{{ $index }}][price]" class="form-control form-control-sm form-control-dark rounded-2" value="{{ $option->price }}" placeholder="Price (₱)" required>
+                                                                        <input type="number" step="0.01" name="options[{{ $index }}][price]" class="form-control form-control-sm form-control-dark rounded-2" value="{{ $option->price }}" placeholder="Price (₱)" {{ $service->selection_type === 'flat' ? 'disabled' : '' }} required>
                                                                     </div>
                                                                     <div class="col-1 text-center">
                                                                         <button type="button" class="btn btn-sm btn-outline-danger-custom w-100 rounded-2" onclick="removeOptionRow(this)"><i class="bi bi-trash"></i></button>
@@ -1527,14 +1531,23 @@
             const optionsBox = document.getElementById('optionsBox');
 
             if (value === 'flat') {
-                flatBox.style.display = 'block';
-                optionsBox.style.display = 'none';
+                if (flatBox) flatBox.style.display = 'block';
+                if (optionsBox) {
+                    optionsBox.style.display = 'none';
+                    optionsBox.querySelectorAll('input').forEach(input => input.disabled = true);
+                }
             } else if (value === 'single') {
-                flatBox.style.display = 'block';
-                optionsBox.style.display = 'block';
+                if (flatBox) flatBox.style.display = 'block';
+                if (optionsBox) {
+                    optionsBox.style.display = 'block';
+                    optionsBox.querySelectorAll('input').forEach(input => input.disabled = false);
+                }
             } else {
-                flatBox.style.display = 'none';
-                optionsBox.style.display = 'block';
+                if (flatBox) flatBox.style.display = 'none';
+                if (optionsBox) {
+                    optionsBox.style.display = 'block';
+                    optionsBox.querySelectorAll('input').forEach(input => input.disabled = false);
+                }
             }
         }
 
@@ -1543,14 +1556,23 @@
             const optionsBox = document.getElementById('optionsBox' + id);
 
             if (value === 'flat') {
-                flatBox.style.display = 'block';
-                optionsBox.style.display = 'none';
+                if (flatBox) flatBox.style.display = 'block';
+                if (optionsBox) {
+                    optionsBox.style.display = 'none';
+                    optionsBox.querySelectorAll('input').forEach(input => input.disabled = true);
+                }
             } else if (value === 'single') {
-                flatBox.style.display = 'block';
-                optionsBox.style.display = 'block';
+                if (flatBox) flatBox.style.display = 'block';
+                if (optionsBox) {
+                    optionsBox.style.display = 'block';
+                    optionsBox.querySelectorAll('input').forEach(input => input.disabled = false);
+                }
             } else {
-                flatBox.style.display = 'none';
-                optionsBox.style.display = 'block';
+                if (flatBox) flatBox.style.display = 'none';
+                if (optionsBox) {
+                    optionsBox.style.display = 'block';
+                    optionsBox.querySelectorAll('input').forEach(input => input.disabled = false);
+                }
             }
         }
 

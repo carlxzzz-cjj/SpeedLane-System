@@ -34,6 +34,15 @@
             color: #0f172a;
             text-transform: uppercase;
             letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+        .brand-logo-img {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 6px;
+            font-style: normal;
+            width: 24px;
+            height: 24px;
         }
         .brand-address {
             font-size: 8.5px;
@@ -203,6 +212,9 @@
     @php
         $transactions = collect($transactions ?? []);
 
+        // Retrieve active service filter string
+        $selectedServiceFilter = request('service_type') ?? ($serviceType ?? ($service_type ?? null));
+
         // Resolve Report Category Group
         $typeKey = strtolower($reportType ?? 'financial');
         $isFinancial  = in_array($typeKey, ['financial', 'revenue', '1']);
@@ -278,7 +290,8 @@
             return $type !== '' ? $type : ($brandModel !== '' ? $brandModel : 'Unspecified Vehicle');
         };
 
-        $parseServices = function($trx) {
+        // PARSE & STRICTLY FILTER SERVICES MATCHING THE TARGET FILTER
+        $parseServices = function($trx) use ($selectedServiceFilter) {
             $item = is_array($trx) ? (object)$trx : $trx;
             $raw = $item->selected_services ?? [];
             if (is_string($raw)) {
@@ -299,7 +312,13 @@
                 }
                 $trimmed = trim($name);
                 if ($trimmed !== '') {
-                    $result[] = $trimmed;
+                    if (!empty($selectedServiceFilter)) {
+                        if (stripos($trimmed, (string)$selectedServiceFilter) !== false) {
+                            $result[] = $trimmed;
+                        }
+                    } else {
+                        $result[] = $trimmed;
+                    }
                 }
             }
             return $result;
@@ -316,11 +335,9 @@
     <table class="header-table">
         <tr>
             <td style="width: 60%;">
-                <div class="brand-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#0f172a" viewBox="0 0 16 16" style="vertical-align: -2px; margin-right: 4px;">
-                        <path d="M2.52 3.515A2.5 2.5 0 0 1 4.82 2h6.362c.969 0 1.838.567 2.298 1.515l.792 1.628c.08.164.248.272.43.272h.3c.552 0 1 .448 1 1v2c0 .28-.112.534-.293.719C16.452 9.387 16 10.138 16 11v1a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H3v1a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1v-1c0-.862-.452-1.613-.654-1.881A1.002 1.002 0 0 1 0 8V6c0-.552.448-1 1-1h.3c.182 0 .35-.108.43-.272l.79-1.628zM4 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM3.82 4l-.5 1h9.36l-.5-1H3.82z"/>
-                    </svg><span style="color: #f42582;">SPEED</span><span style="color: #00a2ff;">LANE</span>
-                </div>
+               <div class="brand-title">
+    <span style="color: #f42582;">SPEED</span><span style="color: #00a2ff;">LANE</span>
+</div>
                 <div class="brand-address">23 Ramos St., Brgy. Dadiangas East, General Santos City, Philippines, 9500</div>
                 <div class="sub-title">
                     {{ $isFinancial ? 'Executive Financial Summary' : 'Executive Business & Intelligence Analytics' }}
@@ -340,9 +357,7 @@
         <div class="subject-sub">SpeedLane Management & Operational Decision Support Document</div>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- 1. FINANCIAL & REVENUE REPORT                             -->
-    <!-- ========================================================= -->
+    <!-- 1. FINANCIAL & REVENUE REPORT -->
     @if($isFinancial)
 
         <div class="summary-text-bar">
@@ -402,9 +417,7 @@
             </p>
         </div>
 
-    <!-- ========================================================= -->
-    <!-- 2. CUSTOMER & RETENTION REPORT                            -->
-    <!-- ========================================================= -->
+    <!-- 2. CUSTOMER & RETENTION REPORT -->
     @elseif($isCustomer)
 
         @php
@@ -472,9 +485,7 @@
             </ul>
         </div>
 
-    <!-- ========================================================= -->
-    <!-- 3. SERVICE DEMAND REPORT                                  -->
-    <!-- ========================================================= -->
+    <!-- 3. SERVICE DEMAND REPORT -->
     @elseif($isService)
 
         @php
@@ -543,9 +554,7 @@
             </ul>
         </div>
 
-    <!-- ========================================================= -->
-    <!-- 4. VEHICLE SEGMENT REPORT                                 -->
-    <!-- ========================================================= -->
+    <!-- 4. VEHICLE SEGMENT REPORT -->
     @elseif($isVehicle)
 
         @php
@@ -614,9 +623,7 @@
             </ul>
         </div>
 
-    <!-- ========================================================= -->
-    <!-- 5. TECHNICIAN PERFORMANCE REPORT                          -->
-    <!-- ========================================================= -->
+    <!-- 5. TECHNICIAN PERFORMANCE REPORT -->
     @elseif($isTechnician)
 
         @php
@@ -638,106 +645,87 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Technician Name</th>
+                    <th>Technician / Mechanic Name</th>
                     <th class="text-center">Assigned Jobs</th>
-                    <th class="text-center">Completed Jobs</th>
-                    <th class="text-center">Completion Rate</th>
+                    <th class="text-center">Completed</th>
+                    <th class="text-center">In Progress / Queued</th>
                     <th class="text-end">Revenue Generated</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($techGroups as $techName => $jobs)
+                @forelse($techGroups as $tName => $tJobs)
                     @php
-                        $assigned = $jobs->count();
-                        $completed = $jobs->where('status', 'Completed')->count();
-                        $rate = $assigned > 0 ? round(($completed / $assigned) * 100, 1) : 0;
-                        $techRev = $jobs->where('status', 'Completed')->sum('total_cost');
+                        $tAssigned = $tJobs->count();
+                        $tDone = $tJobs->where('status', 'Completed')->count();
+                        $tPending = $tJobs->whereIn('status', ['In Progress', 'Pending', 'In Queue'])->count();
+                        $tRevenue = $tJobs->sum('total_cost');
                     @endphp
                     <tr>
-                        <td class="fw-bold">{{ $techName }}</td>
-                        <td class="text-center">{{ $assigned }}</td>
-                        <td class="text-center fw-bold">{{ $completed }}</td>
-                        <td class="text-center font-mono">{{ $rate }}%</td>
-                        <td class="text-end font-mono fw-bold">{!! $formatMoney($techRev) !!}</td>
+                        <td class="fw-bold">{{ $tName }}</td>
+                        <td class="text-center fw-bold">{{ number_format($tAssigned) }}</td>
+                        <td class="text-center text-success fw-bold">{{ number_format($tDone) }}</td>
+                        <td class="text-center">{{ number_format($tPending) }}</td>
+                        <td class="text-end font-mono fw-bold">{!! $formatMoney($tRevenue) !!}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="text-center">No technician records found.</td></tr>
+                    <tr><td colspan="5" class="text-center">No technician activity recorded for this period.</td></tr>
                 @endforelse
             </tbody>
         </table>
 
         <div class="analysis-box">
-            <div class="analysis-title">Strategic Staffing & Throughput Assessment</div>
-            <ul class="analysis-list">
-                <li style="margin-bottom: 2px;"><strong>Performance Output:</strong> Staff achieved an overall completion rate of {{ $avgCompletionRate }}% during this operational window.</li>
-                <li><strong>Workload Balancing:</strong> Monitor high-volume technician schedules to prevent fatigue and preserve high-quality service standards across detailing bays.</li>
-            </ul>
+            <div class="analysis-title">Technician Efficiency & Output Evaluation</div>
+            <p class="analysis-text">
+                A total of <strong>{{ number_format($activeTechs) }} active technicians</strong> processed <strong>{{ number_format($totalAssigned) }} jobs</strong> during this operational window, reaching an overall completion rate of <strong>{{ $avgCompletionRate }}%</strong>.
+            </p>
         </div>
 
-    <!-- ========================================================= -->
-    <!-- 6. DEFAULT / OPERATIONS QUEUE / SERVICE AUDIT REPORT       -->
-    <!-- ========================================================= -->
+    <!-- GENERAL / DEFAULT AUDIT LOG REPORT -->
     @else
 
-        @php
-            $completionRate = $totalJobsCount > 0 ? round(($completedJobs / $totalJobsCount) * 100, 1) : 0;
-        @endphp
-
         <div class="summary-text-bar">
-            <strong>Operational Queue & Service Audit Log:</strong> Daily activity feed, service details, bay assignments, and ticket turnaround records.
+            <strong>Service Audit Log:</strong> Comprehensive record listing of all service queue logs and status progressions.
         </div>
 
-        <div class="section-header">1. Operational Queue & Service Activity Feed</div>
+        <div class="section-header">Service Audit & Transaction Log</div>
 
-        <p style="color: #475569; margin-bottom: 10px;">
-            This log details daily operational throughput, services performed, bay assignments, and mechanic fulfillment rates. A total of <strong>{{ number_format($totalJobsCount) }} work tickets</strong> were created during this operational window, achieving a turnaround fulfillment rate of <strong>{{ $completionRate }}%</strong>.
-        </p>
-
-        <div class="list-container">
-            <div class="list-title">Logged Activity & Service Audit Breakdown</div>
-            @forelse($transactions as $trx)
-                @php 
-                    $trxObj = is_array($trx) ? (object)$trx : $trx; 
-                    $qServices = $parseServices($trx);
-                @endphp
-                <div class="list-item">
-                    <table class="list-item-header">
-                        <tr>
-                            <td class="font-mono fw-bold" style="font-size: 10px; color: #0f172a;">{{ $trxObj->tracking_code }}</td>
-                            <td class="text-end fw-bold">{{ $trxObj->status }}</td>
-                        </tr>
-                    </table>
-                    <div style="font-weight: 600; color: #0f172a; margin-top: 2px;">
-                        Client: {{ $getCustomerName($trx) }} | Vehicle: {{ $getVehicleDetails($trx) }} | Plate: {{ $trxObj->plate_number ?? 'N/A' }}
-                    </div>
-                    <div class="list-item-meta" style="margin-top: 2px;">
-                        Services Rendered: <strong>{{ !empty($qServices) ? implode(', ', $qServices) : 'N/A' }}</strong>
-                    </div>
-                    <div class="list-item-meta">
-                        Assigned Staff: <strong>{{ $getMechanicName($trx) }}</strong> | 
-                        Registered: <strong>{{ $getDateRegistered($trx) }}</strong> | 
-                        Completed: <strong>{{ $getDateCompleted($trx) }}</strong>
-                    </div>
-                </div>
-            @empty
-                <div style="color: #64748b; font-size: 9px; padding: 4px 0;">No operational queue records found.</div>
-            @endforelse
-        </div>
-
-        <div class="analysis-box">
-            <div class="analysis-title">2. Operational Efficiency & Capacity Assessment</div>
-            <ul class="analysis-list">
-                <li style="margin-bottom: 2px;"><strong>Turnaround Rate:</strong> With {{ $completedJobs }} out of {{ $totalJobsCount }} jobs completed ({{ $completionRate }}%), bay throughput is operating at standard capacity.</li>
-                <li style="margin-bottom: 2px;"><strong>Active Queue:</strong> Currently, {{ $inProgressJobs }} jobs remain in active/pending status. Staffing allocation should be balanced to clear open queues prior to peak arrival hours.</li>
-                <li><strong>Technician Load Balancing:</strong> Ensure service assignments are distributed evenly among mechanics to minimize idle bay time and maintain consistent service quality.</li>
-            </ul>
-        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Tracking Code</th>
+                    <th>Customer</th>
+                    <th>Vehicle</th>
+                    <th>Services Rendered</th>
+                    <th>Mechanic</th>
+                    <th>Status</th>
+                    <th class="text-end">Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($transactions as $trx)
+                    @php 
+                        $trxObj = is_array($trx) ? (object)$trx : $trx; 
+                        $sList = $parseServices($trx);
+                    @endphp
+                    <tr>
+                        <td class="font-mono fw-bold">{{ $trxObj->tracking_code }}</td>
+                        <td class="fw-bold">{{ $getCustomerName($trx) }}</td>
+                        <td>{{ $getVehicleDetails($trx) }}</td>
+                        <td><strong>{{ !empty($sList) ? implode(', ', $sList) : 'N/A' }}</strong></td>
+                        <td>{{ $getMechanicName($trx) }}</td>
+                        <td class="text-center fw-bold">{{ $trxObj->status }}</td>
+                        <td class="text-end font-mono fw-bold">{!! $formatMoney($trxObj->total_cost ?? 0) !!}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="7" class="text-center">No service logs match the selected parameters.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
 
     @endif
 
-    <!-- Footer -->
     <div class="footer">
-        SpeedLane AutoSpa Operational Intelligence Document • Internal Business Management System
+        SpeedLane AutoSpa Internal Operations Document &bull; Confidential &bull; Generated Automatically
     </div>
 
 </body>

@@ -1,6 +1,9 @@
 @php
     $transactions = collect($transactions ?? []);
 
+    // Retrieve active service filter string
+    $selectedServiceFilter = request('service_type') ?? ($serviceType ?? ($service_type ?? null));
+
     // Resolve Report Category Group
     $typeKey = strtolower($reportType ?? 'financial');
     $isFinancial  = in_array($typeKey, ['financial', 'revenue', '1']);
@@ -76,7 +79,8 @@
         return $type !== '' ? $type : ($brandModel !== '' ? $brandModel : 'Unspecified Vehicle');
     };
 
-    $parseServices = function($trx) {
+    // PARSE & STRICTLY FILTER SERVICES MATCHING THE TARGET FILTER
+    $parseServices = function($trx) use ($selectedServiceFilter) {
         $item = is_array($trx) ? (object)$trx : $trx;
         $raw = $item->selected_services ?? [];
         if (is_string($raw)) {
@@ -97,7 +101,13 @@
             }
             $trimmed = trim($name);
             if ($trimmed !== '') {
-                $result[] = $trimmed;
+                if (!empty($selectedServiceFilter)) {
+                    if (stripos($trimmed, (string)$selectedServiceFilter) !== false) {
+                        $result[] = $trimmed;
+                    }
+                } else {
+                    $result[] = $trimmed;
+                }
             }
         }
         return $result;
@@ -131,11 +141,11 @@
     <!-- Document Header Letterhead -->
     <div class="d-flex justify-content-between align-items-end border-bottom pb-3 mb-4" style="border-color: #cbd5e1 !important;">
         <div>
-            <h3 class="fw-bold text-uppercase mb-1 d-flex align-items-center gap-2" style="letter-spacing: -0.5px; color: #0f172a;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-car-front-fill me-1" viewBox="0 0 16 16">
+            <h3 class="fw-bold text-uppercase mb-1" style="letter-spacing: -0.5px; color: #0f172a;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-car-front-fill align-middle me-2" viewBox="0 0 16 16" style="margin-top: -3px;">
                     <path d="M2.52 3.515A2.5 2.5 0 0 1 4.82 2h6.362c.969 0 1.838.567 2.298 1.515l.792 1.628c.08.164.248.272.43.272h.3c.552 0 1 .448 1 1v2c0 .28-.112.534-.293.719C16.452 9.387 16 10.138 16 11v1a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H3v1a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1v-1c0-.862-.452-1.613-.654-1.881A1.002 1.002 0 0 1 0 8V6c0-.552.448-1 1-1h.3c.182 0 .35-.108.43-.272l.79-1.628zM4 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM3.82 4l-.5 1h9.36l-.5-1H3.82z"/>
                 </svg>
-                <span style="font-style: italic;"><span style="color: #f42582;">SPEED</span><span style="color: #00a2ff;">LANE</span></span>
+                <span class="align-middle" style="font-style: italic;"><span style="color: #f42582;">SPEED</span><span style="color: #00a2ff;">LANE</span></span>
             </h3>
             <div class="text-muted extra-small mb-1" style="font-size: 11px;">23 Ramos St., Brgy. Dadiangas East, General Santos City, Philippines, 9500</div>
             <span class="text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px;">

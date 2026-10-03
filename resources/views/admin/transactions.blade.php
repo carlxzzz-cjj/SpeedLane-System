@@ -8,7 +8,6 @@
     <!-- Early Theme Check Script (Defaults to Light Theme) -->
     <script>
         const savedTheme = localStorage.getItem('speedlane_theme');
-        // Default to Light Mode unless explicitly set to 'dark'
         if (savedTheme !== 'dark') {
             document.documentElement.classList.add('light-theme');
         } else {
@@ -44,13 +43,11 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Color Utility Classes */
         .text-speed-pink { color: var(--speed-pink) !important; }
         .text-speed-blue { color: var(--speed-blue) !important; }
         .bg-speed-pink { background-color: var(--speed-pink) !important; }
         .bg-speed-blue { background-color: var(--speed-blue) !important; }
 
-        /* Role Badge Styling */
         .badge-super-admin {
             background-color: rgba(244, 37, 130, 0.18) !important;
             color: #ffb3d9 !important;
@@ -67,7 +64,6 @@
             letter-spacing: 0.3px;
         }
 
-        /* Assigned Mechanic Badge Styling */
         .badge-mechanic {
             background-color: rgba(0, 162, 255, 0.18) !important;
             color: #7dd3fc !important;
@@ -77,7 +73,6 @@
             box-shadow: 0 0 10px rgba(0, 162, 255, 0.1);
         }
 
-        /* Top Navigation Header */
         .navbar-speed {
             background: rgba(7, 9, 14, 0.95);
             border-bottom: 1px solid var(--speed-card-border);
@@ -99,7 +94,6 @@
             font-weight: 700;
         }
 
-        /* Sidebar Styling */
         .admin-sidebar {
             background-color: var(--speed-sidebar-bg) !important;
             border-right: 1px solid var(--speed-card-border) !important;
@@ -125,14 +119,12 @@
             box-shadow: 0 0 15px rgba(244, 37, 130, 0.15);
         }
 
-        /* Speed Card Theme */
         .speed-card {
             background-color: var(--speed-card-bg) !important;
             border: 1px solid var(--speed-card-border) !important;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
-        /* Gradient Action Buttons */
         .btn-speed-gradient {
             background: linear-gradient(90deg, var(--speed-pink) 0%, var(--speed-blue) 100%);
             border: none;
@@ -148,7 +140,6 @@
             box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
         }
 
-        /* Inputs & Dropdowns */
         .form-control-dark, .form-select-dark {
             background-color: #06080d !important;
             border: 1px solid rgba(255, 255, 255, 0.15) !important;
@@ -177,7 +168,6 @@
             border-left: none !important;
         }
 
-        /* High Visibility Logout Button */
         .btn-logout {
             color: #ff6b81 !important;
             border: 1px solid rgba(255, 107, 129, 0.4) !important;
@@ -191,7 +181,6 @@
             border-color: #ff6b81 !important;
         }
 
-        /* Dark Theme Toggle Button */
         #theme-toggle-btn {
             background-color: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -203,7 +192,6 @@
             background-color: rgba(255, 255, 255, 0.15);
         }
 
-        /* LIGHT MODE HIGH-CONTRAST OVERRIDES */
         html.light-theme {
             --speed-dark-bg: #f8fafc;
             --speed-card-bg: #ffffff;
@@ -216,7 +204,6 @@
             color: #1e293b !important;
         }
 
-        /* Text Color Adaptations for Light Mode */
         html.light-theme .text-white {
             color: #0f172a !important;
         }
@@ -237,14 +224,12 @@
             opacity: 1 !important;
         }
 
-        /* Override Dark Background Utilities in Light Mode */
         html.light-theme .bg-black,
         html.light-theme [class*="bg-black"] {
             background-color: #f1f5f9 !important;
             color: #1e293b !important;
         }
 
-        /* Borders Adaptations for Light Mode */
         html.light-theme .border-secondary,
         html.light-theme [class*="border-secondary"] {
             border-color: #cbd5e1 !important;
@@ -254,7 +239,6 @@
             border-color: #cbd5e1 !important;
         }
 
-        /* Badges Adaptations for Light Mode */
         html.light-theme .badge.bg-black,
         html.light-theme .badge.bg-secondary,
         html.light-theme .badge.text-secondary {
@@ -269,7 +253,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
 
-        /* Clear Readable Badges in Light Mode */
         html.light-theme .badge-super-admin {
             background-color: #fce7f3 !important;
             color: #be185d !important;
@@ -291,7 +274,6 @@
             font-weight: 700 !important;
         }
 
-        /* Clear Readable Logout Button in Light Mode */
         html.light-theme .btn-logout {
             color: #e11d48 !important;
             border: 1px solid #fda4af !important;
@@ -305,7 +287,6 @@
             border-color: #f43f5e !important;
         }
 
-        /* Clear Readable Theme Toggle Button in Light Mode */
         html.light-theme #theme-toggle-btn {
             background-color: #e2e8f0 !important;
             border-color: #cbd5e1 !important;
@@ -374,7 +355,6 @@
             border-right: none !important;
         }
 
-        /* Modal Light Mode Adaptations */
         html.light-theme .modal-content-dark {
             background-color: #ffffff !important;
             border: 1px solid rgba(0, 0, 0, 0.1) !important;
@@ -404,7 +384,6 @@
             color: #0f172a !important;
         }
 
-        /* Table Light Mode Adaptations */
         html.light-theme .custom-admin-table {
             color: #1e293b !important;
         }
@@ -438,7 +417,6 @@
             color: #0f172a !important;
         }
 
-        /* Custom Table Styling for Dark Theme */
         .custom-admin-table {
             color: #e2e8f0;
         }
@@ -463,7 +441,6 @@
             background-color: rgba(255, 255, 255, 0.02) !important;
         }
 
-        /* Stat Icon */
         .stat-icon {
             width: 48px;
             height: 48px;
@@ -475,7 +452,6 @@
 
         .extra-small { font-size: 0.75rem; }
 
-        /* Report Option Cards in Modal */
         .report-card-option {
             cursor: pointer;
             transition: all 0.2s ease-in-out;
@@ -493,14 +469,12 @@
             box-shadow: 0 0 15px rgba(244, 37, 130, 0.2);
         }
 
-        /* Modal Dark Theme Overrides */
         .modal-content-dark {
             background-color: var(--speed-card-bg) !important;
             border: 1px solid var(--speed-card-border) !important;
             color: #e2e8f0;
         }
 
-        /* Printable area styles for PDF/Print preview */
         .printable-area {
             height: auto !important;
             max-height: none !important;
@@ -553,9 +527,9 @@
                 display: none !important; 
             }
         }
-           body {
-    zoom: 80%; /* Adjusts the render scale across modern browsers */
-  }
+        body {
+            zoom: 80%;
+        }
     </style>
 </head>
 <body>
@@ -599,7 +573,6 @@
                     </button>
                 </form>
 
-                <!-- Light / Dark Mode Toggle Button -->
                 <button id="theme-toggle-btn" type="button" class="btn d-flex align-items-center justify-content-center rounded-circle p-2" style="width: 40px; height: 40px;" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode" onclick="toggleSpeedLaneTheme()">
                     <i id="theme-toggle-icon" class="bi bi-sun-fill text-warning"></i>
                 </button>
@@ -643,7 +616,6 @@
                         <p class="text-secondary mb-0 small">View transaction history, analyze technician performance, and generate business decision reports.</p>
                     </div>
 
-                    <!-- Generate Report Modal Trigger Button -->
                     <button class="btn btn-speed-gradient rounded-3 px-3 py-2 fw-semibold d-flex align-items-center gap-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#generateReportModal">
                         <i class="bi bi-bar-chart-line-fill"></i> Generate Business Report
                     </button>
@@ -705,7 +677,7 @@
                                     @php
                                         $vTypesList = (isset($vehicleTypes) && count($vehicleTypes) > 0) 
                                             ? $vehicleTypes 
-                                            : ['Hatchback', 'Sedan', 'Coupe', 'Crossover', 'MPV', 'Wagon', 'SUV', 'Pickup Truck', 'Sports Car', 'Van', Supercar];
+                                            : ['Hatchback', 'Sedan', 'Coupe', 'Crossover', 'MPV', 'Wagon', 'SUV', 'Pickup Truck', 'Sports Car', 'Van', 'Supercar'];
                                     @endphp
                                     @foreach($vTypesList as $vType)
                                         @php 
@@ -833,6 +805,14 @@
         }, $servicesArr ?? []);
         $serviceNames = array_filter($serviceNames);
 
+        // FILTER SPECIFIC SERVICE WHEN SERVICE_TYPE FILTER IS APPLIED
+        $reqService = request('service_type');
+        if (!empty($reqService)) {
+            $serviceNames = array_values(array_filter($serviceNames, function($s) use ($reqService) {
+                return stripos((string)$s, (string)$reqService) !== false;
+            }));
+        }
+
         $vehicleBrand = $service->vehicle_make ?? $service->vehicle_brand ?? $service->brand ?? $service->make ?? 'N/A';
         $vehicleModel = $service->vehicle_model ?? $service->model ?? 'N/A';
         $vehicleType  = $service->vehicle_type ?? $service->body_type ?? 'Sedan';
@@ -888,7 +868,6 @@
         </div>
     </div>
 
-
     <!-- RECORD MODALS LOOP -->
 @foreach($transactions as $service)
     @php
@@ -924,6 +903,14 @@
             return is_array($item) ? ($item['name'] ?? '') : $item;
         }, $servicesArr ?? []);
         $serviceNames = array_filter($serviceNames);
+
+        // FILTER SPECIFIC SERVICE WHEN SERVICE_TYPE FILTER IS APPLIED
+        $reqService = request('service_type');
+        if (!empty($reqService)) {
+            $serviceNames = array_values(array_filter($serviceNames, function($s) use ($reqService) {
+                return stripos((string)$s, (string)$reqService) !== false;
+            }));
+        }
 
         $vehicleBrand = $service->vehicle_make ?? $service->vehicle_brand ?? $service->brand ?? $service->make ?? 'N/A';
         $vehicleModel = $service->vehicle_model ?? $service->model ?? 'N/A';
@@ -1190,11 +1177,10 @@
     </div>
 @endforeach
 
-    <!-- SYSTEM REPORT GENERATION MODAL (REDESIGNED) -->
+    <!-- SYSTEM REPORT GENERATION MODAL -->
     <div class="modal fade" id="generateReportModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content modal-content-dark border-0 rounded-4 shadow-lg overflow-hidden">
-                <!-- Modal Header -->
                 <div class="modal-header border-bottom border-secondary border-opacity-25 py-3 px-4">
                     <div class="d-flex align-items-center gap-2">
                         <div class="bg-speed-pink text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
@@ -1220,7 +1206,6 @@
                             </label>
                             
                             <div class="row g-2">
-                                <!-- Financial & Revenue -->
                                 <div class="col-md-6">
                                     <input class="form-check-input d-none" type="radio" name="report_type" id="type_financial" value="financial" checked onchange="toggleReportFilters()">
                                     <label class="w-100 report-card-label m-0" for="type_financial">
@@ -1236,7 +1221,6 @@
                                     </label>
                                 </div>
 
-                                <!-- Technician Performance -->
                                 <div class="col-md-6">
                                     <input class="form-check-input d-none" type="radio" name="report_type" id="type_technician" value="technician" onchange="toggleReportFilters()">
                                     <label class="w-100 report-card-label m-0" for="type_technician">
@@ -1252,7 +1236,6 @@
                                     </label>
                                 </div>
 
-                                <!-- Service Demand -->
                                 <div class="col-md-6">
                                     <input class="form-check-input d-none" type="radio" name="report_type" id="type_service" value="service_demand" onchange="toggleReportFilters()">
                                     <label class="w-100 report-card-label m-0" for="type_service">
@@ -1268,7 +1251,6 @@
                                     </label>
                                 </div>
 
-                                <!-- Service Queue Log -->
                                 <div class="col-md-6">
                                     <input class="form-check-input d-none" type="radio" name="report_type" id="type_queue" value="queue_log" onchange="toggleReportFilters()">
                                     <label class="w-100 report-card-label m-0" for="type_queue">
@@ -1284,7 +1266,6 @@
                                     </label>
                                 </div>
 
-                                <!-- Customer Loyalty -->
                                 <div class="col-md-6">
                                     <input class="form-check-input d-none" type="radio" name="report_type" id="type_customer" value="customer" onchange="toggleReportFilters()">
                                     <label class="w-100 report-card-label m-0" for="type_customer">
@@ -1300,7 +1281,6 @@
                                     </label>
                                 </div>
 
-                                <!-- Vehicle Analysis -->
                                 <div class="col-md-6">
                                     <input class="form-check-input d-none" type="radio" name="report_type" id="type_vehicle" value="vehicle" onchange="toggleReportFilters()">
                                     <label class="w-100 report-card-label m-0" for="type_vehicle">
@@ -1328,16 +1308,15 @@
                             <div class="row g-2 align-items-center">
                                 <div class="col-md-5">
                                     <select name="timeframe" id="filter_timeframe" class="form-select form-select-sm form-select-dark fw-semibold" onchange="toggleTimeframeFields()">
-                                        <option value="all_time" selected>All-Time Cumulative</option>
+                                        <option value="all_time" {{ request('date') ? '' : 'selected' }}>All-Time Cumulative</option>
                                         <option value="monthly">Monthly Performance</option>
                                         <option value="weekly">Weekly Analysis (7 Days)</option>
                                         <option value="yearly">Yearly Overview</option>
-                                        <option value="custom">Custom Date Range</option>
+                                        <option value="custom" {{ request('date') ? 'selected' : '' }}>Custom Date Range</option>
                                     </select>
                                 </div>
 
                                 <div class="col-md-7">
-                                    <!-- Weekly Field -->
                                     <div id="field_weekly" style="display: none;">
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text input-group-text-dark small">Start Date</span>
@@ -1345,7 +1324,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Monthly Field -->
                                     <div id="field_monthly" style="display: none;">
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text input-group-text-dark small">Month</span>
@@ -1353,7 +1331,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Yearly Field -->
                                     <div id="field_yearly" style="display: none;">
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text input-group-text-dark small">Year</span>
@@ -1365,14 +1342,13 @@
                                         </div>
                                     </div>
 
-                                    <!-- Custom Date Field -->
                                     <div id="field_custom_start" style="display: none;">
                                         <div class="row g-2">
                                             <div class="col-6">
-                                                <input type="date" name="date_from" class="form-control form-control-sm form-control-dark" value="{{ date('Y-m-01') }}" placeholder="From">
+                                                <input type="date" name="date_from" class="form-control form-control-sm form-control-dark" value="{{ request('date') ?? date('Y-m-01') }}" placeholder="From">
                                             </div>
                                             <div class="col-6" id="field_custom_end">
-                                                <input type="date" name="date_to" class="form-control form-control-sm form-control-dark" value="{{ date('Y-m-d') }}" placeholder="To">
+                                                <input type="date" name="date_to" class="form-control form-control-sm form-control-dark" value="{{ request('date') ?? date('Y-m-d') }}" placeholder="To">
                                             </div>
                                         </div>
                                     </div>
@@ -1393,7 +1369,6 @@
                             </div>
 
                             <div class="row g-2">
-                                <!-- Status Filter -->
                                 <div class="col-md-4 filter-group filter-status">
                                     <label class="form-label extra-small text-secondary fw-bold mb-1">Status Scope</label>
                                     <select name="status" class="form-select form-select-sm form-select-dark">
@@ -1405,7 +1380,6 @@
                                     </select>
                                 </div>
 
-                                <!-- Assigned Mechanic Filter -->
                                 <div class="col-md-4 filter-group filter-mechanic">
                                     <label class="form-label extra-small text-secondary fw-bold mb-1">Assigned Mechanic</label>
                                     <select name="technician_id" class="form-select form-select-sm form-select-dark">
@@ -1424,7 +1398,6 @@
                                     </select>
                                 </div>
 
-                                <!-- Service Package Filter -->
                                 <div class="col-md-4 filter-group filter-service">
                                     <label class="form-label extra-small text-secondary fw-bold mb-1">Service Package</label>
                                     <select name="service_type" class="form-select form-select-sm form-select-dark">
@@ -1436,12 +1409,11 @@
                                         @endphp
                                         @foreach($modalServicesList as $srv)
                                             @php $sName = is_object($srv) ? ($srv->name ?? '') : (is_array($srv) ? ($srv['name'] ?? '') : $srv); @endphp
-                                            <option value="{{ $sName }}">{{ $sName }}</option>
+                                            <option value="{{ $sName }}" {{ request('service_type') == $sName ? 'selected' : '' }}>{{ $sName }}</option>
                                         @endforeach
                                     </select>
                                 </div>
 
-                                <!-- Vehicle Segment Filter -->
                                 <div class="col-md-4 filter-group filter-vehicle-type">
                                     <label class="form-label extra-small text-secondary fw-bold mb-1">Vehicle Segment</label>
                                     <select name="vehicle_type" class="form-select form-select-sm form-select-dark">
@@ -1449,16 +1421,15 @@
                                         @php
                                             $modalTypesList = (isset($vehicleTypes) && count($vehicleTypes) > 0) 
                                                 ? $vehicleTypes 
-                                                : ['Hatchback', 'Sedan', 'Coupe', 'Crossover', 'MPV', 'Wagon', 'SUV', 'Pickup Truck', 'Sports Car', 'Van', Supercar];
+                                                : ['Hatchback', 'Sedan', 'Coupe', 'Crossover', 'MPV', 'Wagon', 'SUV', 'Pickup Truck', 'Sports Car', 'Van', 'Supercar'];
                                         @endphp
                                         @foreach($modalTypesList as $vSeg)
                                             @php $vSegName = is_object($vSeg) ? ($vSeg->vehicle_type ?? $vSeg->name ?? '') : (is_array($vSeg) ? ($vSeg['vehicle_type'] ?? $vSeg['name'] ?? '') : $vSeg); @endphp
-                                            <option value="{{ $vSegName }}">{{ $vSegName }}</option>
+                                            <option value="{{ $vSegName }}" {{ request('vehicle_type') == $vSegName ? 'selected' : '' }}>{{ $vSegName }}</option>
                                         @endforeach
                                     </select>
                                 </div>
 
-                                <!-- Vehicle Brand Filter -->
                                 <div class="col-md-4 filter-group filter-brand">
                                     <label class="form-label extra-small text-secondary fw-bold mb-1">Vehicle Brand</label>
                                     <select name="brand" class="form-select form-select-sm form-select-dark">
@@ -1470,12 +1441,11 @@
                                         @endphp
                                         @foreach($modalBrandsList as $b)
                                             @php $bSegName = is_object($b) ? ($b->brand ?? $b->name ?? '') : (is_array($b) ? ($b['brand'] ?? $b['name'] ?? '') : $b); @endphp
-                                            <option value="{{ $bSegName }}">{{ $bSegName }}</option>
+                                            <option value="{{ $bSegName }}" {{ (request('brand') == $bSegName || request('vehicle_brand') == $bSegName) ? 'selected' : '' }}>{{ $bSegName }}</option>
                                         @endforeach
                                     </select>
                                 </div>
 
-                                <!-- Customer Name Filter -->
                                 <div class="col-md-4 filter-group filter-customer">
                                     <label class="form-label extra-small text-secondary fw-bold mb-1">Customer Name</label>
                                     <input type="text" name="customer_name" id="customer_name_input" class="form-control form-control-sm form-control-dark" list="customer_datalist" placeholder="Filter customer..." value="{{ request('customer_name') }}">
@@ -1488,10 +1458,9 @@
                                     </datalist>
                                 </div>
 
-                                <!-- Search Keyword -->
                                 <div class="col-md-4 filter-group filter-keyword">
                                     <label class="form-label extra-small text-secondary fw-bold mb-1">Search Keyword</label>
-                                    <input type="text" name="search_term" class="form-control form-control-sm form-control-dark" placeholder="Tracking, plate, notes...">
+                                    <input type="text" name="search_term" class="form-control form-control-sm form-control-dark" placeholder="Tracking, plate, notes..." value="{{ request('search') ?? request('search_term') }}">
                                 </div>
                             </div>
                         </div>
@@ -1509,7 +1478,6 @@
         </div>
     </div>
 
-
     <!-- REPORT PREVIEW MODAL WITH ACTION TOOLBAR -->
     <div class="modal fade" id="reportPreviewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -1521,7 +1489,6 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 
-                <!-- Action Toolbar Inside Modal -->
                 <div class="bg-black bg-opacity-40 border-bottom border-secondary border-opacity-25 px-4 py-2 d-flex justify-content-between align-items-center">
                     <div class="text-secondary extra-small">
                         <i class="bi bi-info-circle me-1 text-speed-blue"></i> Document rendered dynamically based on selected database criteria.
@@ -1553,11 +1520,9 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Light Mode Toggle JS -->
     <script src="{{ asset('js/theme-toggle.js') }}"></script>
 
     <script>
-        // Print Helper function to target exact element without printing whole UI
         function printElement(target) {
             document.querySelectorAll('.print-active').forEach(el => el.classList.remove('print-active'));
             
@@ -1574,23 +1539,28 @@
             }, 1000);
         }
 
-        // Toggle Timeframe Input Fields
         function toggleTimeframeFields() {
             const timeframeSelect = document.getElementById('filter_timeframe');
             const val = timeframeSelect ? timeframeSelect.value : 'all_time';
             
-            const fieldWeekly = document.getElementById('field_weekly');
-            const fieldMonthly = document.getElementById('field_monthly');
-            const fieldYearly = document.getElementById('field_yearly');
-            const fieldCustomStart = document.getElementById('field_custom_start');
+            const fields = {
+                weekly: document.getElementById('field_weekly'),
+                monthly: document.getElementById('field_monthly'),
+                yearly: document.getElementById('field_yearly'),
+                custom: document.getElementById('field_custom_start')
+            };
 
-            if (fieldWeekly) fieldWeekly.style.display = (val === 'weekly') ? 'block' : 'none';
-            if (fieldMonthly) fieldMonthly.style.display = (val === 'monthly') ? 'block' : 'none';
-            if (fieldYearly) fieldYearly.style.display = (val === 'yearly') ? 'block' : 'none';
-            if (fieldCustomStart) fieldCustomStart.style.display = (val === 'custom') ? 'block' : 'none';
+            Object.keys(fields).forEach(key => {
+                const el = fields[key];
+                if (!el) return;
+                const isMatch = (val === key);
+                el.style.display = isMatch ? 'block' : 'none';
+                el.querySelectorAll('input, select').forEach(input => {
+                    input.disabled = !isMatch;
+                });
+            });
         }
 
-        // Dynamically Show/Hide Filters Related to the Selected Report Category
         function toggleReportFilters() {
             const reportTypeEl = document.querySelector('input[name="report_type"]:checked');
             if (!reportTypeEl) return;
@@ -1598,36 +1568,51 @@
             const selectedType = reportTypeEl.value;
             const allFilterGroups = document.querySelectorAll('.filter-group');
 
-            allFilterGroups.forEach(el => el.style.display = 'none');
+            allFilterGroups.forEach(el => {
+                el.style.display = 'none';
+                el.querySelectorAll('input, select').forEach(input => {
+                    input.disabled = true;
+                });
+            });
 
+            let activeClasses = [];
             switch (selectedType) {
                 case 'financial':
-                    showFilters(['.filter-status']);
+                    activeClasses = ['.filter-status', '.filter-service'];
                     break;
                 case 'technician':
-                    showFilters(['.filter-status', '.filter-mechanic']);
+                    activeClasses = ['.filter-status', '.filter-mechanic', '.filter-service'];
                     break;
                 case 'service_demand':
-                    showFilters(['.filter-service', '.filter-vehicle-type']);
+                    activeClasses = ['.filter-service', '.filter-vehicle-type'];
                     break;
                 case 'queue_log':
-                    showFilters(['.filter-status', '.filter-mechanic', '.filter-customer', '.filter-keyword']);
+                    activeClasses = ['.filter-status', '.filter-mechanic', '.filter-customer', '.filter-keyword', '.filter-service'];
                     break;
                 case 'customer':
-                    showFilters(['.filter-customer', '.filter-keyword']);
+                    activeClasses = ['.filter-customer', '.filter-keyword', '.filter-service'];
                     break;
                 case 'vehicle':
-                    showFilters(['.filter-vehicle-type', '.filter-brand']);
+                    activeClasses = ['.filter-vehicle-type', '.filter-brand', '.filter-service'];
                     break;
                 default:
-                    allFilterGroups.forEach(el => el.style.display = 'block');
+                    allFilterGroups.forEach(el => {
+                        el.style.display = 'block';
+                        el.querySelectorAll('input, select').forEach(input => {
+                            input.disabled = false;
+                        });
+                    });
+                    return;
             }
-        }
 
-        function showFilters(classes) {
-            classes.forEach(cls => {
+            activeClasses.forEach(cls => {
                 const el = document.querySelector(cls);
-                if (el) el.style.display = 'block';
+                if (el) {
+                    el.style.display = 'block';
+                    el.querySelectorAll('input, select').forEach(input => {
+                        input.disabled = false;
+                    });
+                }
             });
         }
 
@@ -1635,7 +1620,6 @@
             toggleTimeframeFields();
             toggleReportFilters();
 
-            // Real-Time Live Search for Transactions Table
             const searchInput = document.getElementById('transactionSearchInput');
             if (searchInput) {
                 searchInput.addEventListener('input', function() {
@@ -1655,10 +1639,12 @@
                 });
             }
 
-            // Preview Click Handler
             const btnPreview = document.getElementById('btnPreviewReport');
             if (btnPreview) {
                 btnPreview.addEventListener('click', function() {
+                    toggleTimeframeFields();
+                    toggleReportFilters();
+
                     const form = document.getElementById('reportFilterForm');
                     const formData = new FormData(form);
                     const params = new URLSearchParams(formData).toString();
@@ -1695,18 +1681,16 @@
                                     <p class="small mb-0">Please check filter conditions or database connectivity.</p>
                                 </div>
                             `;
-                        })
-                        .finally(() => {
-                            toggleTimeframeFields();
-                            toggleReportFilters();
                         });
                 });
             }
 
-            // PDF Download Button Click Handler
             const btnDownload = document.getElementById('btnDownloadPDF');
             if (btnDownload) {
                 btnDownload.addEventListener('click', function() {
+                    toggleTimeframeFields();
+                    toggleReportFilters();
+
                     const form = document.getElementById('reportFilterForm');
                     const formData = new FormData(form);
                     const params = new URLSearchParams(formData).toString();
@@ -1714,7 +1698,6 @@
                 });
             }
 
-            // Direct Print Button inside Report Preview Modal
             const btnPrint = document.getElementById('btnPrintReportModal');
             if (btnPrint) {
                 btnPrint.addEventListener('click', function() {

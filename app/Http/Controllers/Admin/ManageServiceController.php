@@ -31,6 +31,19 @@ class ManageServiceController extends Controller
      */
     public function storeService(Request $request)
     {
+        if ($request->selection_type === 'flat') {
+            $request->request->remove('options');
+        } elseif ($request->has('options') && is_array($request->options)) {
+            $filteredOptions = array_filter($request->options, function ($opt) {
+                return isset($opt['name']) && trim((string)$opt['name']) !== '';
+            });
+            if (empty($filteredOptions)) {
+                $request->request->remove('options');
+            } else {
+                $request->merge(['options' => array_values($filteredOptions)]);
+            }
+        }
+
         $request->validate([
             'name'           => 'required|string|max:255',
             'vehicle_type'   => 'nullable|string|max:100',
@@ -82,6 +95,19 @@ class ManageServiceController extends Controller
     {
         $service = Service::findOrFail($id);
 
+        if ($request->selection_type === 'flat') {
+            $request->request->remove('options');
+        } elseif ($request->has('options') && is_array($request->options)) {
+            $filteredOptions = array_filter($request->options, function ($opt) {
+                return isset($opt['name']) && trim((string)$opt['name']) !== '';
+            });
+            if (empty($filteredOptions)) {
+                $request->request->remove('options');
+            } else {
+                $request->merge(['options' => array_values($filteredOptions)]);
+            }
+        }
+
         $request->validate([
             'name'           => 'required|string|max:255',
             'vehicle_type'   => 'nullable|string|max:100',
@@ -102,7 +128,8 @@ class ManageServiceController extends Controller
                 'description'    => $request->description,
                 'notice'         => $request->notice,
                 'selection_type' => $request->selection_type,
-'flat_price'     => in_array($request->selection_type, ['flat', 'single']) ? $request->flat_price : null,            ]);
+                'flat_price'     => in_array($request->selection_type, ['flat', 'single']) ? $request->flat_price : null,
+            ]);
 
             if ($request->selection_type !== 'flat') {
                 $service->options()->delete();

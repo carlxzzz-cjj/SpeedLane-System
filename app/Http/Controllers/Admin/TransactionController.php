@@ -125,9 +125,13 @@ class TransactionController extends Controller
             $this->applyBrandFilter($query, $brandInput);
         }
 
-        if ($request->filled('service_type') && Schema::hasColumn('service_records', 'selected_services')) {
-            $query->where('selected_services', 'like', "%" . trim($request->service_type) . "%");
-        }
+      if ($request->filled('service_type')) {
+    $serviceType = $request->service_type;
+    $query->where(function ($q) use ($serviceType) {
+        $q->whereJsonContains('selected_services', $serviceType)
+          ->orWhere('selected_services', 'LIKE', '%' . $serviceType . '%');
+    });
+}
 
         // TECHNICIAN FILTER
         $techInput = $request->input('technician', $request->input('technician_id', $request->input('mechanic')));
@@ -139,7 +143,7 @@ class TransactionController extends Controller
             $query->whereDate('created_at', $request->date);
         }
 
-        $transactions = $query->latest()->get();
+$transactions = $query->latest('updated_at')->get();
 
         foreach ($transactions as $trx) {
             $this->repairTransactionPrices($trx);
@@ -191,221 +195,220 @@ class TransactionController extends Controller
     /**
      * Fetch report data filtered strictly by request options
      */
-    private function getFilteredReportData(Request $request): array
-    {
-        $reportType   = $request->input('report_type', $request->input('type', 'financial'));
-        $timeframe    = strtolower((string)$request->input('timeframe', ''));
-        $statusFilter = $request->input('status', 'Completed');
+  /**
+ * Fetch report data filtered strictly by request options
+ */
+private function getFilteredReportData(Request $request): array
+{
+    $reportType   = $request->input('report_type', $request->input('type', 'financial'));
+    $timeframe    = strtolower((string)$request->input('timeframe', ''));
+    $statusFilter = $request->input('status', 'Completed');
 
-        $query = ServiceRecord::query();
+    $query = ServiceRecord::query();
 
-        // Eager-load technician/mechanic and vehicle relationships if defined
-        $relations = array_filter(['technician', 'mechanic', 'vehicleModel', 'vehicle'], fn($rel) => method_exists(ServiceRecord::class, $rel));
-        if (!empty($relations)) {
-            $query->with($relations);
+    // Eager-load technician/mechanic and vehicle relationships if defined
+    $relations = array_filter(['technician', 'mechanic', 'vehicleModel', 'vehicle'], fn($rel) => method_exists(ServiceRecord::class, $rel));
+    if (!empty($relations)) {
+        $query->with($relations);
+    }
+
+    // 1. Case-Insensitive Status Filter Check
+    $cleanStatus = strtolower(trim((string)$statusFilter));
+    if ($cleanStatus !== '' && !in_array($cleanStatus, ['all', 'all statuses', 'all_statuses'])) {
+        if (Schema::hasColumn('service_records', 'status')) {
+            $query->whereRaw('LOWER(status) = ?', [$cleanStatus]);
         }
+    } else {
+        $statusFilter = 'All Statuses';
+    }
 
-        // 1. Status Filter Check
-        $cleanStatus = strtolower(trim((string)$statusFilter));
-        if ($cleanStatus !== '' && $cleanStatus !== 'all' && $cleanStatus !== 'all statuses' && $cleanStatus !== 'all_statuses') {
-            if (Schema::hasColumn('service_records', 'status')) {
-                $query->where('status', $statusFilter);
-            }
-        } else {
-            $statusFilter = 'All Statuses';
+    $periodLabel = "All Time";
+
+    // Date column to check (Prefer updated_at for completed transactions, fallback to created_at)
+    $dateColumn = Schema::hasColumn('service_records', 'updated_at') ? 'updated_at' : 'created_at';
+
+    // 2. Flexible Date / Timeframe Filtering
+    $startDateInput = $request->input('custom_start', $request->input('start_date', $request->input('date_from', $request->input('date'))));
+    $endDateInput   = $request->input('custom_end', $request->input('end_date', $request->input('date_to')));
+
+    if ($timeframe === 'weekly') {
+        $startDate = $startDateInput ? Carbon::parse($startDateInput)->startOfDay() : Carbon::now()->startOfWeek();
+        $endDate   = $endDateInput ? Carbon::parse($endDateInput)->endOfDay() : $startDate->copy()->endOfWeek();
+        $query->whereBetween($dateColumn, [$startDate, $endDate]);
+        $periodLabel = "Weekly Period: " . $startDate->format('M d, Y') . ' - ' . $endDate->format('M d, Y');
+    } elseif ($timeframe === 'monthly' || ($timeframe === '' && $request->filled('month_year'))) {
+        $monthYear = $request->input('month_year', date('Y-m'));
+        $date = Carbon::parse($monthYear . '-01');
+        $query->whereYear($dateColumn, $date->year)
+              ->whereMonth($dateColumn, $date->month);
+        $periodLabel = "Monthly Period: " . $date->format('F Y');
+    } elseif ($timeframe === 'yearly' || ($timeframe === '' && $request->filled('year'))) {
+        $year = $request->input('year', date('Y'));
+        $query->whereYear($dateColumn, $year);
+        $periodLabel = "Annual Period: Year " . $year;
+    } elseif ($timeframe === 'custom' || ($startDateInput && $endDateInput)) {
+        if ($startDateInput && $endDateInput) {
+            $sDate = Carbon::parse($startDateInput)->startOfDay();
+            $eDate = Carbon::parse($endDateInput)->endOfDay();
+            $query->whereBetween($dateColumn, [$sDate, $eDate]);
+            $periodLabel = "Custom Range: " . $sDate->format('M d, Y') . " to " . $eDate->format('M d, Y');
+        } elseif ($startDateInput) {
+            $sDate = Carbon::parse($startDateInput)->startOfDay();
+            $eDate = Carbon::parse($startDateInput)->endOfDay();
+            $query->whereBetween($dateColumn, [$sDate, $eDate]);
+            $periodLabel = "Date: " . $sDate->format('M d, Y');
+        } elseif ($endDateInput) {
+            $eDate = Carbon::parse($endDateInput)->endOfDay();
+            $query->where($dateColumn, '<=', $eDate);
+            $periodLabel = "Up to " . $eDate->format('M d, Y');
         }
+    } elseif ($request->filled('date')) {
+        $sDate = Carbon::parse($request->date)->startOfDay();
+        $eDate = Carbon::parse($request->date)->endOfDay();
+        $query->whereBetween($dateColumn, [$sDate, $eDate]);
+        $periodLabel = "Date: " . $sDate->format('M d, Y');
+    }
 
-        $periodLabel = "All Time";
+    // 3. Unified Search Query Filtering
+    $searchTerm = trim((string)($request->input('search', $request->input('search_term'))));
+    if (!empty($searchTerm)) {
+        $query->where(function ($q) use ($searchTerm) {
+            if (Schema::hasColumn('service_records', 'customer_name')) $q->orWhere('customer_name', 'like', "%{$searchTerm}%");
+            if (Schema::hasColumn('service_records', 'tracking_code')) $q->orWhere('tracking_code', 'like', "%{$searchTerm}%");
+            if (Schema::hasColumn('service_records', 'vehicle_type')) $q->orWhere('vehicle_type', 'like', "%{$searchTerm}%");
+            if (Schema::hasColumn('service_records', 'vehicle_brand')) $q->orWhere('vehicle_brand', 'like', "%{$searchTerm}%");
+            if (Schema::hasColumn('service_records', 'brand')) $q->orWhere('brand', 'like', "%{$searchTerm}%");
+            if (Schema::hasColumn('service_records', 'make')) $q->orWhere('make', 'like', "%{$searchTerm}%");
+            if (Schema::hasColumn('service_records', 'vehicle_model')) $q->orWhere('vehicle_model', 'like', "%{$searchTerm}%");
+            if (Schema::hasColumn('service_records', 'plate_number')) $q->orWhere('plate_number', 'like', "%{$searchTerm}%");
+            if (Schema::hasColumn('service_records', 'selected_services')) $q->orWhere('selected_services', 'like', "%{$searchTerm}%");
+            if (Schema::hasColumn('service_records', 'mechanic_assigned')) $q->orWhere('mechanic_assigned', 'like', "%{$searchTerm}%");
+            if (Schema::hasColumn('service_records', 'notes')) $q->orWhere('notes', 'like', "%{$searchTerm}%");
+        });
+    }
 
-        // 2. Flexible Date / Timeframe Filtering
-        $startDateInput = $request->input('custom_start', $request->input('start_date', $request->input('date_from')));
-        $endDateInput   = $request->input('custom_end', $request->input('end_date', $request->input('date_to')));
+    // 4. Input Specific Filters
+    $customer = $request->input('customer', $request->input('customer_name'));
+    if ($customer && Schema::hasColumn('service_records', 'customer_name')) {
+        $query->where('customer_name', 'like', "%" . trim($customer) . "%");
+    }
 
-        if ($timeframe === 'weekly') {
-            $startDate = $startDateInput ? Carbon::parse($startDateInput)->startOfDay() : Carbon::now()->startOfWeek();
-            $endDate   = $startDate->copy()->endOfWeek();
-            $query->whereBetween('created_at', [$startDate, $endDate]);
-            $periodLabel = "Weekly Period: " . $startDate->format('M d, Y') . ' - ' . $endDate->format('M d, Y');
-        } elseif ($timeframe === 'monthly' || ($timeframe === '' && $request->filled('month_year'))) {
-            $monthYear = $request->input('month_year', date('Y-m'));
-            $date = Carbon::parse($monthYear . '-01');
-            $query->whereYear('created_at', $date->year)
-                  ->whereMonth('created_at', $date->month);
-            $periodLabel = "Monthly Period: " . $date->format('F Y');
-        } elseif ($timeframe === 'yearly' || ($timeframe === '' && $request->filled('year'))) {
-            $year = $request->input('year', date('Y'));
-            $query->whereYear('created_at', $year);
-            $periodLabel = "Annual Period: Year " . $year;
-        } elseif ($timeframe === 'custom' || ($startDateInput && $endDateInput)) {
-            if ($startDateInput && $endDateInput) {
-                $sDate = Carbon::parse($startDateInput)->startOfDay();
-                $eDate = Carbon::parse($endDateInput)->endOfDay();
-                $query->whereBetween('created_at', [$sDate, $eDate]);
-                $periodLabel = "Custom Range: " . $sDate->format('M d, Y') . " to " . $eDate->format('M d, Y');
-            } elseif ($startDateInput) {
-                $sDate = Carbon::parse($startDateInput)->startOfDay();
-                $query->where('created_at', '>=', $sDate);
-                $periodLabel = "From " . $sDate->format('M d, Y');
-            } elseif ($endDateInput) {
-                $eDate = Carbon::parse($endDateInput)->endOfDay();
-                $query->where('created_at', '<=', $eDate);
-                $periodLabel = "Up to " . $eDate->format('M d, Y');
-            }
-        } elseif ($timeframe === 'all' || $timeframe === 'all_time' || $timeframe === 'alltime') {
-            $periodLabel = "All Time";
-        }
+    $plate = $request->input('plate_number', $request->input('plate'));
+    if ($plate && Schema::hasColumn('service_records', 'plate_number')) {
+        $query->where('plate_number', 'like', "%" . trim($plate) . "%");
+    }
 
-        // 3. General Search Query
-        if ($request->filled('search')) {
-            $search = trim($request->search);
-            $query->where(function ($q) use ($search) {
-                if (Schema::hasColumn('service_records', 'customer_name')) $q->orWhere('customer_name', 'like', "%{$search}%");
-                if (Schema::hasColumn('service_records', 'tracking_code')) $q->orWhere('tracking_code', 'like', "%{$search}%");
-                if (Schema::hasColumn('service_records', 'vehicle_type')) $q->orWhere('vehicle_type', 'like', "%{$search}%");
-                if (Schema::hasColumn('service_records', 'vehicle_brand')) $q->orWhere('vehicle_brand', 'like', "%{$search}%");
-                if (Schema::hasColumn('service_records', 'brand')) $q->orWhere('brand', 'like', "%{$search}%");
-                if (Schema::hasColumn('service_records', 'make')) $q->orWhere('make', 'like', "%{$search}%");
-                if (Schema::hasColumn('service_records', 'vehicle_model')) $q->orWhere('vehicle_model', 'like', "%{$search}%");
-                if (Schema::hasColumn('service_records', 'plate_number')) $q->orWhere('plate_number', 'like', "%{$search}%");
-                if (Schema::hasColumn('service_records', 'selected_services')) $q->orWhere('selected_services', 'like', "%{$search}%");
-                if (Schema::hasColumn('service_records', 'mechanic_assigned')) $q->orWhere('mechanic_assigned', 'like', "%{$search}%");
-            });
-        }
+    if ($request->filled('vehicle_type')) {
+        $this->applyVehicleTypeFilter($query, $request->vehicle_type);
+    }
 
-        // 4. Input Specific Filters
-        $customer = $request->input('customer', $request->input('customer_name'));
-        if ($customer && Schema::hasColumn('service_records', 'customer_name')) {
-            $query->where('customer_name', 'like', "%" . trim($customer) . "%");
-        }
+    $brand = $request->input('brand', $request->input('vehicle_brand', $request->input('vehicle_make')));
+    if (!empty($brand)) {
+        $this->applyBrandFilter($query, $brand);
+    }
 
-        $plate = $request->input('plate_number', $request->input('plate'));
-        if ($plate && Schema::hasColumn('service_records', 'plate_number')) {
-            $query->where('plate_number', 'like', "%" . trim($plate) . "%");
-        }
+    $service = $request->input('service_type', $request->input('service'));
+    if ($service && Schema::hasColumn('service_records', 'selected_services')) {
+        $query->where('selected_services', 'like', "%" . trim($service) . "%");
+    }
 
-        if ($request->filled('vehicle_type')) {
-            $this->applyVehicleTypeFilter($query, $request->vehicle_type);
-        }
+    $technician = $request->input('technician', $request->input('technician_id', $request->input('mechanic')));
+    if (!empty($technician)) {
+        $this->applyTechnicianFilter($query, $technician);
+    }
 
-        $brand = $request->input('brand', $request->input('vehicle_brand', $request->input('vehicle_make')));
-        if (!empty($brand)) {
-            $this->applyBrandFilter($query, $brand);
-        }
+    $transactions = $query->latest('updated_at')->get();
 
-        $service = $request->input('service_type', $request->input('service'));
-        if ($service && Schema::hasColumn('service_records', 'selected_services')) {
-            $query->where('selected_services', 'like', "%" . trim($service) . "%");
-        }
+    foreach ($transactions as $trx) {
+        $this->repairTransactionPrices($trx);
+    }
 
-        // TECHNICIAN FILTER
-        $technician = $request->input('technician', $request->input('technician_id', $request->input('mechanic')));
-        if (!empty($technician)) {
-            $this->applyTechnicianFilter($query, $technician);
-        }
+    $totalCount   = $transactions->count();
+    $totalRevenue = $transactions->sum('total_cost');
 
-        if ($request->filled('search_term')) {
-            $searchTerm = trim($request->search_term);
-            $query->where(function ($q) use ($searchTerm) {
-                if (Schema::hasColumn('service_records', 'tracking_code')) $q->orWhere('tracking_code', 'like', "%{$searchTerm}%");
-                if (Schema::hasColumn('service_records', 'plate_number')) $q->orWhere('plate_number', 'like', "%{$searchTerm}%");
-                if (Schema::hasColumn('service_records', 'notes')) $q->orWhere('notes', 'like', "%{$searchTerm}%");
-                if (Schema::hasColumn('service_records', 'vehicle_model')) $q->orWhere('vehicle_model', 'like', "%{$searchTerm}%");
-                if (Schema::hasColumn('service_records', 'customer_name')) $q->orWhere('customer_name', 'like', "%{$searchTerm}%");
-            });
-        }
-
-        $transactions = $query->latest()->get();
+    // Build service breakdown structures
+    $serviceBreakdown = [];
+    if (in_array($reportType, ['service', 'service_demand', '3'])) {
+        $title = "Completed Services & Revenue Report";
 
         foreach ($transactions as $trx) {
-            $this->repairTransactionPrices($trx);
-        }
+            $services = is_array($trx->selected_services) 
+                ? $trx->selected_services 
+                : json_decode($trx->selected_services ?? '[]', true);
 
-        $totalCount   = $transactions->count();
-        $totalRevenue = $transactions->sum('total_cost');
+            if (!is_array($services)) {
+                $services = array_filter(explode(', ', (string)($trx->selected_services ?? '')));
+            }
 
-        // Build report-specific data structures
-        $serviceBreakdown = [];
-        if (in_array($reportType, ['service', 'service_demand', '3'])) {
-            $title = "Completed Services & Revenue Report";
+            $pricesMap = is_array($trx->selected_services_prices) 
+                ? $trx->selected_services_prices 
+                : json_decode($trx->selected_services_prices ?? '[]', true);
 
-            foreach ($transactions as $trx) {
-                $services = is_array($trx->selected_services) 
-                    ? $trx->selected_services 
-                    : json_decode($trx->selected_services ?? '[]', true);
+            foreach ($services as $srv) {
+                $sName = is_array($srv) ? ($srv['name'] ?? '') : (string)$srv;
+                $sName = trim($sName);
+                if (empty($sName)) continue;
 
-                if (!is_array($services)) {
-                    $services = array_filter(explode(', ', (string)($trx->selected_services ?? '')));
+                if ($service && stripos($sName, trim($service)) === false) {
+                    continue;
                 }
 
-                $pricesMap = is_array($trx->selected_services_prices) 
-                    ? $trx->selected_services_prices 
-                    : json_decode($trx->selected_services_prices ?? '[]', true);
+                $cost = (float) ($pricesMap[$sName] ?? 0);
 
-                foreach ($services as $srv) {
-                    $sName = is_array($srv) ? ($srv['name'] ?? '') : (string)$srv;
-                    $sName = trim($sName);
-                    if (empty($sName)) continue;
+                if (!isset($serviceBreakdown[$sName])) {
+                    $serviceBreakdown[$sName] = [
+                        'name'            => $sName,
+                        'times_completed' => 0,
+                        'unit_price'      => $cost,
+                        'total_revenue'   => 0.0
+                    ];
+                }
 
-                    if ($service && stripos($sName, trim($service)) === false) {
-                        continue;
-                    }
-
-                    $cost = (float) ($pricesMap[$sName] ?? 0);
-
-                    if (!isset($serviceBreakdown[$sName])) {
-                        $serviceBreakdown[$sName] = [
-                            'name'            => $sName,
-                            'times_completed' => 0,
-                            'unit_price'      => $cost,
-                            'total_revenue'   => 0.0
-                        ];
-                    }
-
-                    $serviceBreakdown[$sName]['times_completed'] += 1;
-                    $serviceBreakdown[$sName]['total_revenue']   += $cost;
-                    if ($cost > 0 && $serviceBreakdown[$sName]['unit_price'] == 0) {
-                        $serviceBreakdown[$sName]['unit_price'] = $cost;
-                    }
+                $serviceBreakdown[$sName]['times_completed'] += 1;
+                $serviceBreakdown[$sName]['total_revenue']   += $cost;
+                if ($cost > 0 && $serviceBreakdown[$sName]['unit_price'] == 0) {
+                    $serviceBreakdown[$sName]['unit_price'] = $cost;
                 }
             }
-        } elseif (in_array($reportType, ['financial', '1'])) {
-            $title = "Revenue & Financial Summary Report";
-        } elseif (in_array($reportType, ['technician', '2'])) {
-            $title = "Technician Workload & Performance Report";
-        } elseif (in_array($reportType, ['vehicle', '6'])) {
-            $title = "Vehicle History Report";
-        } elseif (in_array($reportType, ['customer', '5'])) {
-            $title = "Customer Service History Report";
-        } elseif (in_array($reportType, ['audit', 'queue', 'queue_log', '4'])) {
-            $title = "Service Records & Operational Log Report";
-        } else {
-            $title = strtoupper(str_replace('_', ' ', $reportType)) . " REPORT";
         }
-
-        $availableServices = $this->getAvailableServices();
-        $vehicleTypes      = $this->getVehicleTypes();
-        $vehicleBrands     = $this->getVehicleBrands();
-        $technicians       = $this->getTechnicians();
-        $customers         = $this->getCustomers();
-
-        return [
-            'reportType'       => $reportType,
-            'title'            => $title,
-            'periodLabel'      => $periodLabel,
-            'timeframe'        => $timeframe,
-            'statusFilter'     => $statusFilter,
-            'transactions'     => $transactions,
-            'serviceBreakdown' => $serviceBreakdown,
-            'totalCount'       => $totalCount,
-            'totalRevenue'     => $totalRevenue,
-            'availableServices'=> $availableServices,
-            'vehicleTypes'     => $vehicleTypes,
-            'vehicleBrands'    => $vehicleBrands,
-            'technicians'      => $technicians,
-            'customers'        => $customers,
-            'generatedAt'      => Carbon::now()->format('M d, Y h:i A')
-        ];
+    } elseif (in_array($reportType, ['financial', '1'])) {
+        $title = "Revenue & Financial Summary Report";
+    } elseif (in_array($reportType, ['technician', '2'])) {
+        $title = "Technician Workload & Performance Report";
+    } elseif (in_array($reportType, ['vehicle', '6'])) {
+        $title = "Vehicle History Report";
+    } elseif (in_array($reportType, ['customer', '5'])) {
+        $title = "Customer Service History Report";
+    } elseif (in_array($reportType, ['audit', 'queue', 'queue_log', '4'])) {
+        $title = "Service Records & Operational Log Report";
+    } else {
+        $title = strtoupper(str_replace('_', ' ', $reportType)) . " REPORT";
     }
+
+    $availableServices = $this->getAvailableServices();
+    $vehicleTypes      = $this->getVehicleTypes();
+    $vehicleBrands     = $this->getVehicleBrands();
+    $technicians       = $this->getTechnicians();
+    $customers         = $this->getCustomers();
+
+    return [
+        'reportType'       => $reportType,
+        'title'            => $title,
+        'periodLabel'      => $periodLabel,
+        'timeframe'        => $timeframe,
+        'statusFilter'     => $statusFilter,
+        'transactions'     => $transactions,
+        'serviceBreakdown' => $serviceBreakdown,
+        'totalCount'       => $totalCount,
+        'totalRevenue'     => $totalRevenue,
+        'availableServices'=> $availableServices,
+        'vehicleTypes'     => $vehicleTypes,
+        'vehicleBrands'    => $vehicleBrands,
+        'technicians'      => $technicians,
+        'customers'        => $customers,
+        'generatedAt'      => Carbon::now()->format('M d, Y h:i A')
+    ];
+}
 
     /**
      * Helper to apply brand filter dynamically across multiple schema columns and models
