@@ -346,6 +346,7 @@
             background-color: #ffffff !important;
             border: 1px solid rgba(0, 0, 0, 0.1) !important;
             color: #0f172a !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15) !important;
         }
 
         html.light-theme .modal-content-dark .modal-header,
@@ -581,11 +582,17 @@
             color: #e2e8f0;
         }
 
-        /* Dark Modals Styling */
+        /* Modal Backdrop & Clean Dark Shadow Overrides */
+        .modal-backdrop {
+            background-color: #000000 !important;
+            opacity: 0.6 !important;
+        }
+
         .modal-content-dark {
             background-color: var(--speed-card-bg) !important;
             border: 1px solid var(--speed-card-border) !important;
             color: #e2e8f0 !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
         }
 
         .modal-content-dark .modal-header {
@@ -683,9 +690,10 @@
         .letter-spacing-otp {
             letter-spacing: 0.5rem;
         }
-           body {
-    zoom: 80%; /* Adjusts the render scale across modern browsers */
-  }
+
+        body {
+            zoom: 80%; /* Adjusts the render scale across modern browsers */
+        }
     </style>
 </head>
 <body>
@@ -962,7 +970,7 @@
                                 <!-- EDIT SERVICE MODAL -->
                                 <div class="modal fade" id="editServiceModal{{ $service->id }}" tabindex="-1">
                                     <div class="modal-dialog modal-lg modal-dialog-centered">
-                                        <div class="modal-content modal-content-dark rounded-4 shadow">
+                                        <div class="modal-content modal-content-dark rounded-4">
                                             <form action="{{ route('admin.manage-services.update-service', $service->id) }}" method="POST">
                                                 @csrf
                                                 @method('PUT')
@@ -1258,7 +1266,7 @@
                                                         <!-- EDIT STAFF MODAL -->
                                                         <div class="modal fade" id="editStaffModal{{ $staff->id }}" tabindex="-1">
                                                             <div class="modal-dialog modal-dialog-centered">
-                                                                <div class="modal-content modal-content-dark rounded-4 shadow">
+                                                                <div class="modal-content modal-content-dark rounded-4">
                                                                     <form action="{{ route('admin.manage-services.update-staff', $staff->id) }}" method="POST">
                                                                         @csrf
                                                                         @method('PUT')
@@ -1313,7 +1321,7 @@
     <!-- ADD SERVICE MODAL -->
     <div class="modal fade" id="addServiceModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content modal-content-dark rounded-4 shadow">
+            <div class="modal-content modal-content-dark rounded-4">
                 <form action="{{ route('admin.manage-services.store-service') }}" method="POST">
                     @csrf
                     <div class="modal-header">
@@ -1396,18 +1404,15 @@
         </div>
     </div>
 
-    <!-- CREATE ADMIN MODAL -->
+    <!-- CREATE STAFF / ADMIN MODAL -->
     <div class="modal fade" id="createStaffModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modal-content-dark rounded-4 shadow">
+            <div class="modal-content modal-content-dark rounded-4">
                 <form action="{{ route('admin.manage-services.store-staff') }}" method="POST">
                     @csrf
-                    
-                    <!-- FORCE ROLE TO ADMIN -->
-                    <input type="hidden" name="role" value="admin">
 
                     <div class="modal-header">
-                        <h5 class="modal-title fw-bold text-white"><i class="bi bi-person-plus text-speed-pink me-2"></i>Add Admin Account</h5>
+                        <h5 class="modal-title fw-bold text-white"><i class="bi bi-person-plus text-speed-pink me-2"></i>Add Staff / Admin Account</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body p-4">
@@ -1418,6 +1423,14 @@
                         <div class="mb-3">
                             <label class="form-label small fw-semibold text-secondary">Username <span class="text-speed-pink">*</span></label>
                             <input type="text" name="username" class="form-control form-control-dark" required>
+                        </div>
+                        <!-- ROLE SELECTION DROPDOWN -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">Role <span class="text-speed-pink">*</span></label>
+                            <select name="role" class="form-select form-select-dark" required>
+                                <option value="admin" selected>Admin</option>
+                                <option value="super_admin">Super Admin</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-semibold text-secondary">Email Address <span class="text-speed-pink">*</span></label>
@@ -1434,7 +1447,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-dark-cancel rounded-3" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-speed-gradient rounded-3 px-4 fw-semibold">Create Admin Account</button>
+                        <button type="submit" class="btn btn-speed-gradient rounded-3 px-4 fw-semibold">Create Account</button>
                     </div>
                 </form>
             </div>
@@ -1444,7 +1457,7 @@
     <!-- GMAIL OTP PASSWORD RESET MODAL -->
     <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modal-content-dark rounded-4 shadow">
+            <div class="modal-content modal-content-dark rounded-4">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2">
                         <i class="bi bi-shield-lock-fill text-speed-pink"></i> Edit Admin Password

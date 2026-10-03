@@ -204,7 +204,7 @@ class ManageServiceController extends Controller
             'email'          => 'required|email|max:255|unique:users,email',
             'contact_number' => 'required|string|max:50',
             'password'       => 'required|string|min:8',
-            'role'           => 'nullable|string|in:admin,staff',
+            'role'           => 'nullable|string|in:admin,staff,super_admin',
         ]);
 
         $role = $request->input('role', 'admin');
