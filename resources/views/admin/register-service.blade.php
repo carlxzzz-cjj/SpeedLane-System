@@ -508,10 +508,16 @@
 
         html.light-theme .btn-close-white {
             filter: invert(1) grayscale(100%) brightness(50%);
+       }
+        body {
+            zoom: 80%;
         }
-           body {
-    zoom: 80%; /* Adjusts the render scale across modern browsers */
-  }
+
+        /* FIX: Remove black/grayish modal backdrop shadow */
+        .modal-backdrop {
+            background-color: transparent !important;
+            opacity: 0 !important;
+        }
     </style>
 </head>
 
@@ -532,16 +538,21 @@
                 </div>
             </a>
 
-            <!-- Right Nav Alignment -->
-            <div class="d-flex align-items-center gap-3 ms-auto">
-                @if(auth()->check() && auth()->user()->isSuperAdmin())
-                    <span class="badge badge-super-admin px-3 py-2 rounded-pill">
-                        <i class="bi bi-shield-check me-1"></i> Super Admin
-                    </span>
-                @else
-                    <span class="badge badge-admin px-3 py-2 rounded-pill">
-                        <i class="bi bi-person-badge me-1"></i> Admin
-                    </span>
+               <div class="d-flex align-items-center gap-3 ms-auto">
+                @if(auth()->check())
+                    @if(method_exists(auth()->user(), 'isSuperAdmin') && auth()->user()->isSuperAdmin())
+                        <span class="badge badge-super-admin px-3 py-2 rounded-pill d-flex align-items-center gap-1">
+                            <i class="bi bi-shield-check me-1"></i>
+                            <span>{{ auth()->user()->name }}</span>
+                            <span class="ms-1" style="font-size: 0.85em;">(Super Admin)</span>
+                        </span>
+                    @else
+                        <span class="badge badge-admin px-3 py-2 rounded-pill d-flex align-items-center gap-1">
+                            <i class="bi bi-person-badge me-1"></i>
+                            <span>{{ auth()->user()->name }}</span>
+                            <span class="ms-1" style="font-size: 0.85em;">(Admin)</span>
+                        </span>
+                    @endif
                 @endif
 
                 <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
@@ -602,6 +613,13 @@
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4 bg-success bg-opacity-20 text-white border-success" role="alert">
                         <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4 bg-danger bg-opacity-20 text-white border-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
@@ -1010,7 +1028,7 @@
         const icon = document.getElementById('theme-toggle-icon');
         if (icon) {
             if (isLight) {
-                icon.className = 'bi bi-moon-stars-fill text-primary';
+                icon.className = 'bi bi-moon-stars-fill text-warning';
             } else {
                 icon.className = 'bi bi-sun-fill text-warning';
             }
@@ -1211,6 +1229,7 @@
         const generateCodeBtn = document.getElementById('generateCodeBtn');
         const trackingCodeInput = document.getElementById('trackingCodeInput');
         const previewCode = document.getElementById('previewCode');
+        const serviceRegistrationForm = document.getElementById('serviceRegistrationForm');
 
         // --- VALIDATE THAT VEHICLE & SERVICE INFORMATION IS COMPLETED ---
         function validateVehicleServiceInfo() {
@@ -1284,6 +1303,27 @@
             return `SPDL${year}-${nameLetters}${plateDigits}${randomLetter}`;
         }
 
+        // --- HELPER TO AUTO-SELECT VEHICLE TYPE DROPDOWN FROM MODEL DATA ---
+        function setVehicleTypeSelect(typeSelect, targetType) {
+            if (!typeSelect || !targetType) return;
+            const targetLower = targetType.trim().toLowerCase();
+            let matchedValue = '';
+
+            for (let opt of typeSelect.options) {
+                if (!opt.value) continue;
+                const optValLower = opt.value.trim().toLowerCase();
+                if (optValLower === targetLower || targetLower.includes(optValLower) || optValLower.includes(targetLower)) {
+                    matchedValue = opt.value;
+                    break;
+                }
+            }
+
+            if (matchedValue) {
+                typeSelect.value = matchedValue;
+                typeSelect.dispatchEvent(new Event('change'));
+            }
+        }
+
         // --- FILTER SERVICES AND OPTIONS BY VEHICLE TYPE AND SEARCH QUERY ---
         function filterOptionsByVehicleType(vehicleCard) {
             const selectedType = (vehicleCard.querySelector('.type-select')?.value || '').toLowerCase().trim();
@@ -1327,10 +1367,13 @@
                     const optionText = (optionItem.textContent || '').toLowerCase();
                     const input = optionItem.querySelector('.service-option-input');
 
+                    // Option matches directly if vehicle type is 'all' OR matches selectedType specifically
                     const isOptionTypeMatch = optionType === 'all' || 
+                                              optionType === '' || 
                                               optionType === selectedType || 
-                                              serviceType === 'all' || 
-                                              serviceType === selectedType;
+                                              optionType.includes(selectedType) || 
+                                              selectedType.includes(optionType) ||
+                                              optionText.includes(selectedType);
 
                     const isOptionSearchMatch = !searchQuery || optionText.includes(searchQuery) || serviceName.includes(searchQuery);
 
@@ -1340,13 +1383,18 @@
                         if (optionText.includes(searchQuery)) searchMatchedOptionsCount++;
                     } else {
                         optionItem.style.setProperty('display', 'none', 'important');
-                        if (input && input.checked && !isOptionTypeMatch) {
+                        if (input && input.checked) {
                             input.checked = false;
                         }
                     }
                 });
 
-                const isServiceTypeMatch = serviceType === 'all' || serviceType === selectedType;
+                const isServiceTypeMatch = serviceType === 'all' || 
+                                             serviceType === '' || 
+                                             serviceType === selectedType || 
+                                             serviceType.includes(selectedType) || 
+                                             selectedType.includes(serviceType);
+
                 const isServiceSearchMatch = !searchQuery || 
                                              serviceName.includes(searchQuery) || 
                                              serviceDesc.includes(searchQuery) || 
@@ -1394,11 +1442,11 @@
                         if (checkedRadio) {
                             itemPrice = parseFloat(checkedRadio.getAttribute('data-price')) || 0;
                         } else {
-                            const firstVisibleRadio = Array.from(serviceCard.querySelectorAll('.service-option-input'))
-                                .find(input => input.closest('.subservice-option-item').style.display !== 'none');
-                            if (firstVisibleRadio) {
-                                firstVisibleRadio.checked = true;
-                                itemPrice = parseFloat(firstVisibleRadio.getAttribute('data-price')) || 0;
+                            const visibleRadios = Array.from(serviceCard.querySelectorAll('.service-option-input'))
+                                .filter(input => input.closest('.subservice-option-item').style.display !== 'none');
+                            if (visibleRadios.length > 0) {
+                                visibleRadios[0].checked = true;
+                                itemPrice = parseFloat(visibleRadios[0].getAttribute('data-price')) || 0;
                             } else {
                                 itemPrice = flatPrice;
                             }
@@ -1607,6 +1655,28 @@
             });
         }
 
+        // --- FORM SUBMIT INTERCEPTOR TO VALIDATE AND ENABLE DISABLED FIELDS ---
+        if (serviceRegistrationForm) {
+            serviceRegistrationForm.addEventListener('submit', function(e) {
+                if (!validateVehicleServiceInfo()) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Auto-generate tracking code if empty
+                if (trackingCodeInput && !trackingCodeInput.value.trim()) {
+                    const newCode = generateTrackingCode();
+                    trackingCodeInput.value = newCode;
+                    if (previewCode) previewCode.textContent = newCode;
+                }
+
+                // Enable all disabled selects inside vehicle cards so HTML posts their values
+                document.querySelectorAll('.vehicle-card select:disabled').forEach(s => {
+                    s.disabled = false;
+                });
+            });
+        }
+
         // --- UPDATE CARD HEADER DISPLAY ---
         function updateVehicleCardHeader(card) {
             const plate = (card.querySelector('.plate-input')?.value || '').trim().toUpperCase();
@@ -1715,8 +1785,7 @@
                     const autoType = selectedOpt ? selectedOpt.getAttribute('data-type') : null;
 
                     if (autoType && typeSelect) {
-                        typeSelect.value = autoType;
-                        typeSelect.dispatchEvent(new Event('change'));
+                        setVehicleTypeSelect(typeSelect, autoType);
                     }
 
                     // Dynamically update Year dropdown based on model range from vehicle_models schema
@@ -1764,15 +1833,30 @@
                 });
             }
 
+            // Sync parent service checkbox when toggling checkbox directly
             card.querySelectorAll('.service-checkbox').forEach(cb => {
                 cb.addEventListener('change', function() {
+                    const parentServiceCard = cb.closest('.service-card-item');
+                    if (parentServiceCard && !cb.checked) {
+                        parentServiceCard.querySelectorAll('.service-option-input').forEach(opt => {
+                            opt.checked = false;
+                        });
+                    }
                     calculateVehicleTotal(card);
                     calculateGrandTotal();
                 });
             });
 
+            // Auto-check parent service checkbox when selecting a subservice option
             card.querySelectorAll('.service-option-input').forEach(opt => {
                 opt.addEventListener('change', function() {
+                    const parentServiceCard = opt.closest('.service-card-item');
+                    if (parentServiceCard) {
+                        const parentCb = parentServiceCard.querySelector('.service-checkbox');
+                        if (parentCb && !parentCb.checked) {
+                            parentCb.checked = true;
+                        }
+                    }
                     calculateVehicleTotal(card);
                     calculateGrandTotal();
                 });

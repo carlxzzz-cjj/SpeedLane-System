@@ -366,12 +366,14 @@
             opacity: 0.85;
         }
 
+        /* Mobile Hamburger Toggle Styling (Brand Pink for High Visibility in Light & Dark Mode) */
         .navbar-toggler {
-            border: 1px solid var(--speed-card-border);
+            border: 1px solid var(--speed-pink);
             padding: 8px 12px;
         }
         .navbar-toggler-icon {
-            filter: invert(1);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23f42582' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2.5' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            filter: none;
         }
 
 
@@ -549,11 +551,11 @@
         }
 
         html.light-theme .navbar-toggler {
-            border-color: rgba(0, 0, 0, 0.2);
+            border-color: var(--speed-pink);
         }
 
         html.light-theme .navbar-toggler-icon {
-            filter: invert(0);
+            filter: none;
         }
 
   body {
@@ -676,7 +678,7 @@
                                        name="tracking_code" 
                                        class="form-control tracking-input text-uppercase rounded-2" 
                                        id="trackingCode" 
-                                       placeholder="e.g. SL-8921" 
+                                       placeholder="e.g. SPDL26-MI01W" 
                                        value="{{ old('tracking_code', request('tracking_code')) }}" 
                                        autocomplete="off" 
                                        required>

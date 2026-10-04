@@ -113,6 +113,14 @@
             letter-spacing: 0.3px;
         }
 
+        /* Progress Note Required Badge Styling */
+        .note-required-badge {
+            background-color: rgba(220, 53, 69, 0.2) !important;
+            color: #ff8a95 !important;
+            border: 1px solid rgba(220, 53, 69, 0.5) !important;
+            font-weight: 600;
+        }
+
         /* Top Navigation Header */
         .navbar-speed {
             background: rgba(7, 9, 14, 0.95);
@@ -339,6 +347,13 @@
             font-weight: 700 !important;
         }
 
+        html.light-theme .note-required-badge {
+            background-color: #fee2e2 !important;
+            color: #991b1b !important;
+            border: 1px solid #fca5a5 !important;
+            font-weight: 700 !important;
+        }
+
         html.light-theme .badge-plate {
             background-color: #0f172a !important;
             color: #ffffff !important;
@@ -527,10 +542,16 @@
 
         html.light-theme .btn-close-white {
             filter: invert(1) grayscale(100%) brightness(50%);
+      }
+        body {
+            zoom: 80%;
         }
-           body {
-    zoom: 80%; /* Adjusts the render scale across modern browsers */
-  }
+
+        /* FIX: Remove black/grayish modal backdrop shadow */
+        .modal-backdrop {
+            background-color: transparent !important;
+            opacity: 0 !important;
+        }
     </style>
 </head>
 <body>
@@ -552,16 +573,21 @@
                 </div>
             </a>
 
-            <!-- Right Nav Alignment -->
-            <div class="d-flex align-items-center gap-3 ms-auto">
-                @if(auth()->check() && auth()->user()->isSuperAdmin())
-                    <span class="badge badge-super-admin px-3 py-2 rounded-pill">
-                        <i class="bi bi-shield-check me-1"></i> Super Admin
-                    </span>
-                @else
-                    <span class="badge badge-admin px-3 py-2 rounded-pill">
-                        <i class="bi bi-person-badge me-1"></i> Admin
-                    </span>
+            <   <div class="d-flex align-items-center gap-3 ms-auto">
+                @if(auth()->check())
+                    @if(method_exists(auth()->user(), 'isSuperAdmin') && auth()->user()->isSuperAdmin())
+                        <span class="badge badge-super-admin px-3 py-2 rounded-pill d-flex align-items-center gap-1">
+                            <i class="bi bi-shield-check me-1"></i>
+                            <span>{{ auth()->user()->name }}</span>
+                            <span class="ms-1" style="font-size: 0.85em;">(Super Admin)</span>
+                        </span>
+                    @else
+                        <span class="badge badge-admin px-3 py-2 rounded-pill d-flex align-items-center gap-1">
+                            <i class="bi bi-person-badge me-1"></i>
+                            <span>{{ auth()->user()->name }}</span>
+                            <span class="ms-1" style="font-size: 0.85em;">(Admin)</span>
+                        </span>
+                    @endif
                 @endif
 
                 <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
@@ -1183,7 +1209,7 @@
                                                                         <div>
                                                                             <label class="form-label small text-secondary mb-1 d-flex align-items-center gap-1">
                                                                                 <span>Progress Note / Remarks</span>
-                                                                                <span class="note-required-badge badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-50 d-none" style="font-size: 0.68rem;">
+                                                                                <span class="note-required-badge badge d-none" style="font-size: 0.68rem;">
                                                                                     Required (Cost Changed)
                                                                                 </span>
                                                                             </label>

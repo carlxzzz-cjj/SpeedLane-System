@@ -94,6 +94,12 @@
             border-right: none !important;
         }
 
+        html.light-theme .input-group-text-dark-right {
+            background-color: #e2e8f0 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-left: none !important;
+        }
+
         html.light-theme .modal-content-dark {
             background-color: #ffffff !important;
             border: 1px solid rgba(0, 0, 0, 0.1) !important;
@@ -246,6 +252,13 @@
             border-right: none !important;
         }
 
+        .input-group-text-dark-right {
+            background-color: #090c14 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-left: none !important;
+            cursor: pointer;
+        }
+
         .input-group .form-control-dark {
             border-left: none !important;
         }
@@ -310,10 +323,15 @@
             color: #d946ef !important;
         }
 
-  body {
-    zoom: 80%; /* Adjusts the render scale across modern browsers */
-  }
-<
+         body {
+            zoom: 80%;
+        }
+
+        /* FIX: Remove black/grayish modal backdrop shadow */
+        .modal-backdrop {
+            background-color: transparent !important;
+            opacity: 0 !important;
+        }
     </style>
 </head>
 <body>
@@ -404,7 +422,7 @@
                             @enderror
                         </div>
 
-                        <!-- Password Field with Forgot Password Link -->
+                        <!-- Password Field with Forgot Password Link & See Password Toggle -->
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <label class="form-label small fw-semibold text-secondary mb-0">Password</label>
@@ -415,10 +433,15 @@
                             <div class="input-group">
                                 <span class="input-group-text input-group-text-dark"><i class="bi bi-lock text-speed-pink"></i></span>
                                 <input type="password" 
+                                       id="loginPassword"
                                        name="password" 
                                        class="form-control form-control-dark @error('password') is-invalid @enderror" 
                                        placeholder="Enter password" 
+                                       style="border-right: none !important;"
                                        required>
+                                <button class="btn input-group-text-dark-right text-secondary" type="button" id="togglePassword" title="Toggle Password Visibility">
+                                    <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
+                                </button>
                             </div>
 
                             @error('password')
@@ -495,7 +518,10 @@
                             <label class="form-label small fw-semibold text-secondary">New Password <span class="text-speed-pink">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text input-group-text-dark"><i class="bi bi-lock text-speed-pink"></i></span>
-                                <input type="password" id="newPassword" name="password" class="form-control form-control-dark" placeholder="Minimum 8 characters" minlength="8" required>
+                                <input type="password" id="newPassword" name="password" class="form-control form-control-dark" placeholder="Minimum 8 characters" minlength="8" style="border-right: none !important;" required>
+                                <button class="btn input-group-text-dark-right text-secondary" type="button" id="toggleNewPassword" title="Toggle Password Visibility">
+                                    <i class="bi bi-eye-slash" id="toggleNewPasswordIcon"></i>
+                                </button>
                             </div>
                         </div>
 
@@ -504,7 +530,10 @@
                             <label class="form-label small fw-semibold text-secondary">Confirm New Password <span class="text-speed-pink">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text input-group-text-dark"><i class="bi bi-lock-fill text-speed-pink"></i></span>
-                                <input type="password" id="newPasswordConfirmation" name="password_confirmation" class="form-control form-control-dark" placeholder="Re-enter new password" required>
+                                <input type="password" id="newPasswordConfirmation" name="password_confirmation" class="form-control form-control-dark" placeholder="Re-enter new password" style="border-right: none !important;" required>
+                                <button class="btn input-group-text-dark-right text-secondary" type="button" id="toggleConfirmPassword" title="Toggle Password Visibility">
+                                    <i class="bi bi-eye-slash" id="toggleConfirmPasswordIcon"></i>
+                                </button>
                             </div>
                         </div>
 
@@ -530,6 +559,26 @@
     <!-- Modal Workflow JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Password Visibility Toggle Function
+            function setupPasswordToggle(btnId, inputId, iconId) {
+                const btn = document.getElementById(btnId);
+                const input = document.getElementById(inputId);
+                const icon = document.getElementById(iconId);
+
+                if (btn && input && icon) {
+                    btn.addEventListener('click', function () {
+                        const isPassword = input.getAttribute('type') === 'password';
+                        input.setAttribute('type', isPassword ? 'text' : 'password');
+                        icon.classList.toggle('bi-eye', isPassword);
+                        icon.classList.toggle('bi-eye-slash', !isPassword);
+                    });
+                }
+            }
+
+            setupPasswordToggle('togglePassword', 'loginPassword', 'togglePasswordIcon');
+            setupPasswordToggle('toggleNewPassword', 'newPassword', 'toggleNewPasswordIcon');
+            setupPasswordToggle('toggleConfirmPassword', 'newPasswordConfirmation', 'toggleConfirmPasswordIcon');
+
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             
             const loginUsernameInput = document.getElementById('loginUsername');

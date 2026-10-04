@@ -39,34 +39,34 @@ class ServiceController extends Controller
     /**
      * Display service registration form.
      */
-   public function create()
-{
-    // Fetch active services eager-loading their options
-    $services = Service::with('options')
-        ->where('is_active', 1)
-        ->get();
+    public function create()
+    {
+        // Fetch active services eager-loading their options
+        $services = Service::with('options')
+            ->where('is_active', 1)
+            ->get();
 
-    // Fetch only active technicians for assignment
-    $technicians = Technician::where('is_active', 1)->get();
+        // Fetch only active technicians for assignment
+        $technicians = Technician::where('is_active', 1)->get();
 
-    // Fetch vehicle models and include both name and type
-    $vehicleModels = VehicleModel::all()
-        ->groupBy(function ($model) {
-            return $model->brand ?? $model->make ?? 'Other';
-        }) 
-        ->map(function ($models) {
-            return $models->map(function ($model) {
-                return [
-                    'name' => $model->name,
-                    'type' => $model->type ?? $model->vehicle_type ?? '',
-                    'year_start' => $model->year_start ?? $model->start_year ?? 1990,
-                    'year_end'   => $model->year_end ?? $model->end_year ?? date('Y'),
-                ];
-            })->values();
-        });
+        // Fetch vehicle models and include both name and type
+        $vehicleModels = VehicleModel::all()
+            ->groupBy(function ($model) {
+                return $model->brand ?? $model->make ?? 'Other';
+            }) 
+            ->map(function ($models) {
+                return $models->map(function ($model) {
+                    return [
+                        'name' => $model->name,
+                        'type' => $model->type ?? $model->vehicle_type ?? '',
+                        'year_start' => $model->year_start ?? $model->start_year ?? 1990,
+                        'year_end'   => $model->year_end ?? $model->end_year ?? date('Y'),
+                    ];
+                })->values();
+            });
 
-    return view('admin.register-service', compact('services', 'technicians', 'vehicleModels'));
-}
+        return view('admin.register-service', compact('services', 'technicians', 'vehicleModels'));
+    }
 
     /**
      * Store service registration record.
@@ -86,6 +86,7 @@ class ServiceController extends Controller
             'vehicles.*.vehicle_type'           => 'nullable|string|max:255',
             'vehicles.*.vehicle_year'           => 'nullable|string|max:10',
             'vehicles.*.mechanic_assigned'      => 'required|string|max:255',
+            'vehicles.*.technician_id'          => 'nullable|integer',
             'vehicles.*.services'               => 'nullable|array',
             'vehicles.*.price_adjustment_note' => 'nullable|string',
             'vehicles.*.total_cost'             => 'nullable|numeric',
@@ -176,6 +177,32 @@ class ServiceController extends Controller
                 $brandName = $vehicleData['brand'] ?? $vehicleData['vehicle_make'] ?? '';
 
                 $record = new ServiceRecord();
+
+                // 1. Assign currently logged-in Admin / Super Admin ID
+                $record->user_id = auth()->id();
+
+                // 2. Resolve and assign Technician ID
+                $mechanicInput = $vehicleData['mechanic_assigned'] ?? null;
+                $techIdInput   = $vehicleData['technician_id'] ?? null;
+
+                if (!empty($techIdInput)) {
+                    $record->technician_id = $techIdInput;
+                    $tech = Technician::find($techIdInput);
+                    $record->mechanic_assigned = $tech ? $tech->name : $mechanicInput;
+                } elseif (!empty($mechanicInput)) {
+                    if (is_numeric($mechanicInput)) {
+                        $record->technician_id = (int)$mechanicInput;
+                        $tech = Technician::find($mechanicInput);
+                        $record->mechanic_assigned = $tech ? $tech->name : "Technician #{$mechanicInput}";
+                    } else {
+                        $record->mechanic_assigned = $mechanicInput;
+                        $tech = Technician::where('name', $mechanicInput)->first();
+                        if ($tech) {
+                            $record->technician_id = $tech->id;
+                        }
+                    }
+                }
+
                 $record->tracking_code            = $trackingCode;
                 $record->customer_name            = $validated['customer_name'];
                 $record->contact_number           = $contactPhone;
@@ -186,7 +213,6 @@ class ServiceController extends Controller
                 $record->plate_number             = strtoupper($vehicleData['plate_number']);
                 $record->price_adjustment_note    = $vehicleData['price_adjustment_note'] ?? null;
                 $record->total_cost               = $finalVehicleCost;
-                $record->mechanic_assigned        = $vehicleData['mechanic_assigned'];
                 $record->status                   = 'Pending Queue';
 
                 if ($record->hasCast('selected_services')) {

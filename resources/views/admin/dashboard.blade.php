@@ -405,8 +405,14 @@
             font-size: 0.75rem;
         }
         body {
-    zoom: 80%; /* Adjusts the render scale across modern browsers */
-  }
+            zoom: 80%;
+        }
+
+        /* FIX: Remove black/grayish modal backdrop shadow */
+        .modal-backdrop {
+            background-color: transparent !important;
+            opacity: 0 !important;
+        }
     </style>
 </head>
 <body>
@@ -428,18 +434,21 @@
                 </div>
             </a>
 
-            <!-- Right Nav Alignment -->
-            <div class="d-flex align-items-center gap-3 ms-auto">
-                
-                {{-- ROLE BADGE --}}
-                @if(auth()->check() && auth()->user()->isSuperAdmin())
-                    <span class="badge badge-super-admin px-3 py-2 rounded-pill">
-                        <i class="bi bi-shield-check me-1"></i> Super Admin
-                    </span>
-                @else
-                    <span class="badge badge-admin px-3 py-2 rounded-pill">
-                        <i class="bi bi-person-badge me-1"></i> Admin
-                    </span>
+             <div class="d-flex align-items-center gap-3 ms-auto">
+                @if(auth()->check())
+                    @if(method_exists(auth()->user(), 'isSuperAdmin') && auth()->user()->isSuperAdmin())
+                        <span class="badge badge-super-admin px-3 py-2 rounded-pill d-flex align-items-center gap-1">
+                            <i class="bi bi-shield-check me-1"></i>
+                            <span>{{ auth()->user()->name }}</span>
+                            <span class="ms-1" style="font-size: 0.85em;">(Super Admin)</span>
+                        </span>
+                    @else
+                        <span class="badge badge-admin px-3 py-2 rounded-pill d-flex align-items-center gap-1">
+                            <i class="bi bi-person-badge me-1"></i>
+                            <span>{{ auth()->user()->name }}</span>
+                            <span class="ms-1" style="font-size: 0.85em;">(Admin)</span>
+                        </span>
+                    @endif
                 @endif
 
                 <!-- Logout Action Form -->

@@ -73,6 +73,37 @@
             box-shadow: 0 0 10px rgba(0, 162, 255, 0.1);
         }
 
+        /* High-Contrast "PAID" Badges for Dark & Light Mode */
+        .badge-paid-view {
+            background-color: rgba(34, 197, 94, 0.2) !important;
+            color: #4ade80 !important;
+            border: 1px solid rgba(34, 197, 94, 0.4) !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-paid-pdf {
+            background-color: #15803d !important;
+            color: #ffffff !important;
+            border: 1px solid #166534 !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.5px;
+        }
+
+        html.light-theme .badge-paid-view {
+            background-color: #dcfce7 !important;
+            color: #15803d !important;
+            border: 1px solid #86efac !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-theme .badge-paid-pdf {
+            background-color: #15803d !important;
+            color: #ffffff !important;
+            border: 1px solid #166534 !important;
+            font-weight: 700 !important;
+        }
+
         .navbar-speed {
             background: rgba(7, 9, 14, 0.95);
             border-bottom: 1px solid var(--speed-card-border);
@@ -526,9 +557,15 @@
             .no-print, .modal-header, .modal-footer, .btn-close, .navbar, aside, main > *:not(.modal) { 
                 display: none !important; 
             }
-        }
+       }
         body {
             zoom: 80%;
+        }
+
+        /* FIX: Remove black/grayish modal backdrop shadow */
+        .modal-backdrop {
+            background-color: transparent !important;
+            opacity: 0 !important;
         }
     </style>
 </head>
@@ -672,7 +709,7 @@
 
                             <div class="col-md-2">
                                 <label class="form-label small fw-semibold text-light opacity-75 mb-1">Vehicle Type</label>
-                                <select name="vehicle_type" class="form-select form-select-sm form-select-dark">
+                                <select name="vehicle_type" class="form-select form-select-sm form-select-dark" onchange="this.form.submit()">
                                     <option value="">All Vehicles</option>
                                     @php
                                         $vTypesList = (isset($vehicleTypes) && count($vehicleTypes) > 0) 
@@ -690,7 +727,7 @@
 
                             <div class="col-md-2">
                                 <label class="form-label small fw-semibold text-light opacity-75 mb-1">Vehicle Brand</label>
-                                <select name="brand" class="form-select form-select-sm form-select-dark">
+                                <select name="brand" class="form-select form-select-sm form-select-dark" onchange="this.form.submit()">
                                     <option value="">All Brands</option>
                                     @php
                                         $vBrandsList = (isset($vehicleBrands) && count($vehicleBrands) > 0) 
@@ -708,7 +745,7 @@
 
                             <div class="col-md-2">
                                 <label class="form-label small fw-semibold text-light opacity-75 mb-1">Service Type</label>
-                                <select name="service_type" class="form-select form-select-sm form-select-dark">
+                                <select name="service_type" class="form-select form-select-sm form-select-dark" onchange="this.form.submit()">
                                     <option value="">All Services</option>
                                     @php
                                         $vServicesList = (isset($availableServices) && count($availableServices) > 0) 
@@ -726,7 +763,7 @@
 
                             <div class="col-md-1">
                                 <label class="form-label small fw-semibold text-light opacity-75 mb-1">Date</label>
-                                <input type="date" name="date" class="form-control form-control-sm form-control-dark" value="{{ request('date') }}">
+                                <input type="date" name="date" class="form-control form-control-sm form-control-dark" value="{{ request('date') }}" onchange="this.form.submit()">
                             </div>
 
                             <div class="col-md-2 d-flex align-items-end gap-2">
@@ -939,7 +976,7 @@
                                 <p class="text-secondary small mb-0">Official Transaction & Service Record</p>
                             </div>
                             <div class="text-end">
-                                <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30 px-3 py-1 rounded-pill mb-1 fw-bold">
+                                <span class="badge badge-paid-view px-3 py-1.5 rounded-pill mb-1 fw-bold">
                                     <i class="bi bi-check-circle-fill me-1"></i> PAID
                                 </span>
                                 <p class="text-secondary small mb-0">Tracking Code: <strong class="font-monospace text-speed-blue">{{ $service->tracking_code }}</strong></p>
@@ -1067,7 +1104,7 @@
                                 <p class="text-muted small mb-0">Official Transaction & Service Record Receipt</p>
                             </div>
                             <div class="text-end">
-                                <span class="badge bg-success text-white px-3 py-1 rounded-pill mb-1 fw-bold">PAID</span>
+                                <span class="badge badge-paid-pdf px-3 py-1.5 rounded-pill mb-1 fw-bold">PAID</span>
                                 <p class="text-muted small mb-0">Tracking Code: <strong class="font-monospace text-dark">{{ $service->tracking_code }}</strong></p>
                             </div>
                         </div>
@@ -1375,8 +1412,7 @@
                                         <option value="">All Statuses</option>
                                         <option value="Completed" selected>Completed Only</option>
                                         <option value="In Progress">In Progress</option>
-                                        <option value="Queued">Queued</option>
-                                        <option value="Cancelled">Cancelled</option>
+                                        <option value="Pending Queue">Queued</option>
                                     </select>
                                 </div>
 

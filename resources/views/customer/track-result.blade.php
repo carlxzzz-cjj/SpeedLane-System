@@ -777,12 +777,12 @@
 
                 <!-- Email Link -->
                 <div class="col-md-6">
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@speedlane.com" target="_blank" class="text-decoration-none">
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=speedlaneperformance@speedlane.com" target="_blank" class="text-decoration-none">
                         <div class="rounded-3 p-3 d-flex align-items-center gap-3 border border-secondary border-opacity-25 hover-shadow inner-dark-box" style="background-color: rgba(6, 8, 13, 0.6);">
                             <i class="bi bi-envelope-fill text-speed-blue fs-5"></i>
                             <div>
                                 <span class="extra-small text-secondary d-block">Email Support</span>
-                                <span class="fw-bold text-white small">support@speedlane.com</span>
+                                <span class="fw-bold text-white small">speedlaneperformance@speedlane.com</span>
                             </div>
                         </div>
                     </a>
