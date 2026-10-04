@@ -36,6 +36,12 @@
             --speed-card-border: rgba(255, 255, 255, 0.07);
         }
 
+        /* Hide browser default password reveal icons (Edge / IE) */
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none;
+        }
+
         /* Dark Theme Default */
         body {
             background-color: var(--speed-dark-bg) !important;
@@ -660,7 +666,7 @@
                 } finally {
                     btnSendOtp.disabled = false;
                     btnSendOtpText.classList.remove('d-none');
-                    btnSendOtpSpinner.classList.add('d-none');
+                    btnSendOtpSpinner.add('d-none');
                 }
             });
 

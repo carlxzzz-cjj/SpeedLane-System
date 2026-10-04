@@ -113,7 +113,7 @@
             letter-spacing: 0.3px;
         }
 
-        /* Progress Note Required Badge Styling */
+        /* Required Note Badge Styling */
         .note-required-badge {
             background-color: rgba(220, 53, 69, 0.2) !important;
             color: #ff8a95 !important;
@@ -320,6 +320,17 @@
         .card-dark-item {
             background-color: #0c0f18 !important;
             border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+
+        /* Progress Note Box Styling (High Contrast in Dark & Light Modes) */
+        .progress-note-box {
+            background-color: #131826 !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #e2e8f0 !important;
+        }
+
+        .progress-note-box strong {
+            color: #ffffff !important;
         }
 
         /* Logout Button */
@@ -584,6 +595,16 @@
             border: 1px solid rgba(0, 0, 0, 0.08) !important;
         }
 
+        html.light-theme .progress-note-box {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-theme .progress-note-box strong {
+            color: #0f172a !important;
+        }
+
         html.light-theme h3,
         html.light-theme h4,
         html.light-theme h5,
@@ -631,6 +652,17 @@
         .modal-backdrop {
             background-color: transparent !important;
             opacity: 0 !important;
+        }
+
+        /* Remove number input spin buttons (up and down scroll controls) */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
         }
     </style>
 </head>
@@ -940,7 +972,7 @@
                                                     $items[] = [
                                                         'name'   => trim($srv['name'] ?? $srv['service_name'] ?? 'Service'),
                                                         'status' => trim($srv['status'] ?? 'Pending Queue'),
-                                                        'note'   => trim($srv['note'] ?? $srv['status_note'] ?? '')
+                                                        'note'   => trim($srv['note'] ?? $srv['status_note'] ?? $srv['progress_note'] ?? $srv['remarks'] ?? $srv['service_note'] ?? '')
                                                     ];
                                                 } elseif (is_string($srv) && !empty($srv)) {
                                                     $items[] = [
@@ -1167,7 +1199,7 @@
                                                         </div>
 
                                                         @foreach($formattedVehicles as $vIdx => $vData)
-                                                            <div class="card-dark-nested rounded-3 p-3 mb-3">
+                                                            <div class="card-dark-nested rounded-3 p-3 mb-3" data-initial-adjustment="{{ floatval($vData['price_adjustment'] ?? 0) }}">
                                                                 <div class="fw-bold text-white mb-2 d-flex justify-content-between align-items-center">
                                                                     <span><i class="bi bi-car-front text-speed-blue me-1"></i> Vehicle: {{ implode(' ', array_filter([$vData['vehicle_make'], $vData['vehicle_model']])) }}</span>
                                                                     <span class="badge badge-plate">{{ $vData['plate_number'] }}</span>
@@ -1299,21 +1331,23 @@
                                                                         </div>
 
                                                                         <div>
-                                                                            <label class="form-label small text-secondary mb-1 d-flex align-items-center gap-1">
-                                                                                <span>Progress Note / Remarks</span>
-                                                                                <span class="note-required-badge badge d-none" style="font-size: 0.68rem;">
-                                                                                    Required (Cost Changed)
-                                                                                </span>
+                                                                            <label class="form-label small text-secondary mb-1">
+                                                                                Progress Note / Remarks
                                                                             </label>
                                                                             <textarea name="services[{{ $vIdx }}][{{ $sIdx }}][note]" class="form-control form-control-sm form-control-dark service-note-input" rows="2" placeholder="Enter findings, updates, or notes..." {{ $isItemCompletedInDb ? 'readonly' : '' }}>{{ $item['note'] }}</textarea>
                                                                         </div>
                                                                     </div>
                                                                 @endforeach
 
-                                                                <!-- Price Adjustment Note per Vehicle -->
+                                                                <!-- Price Adjustment Note per Vehicle (Registration Note) -->
                                                                 <div class="mt-2">
-                                                                    <label class="form-label small text-secondary mb-1"><i class="bi bi-pencil-square me-1"></i>Registration Note</label>
-                                                                    <input type="text" name="vehicles[{{ $vIdx }}][price_adjustment_note]" class="form-control form-control-sm form-control-dark" value="{{ $vData['price_adjustment_note'] ?? '' }}" placeholder="e.g., Applied 10% loyalty discount or added extra cleaning fee...">
+                                                                    <label class="form-label small text-secondary mb-1 d-flex align-items-center gap-1">
+                                                                        <span><i class="bi bi-pencil-square me-1"></i>Price Adjustment Note</span>
+                                                                        <span class="registration-note-badge note-required-badge badge d-none" style="font-size: 0.68rem;">
+                                                                            Required (Price Adjusted)
+                                                                        </span>
+                                                                    </label>
+                                                                    <input type="text" name="vehicles[{{ $vIdx }}][price_adjustment_note]" class="form-control form-control-sm form-control-dark registration-note-input" value="{{ $vData['price_adjustment_note'] }}" placeholder="e.g., Applied 10% loyalty discount or added extra cleaning fee...">
                                                                 </div>
                                                             </div>
                                                         @endforeach
@@ -1413,6 +1447,13 @@
             const filterForm = document.getElementById('searchFilterForm');
             const resetFilterBtn = document.getElementById('resetFilterBtn');
 
+            // Prevent mouse wheel scrolling from altering number inputs
+            document.addEventListener('wheel', function(e) {
+                if (document.activeElement && document.activeElement.type === 'number') {
+                    document.activeElement.blur();
+                }
+            }, { passive: true });
+
             function applyTableFilters() {
                 const searchText = searchInput ? searchInput.value.toLowerCase().trim() : '';
                 const selectedType = vehicleTypeSelect ? vehicleTypeSelect.value.toLowerCase().trim() : '';
@@ -1497,15 +1538,13 @@
             // Initial execution on load
             applyTableFilters();
 
-            // Function to sync cost editable state & required remarks per card
+            // Function to sync cost editable state per card
             function syncCardState(card) {
                 const stageSelect = card.querySelector('.status-stage-select');
                 const costInput = card.querySelector('.service-cost-input');
-                const noteInput = card.querySelector('.service-note-input');
-                const noteBadge = card.querySelector('.note-required-badge');
                 const costHint = card.querySelector('.cost-editable-hint');
 
-                if (!stageSelect || !costInput || !noteInput) return;
+                if (!stageSelect || !costInput) return;
 
                 // If stage select is disabled (item is locked as completed from DB)
                 if (stageSelect.disabled) {
@@ -1521,7 +1560,7 @@
                 const selectedVal = stageSelect.value.trim().toLowerCase();
                 const isCompleted = selectedVal.includes('completed') || selectedVal.includes('ready for pick up') || selectedVal.includes('ready for pickup');
 
-                // 1. Enable / Disable cost input based on "Completed & Ready for Pick Up"
+                // Enable / Disable cost input based on "Completed & Ready for Pick Up"
                 if (isCompleted) {
                     costInput.removeAttribute('readonly');
                     costInput.classList.remove('bg-transparent');
@@ -1540,51 +1579,89 @@
                         costInput.value = costInput.dataset.initialPrice;
                     }
                 }
-
-                // 2. Check if Final Service Cost changed from initial
-                const initialVal = parseFloat(costInput.dataset.initialPrice || 0);
-                const currentVal = parseFloat(costInput.value || 0);
-                const isCostModified = Math.abs(currentVal - initialVal) > 0.001;
-
-                if (isCostModified) {
-                    noteInput.setAttribute('required', 'required');
-                    if (noteBadge) noteBadge.classList.remove('d-none');
-                } else {
-                    noteInput.removeAttribute('required');
-                    if (noteBadge) noteBadge.classList.add('d-none');
-                }
             }
 
-            // Function to recalculate modal Overall Estimated Cost and Progress Status
+            // Function to recalculate modal Overall Estimated Cost, Progress Status, and Registration Note Requirement/Editability
             function syncModalSummary(modal) {
                 if (!modal) return;
 
                 let totalCost = 0;
                 let allStatuses = [];
 
-                const cards = modal.querySelectorAll('.service-item-card');
-                cards.forEach(card => {
-                    // Calculate cost
-                    const costInput = card.querySelector('.service-cost-input');
-                    if (costInput) {
-                        const val = parseFloat(costInput.value);
-                        if (!isNaN(val)) {
-                            totalCost += val;
+                const vehicleBlocks = modal.querySelectorAll('.card-dark-nested');
+                vehicleBlocks.forEach(vBlock => {
+                    let allVehicleServicesCompleted = true;
+                    let hasPriceAdjustment = false;
+
+                    const initAdj = parseFloat(vBlock.getAttribute('data-initial-adjustment') || '0');
+                    if (!isNaN(initAdj) && Math.abs(initAdj) > 0.001) {
+                        hasPriceAdjustment = true;
+                    }
+
+                    const cards = vBlock.querySelectorAll('.service-item-card');
+
+                    if (cards.length === 0) {
+                        allVehicleServicesCompleted = false;
+                    }
+
+                    cards.forEach(card => {
+                        // Calculate cost
+                        const costInput = card.querySelector('.service-cost-input');
+                        if (costInput) {
+                            const val = parseFloat(costInput.value);
+                            if (!isNaN(val)) {
+                                totalCost += val;
+                            }
+
+                            const initialVal = parseFloat(costInput.dataset.initialPrice);
+                            if (!isNaN(val) && !isNaN(initialVal) && Math.abs(val - initialVal) > 0.001) {
+                                hasPriceAdjustment = true;
+                            }
                         }
-                    }
 
-                    // Get status stage (from locked hidden input if disabled, or select value)
-                    const stageSelect = card.querySelector('.status-stage-select');
-                    const lockedStatus = card.querySelector('.locked-status-value');
-                    let statusVal = '';
-                    if (lockedStatus && lockedStatus.value) {
-                        statusVal = lockedStatus.value;
-                    } else if (stageSelect && stageSelect.value) {
-                        statusVal = stageSelect.value;
-                    }
+                        // Get status stage (from locked hidden input if disabled, or select value)
+                        const stageSelect = card.querySelector('.status-stage-select');
+                        const lockedStatus = card.querySelector('.locked-status-value');
+                        let statusVal = '';
+                        if (lockedStatus && lockedStatus.value) {
+                            statusVal = lockedStatus.value;
+                        } else if (stageSelect && stageSelect.value) {
+                            statusVal = stageSelect.value;
+                        }
 
-                    if (statusVal) {
-                        allStatuses.push(statusVal.trim().toLowerCase());
+                        if (statusVal) {
+                            const stLower = statusVal.trim().toLowerCase();
+                            allStatuses.push(stLower);
+                            const isItemDone = stLower.includes('completed') || stLower.includes('ready');
+                            if (!isItemDone) {
+                                allVehicleServicesCompleted = false;
+                            }
+                        } else {
+                            allVehicleServicesCompleted = false;
+                        }
+                    });
+
+                    // Handle Price Adjustment Note Requirement:
+                    // Note is required ONLY when there is an adjustment in the price. If none, then optional.
+                    const regNoteInput = vBlock.querySelector('.registration-note-input');
+                    const regNoteBadge = vBlock.querySelector('.registration-note-badge');
+
+                    if (regNoteInput) {
+                        regNoteInput.removeAttribute('readonly');
+                        regNoteInput.classList.remove('bg-transparent');
+
+                        if (hasPriceAdjustment) {
+                            regNoteInput.setAttribute('required', 'required');
+                            if (regNoteBadge) {
+                                regNoteBadge.textContent = 'Required (Price Adjusted)';
+                                regNoteBadge.classList.remove('d-none');
+                            }
+                        } else {
+                            regNoteInput.removeAttribute('required');
+                            if (regNoteBadge) {
+                                regNoteBadge.classList.add('d-none');
+                            }
+                        }
                     }
                 });
 
@@ -1653,8 +1730,8 @@
             // Mark as completed switch auto-selects completed stage for non-disabled selects
             document.querySelectorAll('.complete-switch-input').forEach(switchInput => {
                 switchInput.addEventListener('change', function() {
+                    const modal = this.closest('.modal');
                     if (this.checked) {
-                        const modal = this.closest('.modal');
                         if (modal) {
                             modal.querySelectorAll('.status-stage-select:not([disabled])').forEach(select => {
                                 let found = false;
@@ -1672,18 +1749,19 @@
                             });
                         }
                     }
+                    if (modal) {
+                        syncModalSummary(modal);
+                    }
                 });
             });
 
-            // Selecting "Completed & Ready for Pick Up" automatically checks the completion switch
+            // Selecting "Completed & Ready for Pick Up" automatically checks the completion switch when all are completed
             document.querySelectorAll('.status-stage-select').forEach(select => {
                 select.addEventListener('change', function() {
                     const modal = this.closest('.modal');
                     if (!modal) return;
 
                     const switchInput = modal.querySelector('.complete-switch-input');
-                    if (!switchInput) return;
-
                     const cards = modal.querySelectorAll('.service-item-card');
                     const allCompleted = Array.from(cards).every(card => {
                         const stageSel = card.querySelector('.status-stage-select');
@@ -1692,11 +1770,10 @@
                         return val.toLowerCase().includes('completed') || val.toLowerCase().includes('ready');
                     });
 
-                    if (allCompleted) {
-                        switchInput.checked = true;
-                    } else {
-                        switchInput.checked = false;
+                    if (switchInput) {
+                        switchInput.checked = allCompleted;
                     }
+                    syncModalSummary(modal);
                 });
             });
 
@@ -1730,13 +1807,23 @@
                                             stClass = 'badge-completed';
                                         }
 
+                                        const noteText = s.note && s.note.trim() !== '' ? s.note.trim() : '';
+
                                         servicesHTML += `
                                             <div class="border-bottom border-secondary border-opacity-25 py-2">
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <span class="fw-semibold text-white">${s.name}</span>
                                                     <span class="badge ${stClass}">${s.status || 'Pending Queue'}</span>
                                                 </div>
-                                                ${s.note ? `<div class="small text-secondary mt-1"><i class="bi bi-chat-left-text me-1"></i>Note: ${s.note}</div>` : ''}
+                                                ${noteText ? `
+                                                    <div class="small progress-note-box p-2.5 rounded-3 mt-2">
+                                                        <i class="bi bi-chat-left-text-fill text-speed-blue me-1"></i><strong class="me-1">Progress Note:</strong><span>${noteText}</span>
+                                                    </div>
+                                                ` : `
+                                                    <div class="small text-secondary opacity-75 mt-1">
+                                                        <i class="bi bi-chat-left-text me-1"></i>No progress note provided
+                                                    </div>
+                                                `}
                                                 <div class="small font-monospace text-end text-speed-pink fw-bold mt-1">₱${parseFloat(sPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
                                             </div>
                                         `;

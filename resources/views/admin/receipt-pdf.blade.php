@@ -56,7 +56,7 @@
 
         .badge-paid {
             display: inline-block;
-            background-color: #16a34a;
+            background-color: #15803d;
             color: #ffffff;
             font-size: 8px;
             font-weight: 800;
@@ -181,6 +181,31 @@
             color: #334155;
         }
 
+        /* Price Adjustment Note Box */
+        .note-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            background-color: #f8fafc;
+            padding: 6px 8px;
+            margin-bottom: 8px;
+        }
+
+        .note-label {
+            font-size: 7px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .note-value {
+            font-size: 8px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
         /* Services Table */
         .services-table { 
             width: 100%; 
@@ -220,7 +245,7 @@
         .fw-bold { font-weight: bold; }
         .text-muted { color: #64748b; }
         .text-primary { color: #0f172a; }
-        .text-success { color: #16a34a; }
+        .text-success { color: #15803d; }
 
         /* Footer Note */
         .footer-note { 
@@ -267,6 +292,14 @@
         $vehicleYear  = $service->vehicle_year ?? $service->year ?? 'N/A';
         $plateNumber  = $service->plate_number ?? $service->plate_no ?? $service->plate ?? 'N/A';
 
+        // Resolve Price Adjustment Note
+        $priceAdjustmentNote = $service->price_adjustment_note 
+            ?? $service->adjustment_note 
+            ?? $service->price_note 
+            ?? $service->notes 
+            ?? $service->price_adjustment_reason 
+            ?? 'No price adjustment notes recorded for this transaction.';
+
         // Resolve Selected Services Array
         $servicesArr = is_array($service->selected_services) 
             ? $service->selected_services 
@@ -287,13 +320,13 @@
         <table class="header-table">
             <tr>
                 <td width="60%" style="vertical-align: top;">
-                    <div class="brand-title">SpeedLane AutoSpa</div>
+                    <div class="brand-title">SpeedLane</div>
                     <div class="brand-subtitle">Official Transaction & Service Record Receipt</div>
                 </td>
                 <td width="40%" style="vertical-align: top;" class="text-end">
                     <div><span class="badge-paid">PAID</span></div>
                     <div class="tracking-text">
-                        Tracking: <strong class="tracking-code">{{ $service->tracking_code }}</strong>
+                        Tracking Code: <strong class="tracking-code">{{ $service->tracking_code }}</strong>
                     </div>
                 </td>
             </tr>
@@ -314,9 +347,9 @@
             </tr>
         </table>
 
-        <!-- Full Vehicle Details Card -->
+        <!-- Vehicle Details Card -->
         <div class="vehicle-card">
-            <div class="vehicle-title">Vehicle Specifications</div>
+            <div class="vehicle-title">Vehicle Information</div>
             <table class="vehicle-table">
                 <tr>
                     <td>
@@ -343,15 +376,21 @@
         <table class="dates-table">
             <tr>
                 <td width="50%">
-                    <span class="text-muted">Registered:</span>
+                    <span class="text-muted">Date Registered:</span>
                     <strong>{{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y h:i A') }}</strong>
                 </td>
                 <td width="50%" class="text-end">
-                    <span class="text-muted">Completed:</span>
+                    <span class="text-muted">Date Completed:</span>
                     <strong>{{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y h:i A') }}</strong>
                 </td>
             </tr>
         </table>
+
+        <!-- Price Adjustment Note Box -->
+        <div class="note-card">
+            <span class="note-label">Price Adjustment Note</span>
+            <div class="note-value">{{ $priceAdjustmentNote }}</div>
+        </div>
 
         <!-- Services Table -->
         <table class="services-table">
@@ -381,7 +420,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="2" class="text-end fw-bold" style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px;">Total Amount Paid:</td>
+                    <td colspan="2" class="text-end fw-bold" style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px;">Total Cost Paid:</td>
                     <td class="text-end fw-bold font-mono" style="font-size: 11px; color: #0f172a;">
                         &#8369;{{ number_format((float)($service->total_cost ?? 0), 2) }}
                     </td>

@@ -967,11 +967,11 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div class="p-4 border border-secondary border-opacity-25 rounded-4 bg-black bg-opacity-40 shadow-sm">
+                    <div class="printable-area p-4 border border-secondary border-opacity-25 rounded-4 bg-black bg-opacity-40 shadow-sm">
                         <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom border-secondary border-opacity-25 pb-3 mb-3 gap-2">
                             <div>
                                 <h4 class="fw-bold text-speed-pink mb-1 d-flex align-items-center gap-2 fs-5">
-                                    <i class="bi bi-car-front-fill"></i> SpeedLane AutoSpa
+                                    <i class="bi bi-car-front-fill"></i> SPEEDLANE
                                 </h4>
                                 <p class="text-secondary small mb-0">Official Transaction & Service Record</p>
                             </div>
@@ -1012,7 +1012,7 @@
                                 </div>
                                 <div class="col-md-3 col-6">
                                     <span class="text-secondary extra-small d-block text-uppercase fw-semibold">Plate Number</span>
-                                    <span class="fw-bold font-monospace text-uppercase text-speed-blue small">{{ $plateNumber }}</span>
+                                    <span class="fw-bold font-monospace text-uppercase text-white small">{{ $plateNumber }}</span>
                                 </div>
                                 <div class="col-md-3 col-6">
                                     <span class="text-secondary extra-small d-block text-uppercase fw-semibold">Year</span>
@@ -1030,6 +1030,16 @@
                                 <span class="text-secondary extra-small d-block">Date Completed:</span>
                                 <strong class="text-white small">{{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y h:i A') }}</strong>
                             </div>
+                        </div>
+
+                        <!-- Price Adjustment Note Box -->
+                        <div class="p-3 border border-secondary border-opacity-25 rounded-3 bg-black bg-opacity-30 mb-3">
+                            <span class="text-secondary extra-small d-block text-uppercase fw-semibold mb-1">
+                                <i class="bi bi-sticky me-1 text-speed-blue"></i> Price Adjustment Note
+                            </span>
+                            <p class="mb-0 small fw-medium text-white">
+                                {{ $service->price_adjustment_note ?? $service->adjustment_note ?? $service->price_note ?? $service->notes ?? $service->price_adjustment_reason ?? 'No price adjustment notes recorded for this transaction.' }}
+                            </p>
                         </div>
 
                         <div class="table-responsive mb-0">
@@ -1076,9 +1086,14 @@
                 </div>
                 <div class="modal-footer border-top border-secondary border-opacity-25 py-2 d-flex justify-content-between">
                     <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm px-3" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-outline-danger btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#pdfPreviewModal{{ $service->id }}">
-                        <i class="bi bi-file-earmark-pdf"></i> Switch to PDF Receipt Preview
-                    </button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-light btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" onclick="printElement('viewModal{{ $service->id }}')">
+                            <i class="bi bi-printer-fill"></i> Direct Print
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#pdfPreviewModal{{ $service->id }}">
+                            <i class="bi bi-file-earmark-pdf"></i> Switch to PDF Receipt Preview
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1099,7 +1114,7 @@
                         <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
                             <div>
                                 <h4 class="fw-bold text-primary mb-1 d-flex align-items-center gap-2">
-                                    <i class="bi bi-car-front-fill"></i> SpeedLane AutoSpa
+                                    <i class="bi bi-car-front-fill"></i> SPEEDLANE
                                 </h4>
                                 <p class="text-muted small mb-0">Official Transaction & Service Record Receipt</p>
                             </div>

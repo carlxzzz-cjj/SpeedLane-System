@@ -330,9 +330,15 @@
             color: #b45309 !important;
             border-color: #fcd34d !important;
         }
-          body {
-    zoom: 85%; /* Adjusts the render scale across modern browsers */
-  }
+         body {
+            zoom: 80%;
+        }
+
+        /* FIX: Remove black/grayish modal backdrop shadow */
+        .modal-backdrop {
+            background-color: transparent !important;
+            opacity: 0 !important;
+        }
     </style>
 </head>
 <body class="min-vh-100 d-flex flex-column justify-content-between">
@@ -529,7 +535,7 @@
                         $serviceItems[] = [
                             'name'   => $item->service_type ?? 'General Service',
                             'status' => $item->status ?? 'Pending Queue',
-                            'note'   => $item->note ?? '',
+                            'note'   => $item->price_adjustment_note ?? $item->note ?? '',
                             'updated_at' => null,
                             'stage_timestamps' => []
                         ];
@@ -573,6 +579,12 @@
                                 @endif
                             </span>
                         </div>
+                        @if(!empty($item->price_adjustment_note ?? $item->note))
+                            <div class="col-12">
+                                <span class="text-secondary extra-small d-block">Price Adjustment Note</span>
+                                <span class="fw-bold text-white small">{{ $item->price_adjustment_note ?? $item->note }}</span>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Service Items Timeline -->

@@ -303,8 +303,8 @@
         @media (min-width: 992px) {
             .sticky-receipt-wrapper {
                 position: sticky;
-                top: 80px;
-                max-height: calc(100vh - 100px);
+                top: 75px;
+                max-height: calc(100vh - 80px);
                 overflow-y: auto;
             }
         }
@@ -973,7 +973,7 @@
                         <div class="col-lg-5 col-xl-4">
                             <div class="sticky-receipt-wrapper">
 
-                                <div class="card speed-card border-0 shadow-sm rounded-4 p-4 mb-3">
+                                <div class="card speed-card border-0 shadow-sm rounded-4 p-3.5 p-md-4 mb-3">
                                     <div class="d-flex justify-content-between align-items-center border-bottom border-secondary border-opacity-25 pb-3 mb-3">
                                         <h5 class="fw-bold mb-0 text-white d-flex align-items-center gap-2 fs-6">
                                             <i class="bi bi-receipt text-speed-pink fs-5"></i> Service Receipt
@@ -987,7 +987,7 @@
                                         <div class="small text-secondary font-monospace" id="previewPhone">---</div>
                                     </div>
 
-                                    <div id="previewVehiclesContainer" class="d-flex flex-column gap-3 mb-3" style="max-height: 380px; overflow-y: auto;">
+                                    <div id="previewVehiclesContainer" class="d-flex flex-column gap-3 mb-3" style="max-height: 480px; overflow-y: auto;">
                                         <p class="text-secondary small mb-0">No vehicle details or services selected yet.</p>
                                     </div>
 
@@ -1724,6 +1724,9 @@
                     collapseBody.setAttribute('id', targetId);
                     collapseTrigger.setAttribute('data-bs-target', `#${targetId}`);
                     collapseTrigger.setAttribute('aria-controls', targetId);
+
+                    const isShown = collapseBody.classList.contains('show');
+                    collapseTrigger.setAttribute('aria-expanded', isShown ? 'true' : 'false');
                 }
 
                 card.querySelectorAll('[name]').forEach(input => {
@@ -1878,16 +1881,23 @@
                 const firstCard = document.querySelector('.vehicle-card');
                 if (!firstCard) return;
 
+                // 1. Clone card BEFORE triggering collapse animations on existing cards
+                const newCard = firstCard.cloneNode(true);
+
+                // 2. Collapse all existing vehicles
                 document.querySelectorAll('.vehicle-card').forEach(existingCard => {
                     const collapseBody = existingCard.querySelector('.vehicle-collapse-body');
-                    if (collapseBody && collapseBody.classList.contains('show')) {
-                        const bsCollapse = bootstrap.Collapse.getInstance(collapseBody) || new bootstrap.Collapse(collapseBody, { toggle: false });
+                    const collapseTrigger = existingCard.querySelector('.vehicle-collapse-trigger');
+                    if (collapseBody) {
+                        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseBody, { toggle: false });
                         bsCollapse.hide();
+                    }
+                    if (collapseTrigger) {
+                        collapseTrigger.setAttribute('aria-expanded', 'false');
                     }
                 });
 
-                const newCard = firstCard.cloneNode(true);
-
+                // 3. Reset form inputs in newly cloned card
                 newCard.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
                     if (input.classList.contains('service-price-input') || input.classList.contains('vehicle-total-cost-input')) {
                         input.value = '0.00';
@@ -1926,15 +1936,38 @@
                     statusLabel.classList.add('text-secondary');
                 }
 
+                // 4. Clean up newCard collapse state completely so it displays fully open
                 const newCollapseBody = newCard.querySelector('.vehicle-collapse-body');
+                const newCollapseTrigger = newCard.querySelector('.vehicle-collapse-trigger');
+                
                 if (newCollapseBody) {
-                    newCollapseBody.classList.add('show');
+                    newCollapseBody.classList.remove('collapsing');
+                    newCollapseBody.classList.add('collapse', 'show');
+                    newCollapseBody.removeAttribute('style');
                 }
 
+                if (newCollapseTrigger) {
+                    newCollapseTrigger.setAttribute('aria-expanded', 'true');
+                }
+
+                // 5. Append newCard to DOM
                 vehiclesContainer.appendChild(newCard);
 
+                // 6. Re-index IDs, attributes, and labels
                 reindexVehicleCards();
+
+                // 7. Attach events to new card
                 attachVehicleEvents(newCard);
+
+                // 8. Re-initialize clean Bootstrap Collapse instance on new vehicle card
+                if (newCollapseBody) {
+                    const oldBsInstance = bootstrap.Collapse.getInstance(newCollapseBody);
+                    if (oldBsInstance) {
+                        oldBsInstance.dispose();
+                    }
+                    bootstrap.Collapse.getOrCreateInstance(newCollapseBody, { toggle: false });
+                }
+
                 filterOptionsByVehicleType(newCard);
                 calculateGrandTotal();
 
