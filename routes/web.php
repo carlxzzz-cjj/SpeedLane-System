@@ -104,6 +104,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/transactions/report/download', [TransactionController::class, 'downloadReport'])->name('admin.transactions.reports.download');
     
     Route::get('/admin/transactions/{id}/pdf', [TransactionController::class, 'downloadPdf'])->name('admin.transactions.pdf');
+    
+    // Route for deleting queued customer records on the Update Status page
+Route::delete('/admin/update/{id}', [ServiceController::class, 'destroy'])->name('admin.update.destroy');
 
     /*
     |--------------------------------------------------------------------------

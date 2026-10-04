@@ -347,6 +347,24 @@ class ServiceController extends Controller
         return back()->with('success', $message);
     }
 
+
+    public function destroy($id)
+{
+    try {
+        $record = ServiceRecord::findOrFail($id);
+
+        // Delete associated vehicles if applicable
+        if (method_exists($record, 'vehicles')) {
+            $record->vehicles()->delete();
+        }
+
+        $record->delete();
+
+        return back()->with('success', 'Queued service record deleted successfully!');
+    } catch (\Exception $e) {
+        return back()->with('error', 'Failed to delete record: ' . $e->getMessage());
+    }
+}
     /**
      * Add additional service item and update receipt total.
      */

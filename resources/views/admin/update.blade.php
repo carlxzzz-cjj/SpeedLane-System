@@ -56,7 +56,7 @@
         .text-speed-pink { color: var(--speed-pink) !important; }
         .text-speed-blue { color: var(--speed-blue) !important; }
         .bg-speed-pink { background-color: var(--speed-pink) !important; }
-        .bg-speed-blue { background-color: var(--speed-blue) !important; }
+        .bg-speed-blue { background-color: var(--speed-blue) !important; color: #ffffff !important; }
 
         /* Dedicated Plate Number Badge */
         .badge-plate {
@@ -176,6 +176,36 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
+        /* Action Buttons Fixed Uniform Styling & Spacing */
+        .action-btns-group {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            gap: 0.5rem !important; /* Proper spacing between action buttons */
+            flex-wrap: nowrap !important;
+        }
+
+        .table-dark-custom .btn-action-sm {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            white-space: nowrap !important;
+            font-size: 0.78rem !important;
+            font-weight: 600 !important;
+            padding: 0.35rem 0.65rem !important;
+            height: 32px !important;
+            line-height: 1 !important;
+            border-radius: 0.375rem !important;
+            box-shadow: none !important;
+            transition: all 0.2s ease;
+        }
+
+        .table-dark-custom .btn-action-sm i {
+            font-size: 0.85rem !important;
+            line-height: 1 !important;
+            margin-right: 0.35rem !important;
+        }
+
         /* Gradient Submit / Action Buttons */
         .btn-speed-gradient {
             background: linear-gradient(90deg, var(--speed-pink) 0%, var(--speed-blue) 100%);
@@ -194,6 +224,17 @@
             opacity: 0.95;
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
+            color: #ffffff !important;
+        }
+
+        /* Modal Banner Standard Styling */
+        .alert-info-custom {
+            background-color: rgba(0, 162, 255, 0.12) !important;
+            border: 1px solid rgba(0, 162, 255, 0.3) !important;
+            color: #7dd3fc !important;
+        }
+
+        .alert-info-custom strong {
             color: #ffffff !important;
         }
 
@@ -312,11 +353,36 @@
             --speed-card-bg: #ffffff;
             --speed-card-border: rgba(0, 0, 0, 0.08);
             --speed-sidebar-bg: #f8fafc;
+            --speed-blue: #0284c7; /* High-contrast Ocean Blue for Light Mode */
         }
 
         html.light-theme body {
             background: #f8fafc !important;
             color: #1e293b !important;
+        }
+
+        /* Clear Readable Blue Text & Badges in Light Mode */
+        html.light-theme .text-speed-blue {
+            color: #0284c7 !important;
+        }
+
+        html.light-theme .bg-speed-blue {
+            background-color: #0284c7 !important;
+            color: #ffffff !important;
+        }
+
+        /* Modal Banner High Contrast in Light Mode */
+        html.light-theme .alert-info,
+        html.light-theme .alert-info-custom {
+            background-color: #e0f2fe !important;
+            border-color: #7dd3fc !important;
+            color: #0369a1 !important;
+        }
+
+        html.light-theme .alert-info strong,
+        html.light-theme .alert-info-custom strong,
+        html.light-theme .alert-info .text-white {
+            color: #0f172a !important; /* Crisp dark customer name and codes */
         }
 
         html.light-theme .navbar-speed {
@@ -399,6 +465,19 @@
 
         html.light-theme .btn-outline-info:hover * {
             color: #ffffff !important;
+        }
+
+        html.light-theme .btn-outline-danger {
+            color: #dc2626 !important;
+            border-color: #fca5a5 !important;
+            background-color: #fef2f2 !important;
+            font-weight: 600 !important;
+        }
+
+        html.light-theme .btn-outline-danger:hover {
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+            border-color: #dc2626 !important;
         }
 
         /* Clear Readable Logout Button in Light Mode */
@@ -542,7 +621,8 @@
 
         html.light-theme .btn-close-white {
             filter: invert(1) grayscale(100%) brightness(50%);
-      }
+        }
+
         body {
             zoom: 80%;
         }
@@ -573,7 +653,7 @@
                 </div>
             </a>
 
-            <   <div class="d-flex align-items-center gap-3 ms-auto">
+            <div class="d-flex align-items-center gap-3 ms-auto">
                 @if(auth()->check())
                     @if(method_exists(auth()->user(), 'isSuperAdmin') && auth()->user()->isSuperAdmin())
                         <span class="badge badge-super-admin px-3 py-2 rounded-pill d-flex align-items-center gap-1">
@@ -1039,17 +1119,29 @@
                                             </span>
                                         </td>
 
-                                        <td class="text-end">
-                                            <div class="d-flex justify-content-end gap-1">
+                                        <!-- Uniform Action Buttons Column with Spacing Fix -->
+                                        <td class="text-end text-nowrap" style="white-space: nowrap; width: 1%;">
+                                            <div class="action-btns-group">
                                                 <!-- View Details Action Button -->
-                                                <button class="btn btn-outline-info btn-sm px-2 open-info-btn" title="View Full Record Info">
-                                                    <i class="bi bi-eye-fill me-1"></i> View Info
+                                                <button type="button" class="btn btn-outline-info btn-action-sm open-info-btn" title="View Full Record Info">
+                                                    <i class="bi bi-eye-fill"></i>View Info
                                                 </button>
 
                                                 <!-- Update Status Action Button -->
-                                                <button class="btn btn-speed-gradient btn-sm px-2" data-bs-toggle="modal" data-bs-target="#updateModal{{ $service->id }}" title="Update Progress & Final Price">
-                                                    <i class="bi bi-pencil-square me-1"></i> Update
+                                                <button type="button" class="btn btn-speed-gradient btn-action-sm" data-bs-toggle="modal" data-bs-target="#updateModal{{ $service->id }}" title="Update Progress & Final Price">
+                                                    <i class="bi bi-pencil-square"></i>Update
                                                 </button>
+
+                                                @if($statusLabel === 'Queued')
+                                                    <!-- Delete Option for Queued Status -->
+                                                    <form action="{{ route('admin.update.destroy', $service->id) }}" method="POST" class="d-inline-block m-0 p-0" onsubmit="return confirm('Are you sure you want to cancel and delete this queued service?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-outline-danger btn-action-sm" title="Delete Queued Service">
+                                                            <i class="bi bi-trash-fill"></i>Delete
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -1069,9 +1161,9 @@
                                                     @method('PUT')
                                                     <div class="modal-body p-4">
                                                         
-                                                        <div class="alert alert-info py-2 px-3 small rounded-3 mb-3 bg-info bg-opacity-10 text-info border border-info border-opacity-25 d-flex align-items-center gap-2">
+                                                        <div class="alert alert-info alert-info-custom py-2.5 px-3 small rounded-3 mb-3 d-flex align-items-center gap-2">
                                                             <i class="bi bi-info-circle-fill fs-5"></i>
-                                                            <span>Customer: <strong>{{ $service->customer_name }}</strong> | Tracking Code: <strong>{{ $service->tracking_code }}</strong></span>
+                                                            <span>Customer: <strong class="fw-bold fs-6">{{ $service->customer_name }}</strong> &nbsp;|&nbsp; Tracking Code: <strong class="text-speed-blue fw-bold fs-6">{{ $service->tracking_code }}</strong></span>
                                                         </div>
 
                                                         @foreach($formattedVehicles as $vIdx => $vData)
@@ -1674,7 +1766,7 @@
                                             ${servicesHTML}
                                         </div>
                                         ${(v.price_adjustment_note || adjVal !== 0) ? `
-                                            <div class="small text-info bg-info bg-opacity-10 p-2 rounded-2 mt-2 border border-info border-opacity-25">
+                                            <div class="small text-info alert-info-custom p-2 rounded-2 mt-2 border">
                                                 <i class="bi bi-info-circle me-1"></i><strong>Note:</strong> ${noteLabel}${adjText}
                                             </div>
                                         ` : ''}
@@ -1688,11 +1780,11 @@
                         }
 
                         modalBody.innerHTML = `
-                            <div class="alert alert-info py-2 px-3 small rounded-3 mb-3 bg-info bg-opacity-10 text-info border border-info border-opacity-25 d-flex align-items-center justify-content-between">
+                            <div class="alert alert-info alert-info-custom py-2.5 px-3 small rounded-3 mb-3 d-flex align-items-center justify-content-between">
                                 <div>
-                                    <i class="bi bi-info-circle-fill me-1"></i> Customer: <strong>${order.customer_name}</strong> (${order.contact_number})
+                                    <i class="bi bi-info-circle-fill me-1"></i> Customer: <strong class="fw-bold fs-6">${order.customer_name}</strong> <span class="opacity-75">(${order.contact_number})</span>
                                 </div>
-                                <span class="badge bg-speed-blue text-dark font-monospace">${order.tracking_code}</span>
+                                <span class="badge bg-speed-blue text-white font-monospace px-2.5 py-1.5">${order.tracking_code}</span>
                             </div>
 
                             <div class="row g-3 card-dark-nested p-3 rounded-3 border mb-3">
