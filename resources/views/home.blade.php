@@ -107,8 +107,16 @@
         }
 
         .admin-login-btn {
+            background-color: rgba(255, 255, 255, 0.08) !important;
             color: #ffffff !important;
-            border-color: rgba(255, 255, 255, 0.25) !important;
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            transition: all 0.3s ease;
+        }
+
+        .admin-login-btn:hover {
+            background-color: rgba(244, 37, 130, 0.2) !important;
+            border-color: var(--speed-pink) !important;
+            color: #ffffff !important;
         }
 
         /* Buttons */
@@ -409,12 +417,15 @@
         }
 
         html.light-theme .admin-login-btn {
+            background-color: #ffffff !important;
             color: #0f172a !important;
-            border-color: #94a3b8 !important;
+            border: 1px solid #cbd5e1 !important;
         }
 
         html.light-theme .admin-login-btn:hover {
-            background-color: #e2e8f0 !important;
+            background-color: #f1f5f9 !important;
+            border-color: var(--speed-pink) !important;
+            color: var(--speed-pink) !important;
         }
 
         html.light-theme #theme-toggle-btn {
@@ -605,7 +616,7 @@
 
                 <div class="d-flex align-items-center gap-3 flex-row justify-content-end">
                     <!-- Admin Login Button -->
-                    <a class="btn btn-outline-light fw-bold px-3 py-2 rounded-2 admin-login-btn d-inline-flex align-items-center gap-2 text-nowrap font-racing" href="/admin/login">
+                    <a class="btn fw-bold px-3 py-2 rounded-2 admin-login-btn d-inline-flex align-items-center gap-2 text-nowrap font-racing" href="/admin/login">
                         <i class="bi bi-shield-lock-fill text-speed-pink"></i> Admin Login
                     </a>
 

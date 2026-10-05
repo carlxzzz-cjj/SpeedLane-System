@@ -1252,13 +1252,13 @@
                                                             <i class="bi bi-key-fill"></i> Reset Password
                                                         </button>
 
-                                                        @if(!method_exists($staff, 'isSuperAdmin') || !$staff->isSuperAdmin())
-                                                            <!-- Edit Staff Details Button -->
-                                                            <button class="btn btn-sm btn-outline-info-custom rounded-3 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#editStaffModal{{ $staff->id }}">
-                                                                <i class="bi bi-pencil"></i> Edit
-                                                            </button>
+                                                        <!-- Edit Staff / Admin / Super Admin Details Button -->
+                                                        <button class="btn btn-sm btn-outline-info-custom rounded-3 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#editStaffModal{{ $staff->id }}">
+                                                            <i class="bi bi-pencil"></i> Edit
+                                                        </button>
 
-                                                            <!-- Disable / Enable Toggle Form -->
+                                                        @if(!method_exists($staff, 'isSuperAdmin') || !$staff->isSuperAdmin())
+                                                            <!-- Disable / Enable Toggle Form (Restricted from Super Admin) -->
                                                             <form action="{{ route('admin.manage-services.toggle-staff-status', $staff->id) }}" method="POST" class="d-inline">
                                                                 @csrf
                                                                 @method('PATCH')
@@ -1275,45 +1275,43 @@
                                                         @endif
                                                     </div>
 
-                                                    @if(!method_exists($staff, 'isSuperAdmin') || !$staff->isSuperAdmin())
-                                                        <!-- EDIT STAFF MODAL -->
-                                                        <div class="modal fade" id="editStaffModal{{ $staff->id }}" tabindex="-1">
-                                                            <div class="modal-dialog modal-dialog-centered">
-                                                                <div class="modal-content modal-content-dark rounded-4">
-                                                                    <form action="{{ route('admin.manage-services.update-staff', $staff->id) }}" method="POST">
-                                                                        @csrf
-                                                                        @method('PUT')
-                                                                        <div class="modal-header">
-                                                                            <h5 class="modal-title fw-bold text-white"><i class="bi bi-person-gear text-speed-pink me-2"></i>Edit Staff Details</h5>
-                                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    <!-- EDIT STAFF MODAL (Available for all accounts including Super Admin) -->
+                                                    <div class="modal fade" id="editStaffModal{{ $staff->id }}" tabindex="-1">
+                                                        <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content modal-content-dark rounded-4">
+                                                                <form action="{{ route('admin.manage-services.update-staff', $staff->id) }}" method="POST">
+                                                                    @csrf
+                                                                    @method('PUT')
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title fw-bold text-white"><i class="bi bi-person-gear text-speed-pink me-2"></i>Edit Account Details</h5>
+                                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                                    </div>
+                                                                    <div class="modal-body p-4 text-start">
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label small fw-semibold text-secondary">Full Name</label>
+                                                                            <input type="text" name="name" class="form-control form-control-dark" value="{{ $staff->name }}" required>
                                                                         </div>
-                                                                        <div class="modal-body p-4 text-start">
-                                                                            <div class="mb-3">
-                                                                                <label class="form-label small fw-semibold text-secondary">Full Name</label>
-                                                                                <input type="text" name="name" class="form-control form-control-dark" value="{{ $staff->name }}" required>
-                                                                            </div>
-                                                                            <div class="mb-3">
-                                                                                <label class="form-label small fw-semibold text-secondary">Username</label>
-                                                                                <input type="text" name="username" class="form-control form-control-dark" value="{{ $staff->username }}" required>
-                                                                            </div>
-                                                                            <div class="mb-3">
-                                                                                <label class="form-label small fw-semibold text-secondary">Email Address</label>
-                                                                                <input type="email" name="email" class="form-control form-control-dark" value="{{ $staff->email }}" required>
-                                                                            </div>
-                                                                            <div class="mb-3">
-                                                                                <label class="form-label small fw-semibold text-secondary">Contact Number</label>
-                                                                                <input type="text" name="contact_number" class="form-control form-control-dark" value="{{ $staff->contact_number }}" required>
-                                                                            </div>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label small fw-semibold text-secondary">Username</label>
+                                                                            <input type="text" name="username" class="form-control form-control-dark" value="{{ $staff->username }}" required>
                                                                         </div>
-                                                                        <div class="modal-footer">
-                                                                            <button type="button" class="btn btn-dark-cancel rounded-3" data-bs-dismiss="modal">Cancel</button>
-                                                                            <button type="submit" class="btn btn-speed-gradient rounded-3 px-4 fw-semibold">Save Changes</button>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label small fw-semibold text-secondary">Email Address</label>
+                                                                            <input type="email" name="email" class="form-control form-control-dark" value="{{ $staff->email }}" required>
                                                                         </div>
-                                                                    </form>
-                                                                </div>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label small fw-semibold text-secondary">Contact Number</label>
+                                                                            <input type="text" name="contact_number" class="form-control form-control-dark" value="{{ $staff->contact_number }}" required>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-dark-cancel rounded-3" data-bs-dismiss="modal">Cancel</button>
+                                                                        <button type="submit" class="btn btn-speed-gradient rounded-3 px-4 fw-semibold">Save Changes</button>
+                                                                    </div>
+                                                                </form>
                                                             </div>
                                                         </div>
-                                                    @endif
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @empty

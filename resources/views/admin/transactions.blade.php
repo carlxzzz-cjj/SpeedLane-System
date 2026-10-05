@@ -434,6 +434,61 @@
             color: #0f172a !important;
         }
 
+        /* High-Contrast Pagination Styling for Light and Dark Modes */
+        .pagination .page-link {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .pagination .page-link:hover {
+            background-color: var(--speed-blue) !important;
+            color: #ffffff !important;
+            border-color: var(--speed-blue) !important;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(90deg, var(--speed-pink) 0%, var(--speed-blue) 100%) !important;
+            color: #ffffff !important;
+            border-color: transparent !important;
+            font-weight: 700 !important;
+            box-shadow: 0 2px 8px rgba(244, 37, 130, 0.3);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #0f172a !important;
+            color: #94a3b8 !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            opacity: 0.85;
+        }
+
+        html.light-theme .pagination .page-link {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        html.light-theme .pagination .page-link:hover {
+            background-color: #00a2ff !important;
+            color: #ffffff !important;
+            border-color: #00a2ff !important;
+        }
+
+        html.light-theme .pagination .page-item.active .page-link {
+            background: linear-gradient(90deg, var(--speed-pink) 0%, var(--speed-blue) 100%) !important;
+            color: #ffffff !important;
+            border-color: transparent !important;
+        }
+
+        html.light-theme .pagination .page-item.disabled .page-link {
+            background-color: #f1f5f9 !important;
+            color: #64748b !important;
+            border-color: #cbd5e1 !important;
+            opacity: 0.85;
+        }
+
         .custom-admin-table {
             color: #e2e8f0;
         }
@@ -516,6 +571,9 @@
                 size: auto;
                 margin: 0mm;
             }
+            tfoot {
+                display: table-row-group !important;
+            }
             *, *::before, *::after {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -528,6 +586,7 @@
                 height: auto !important;
                 min-height: 0 !important;
                 overflow: visible !important;
+                zoom: 100% !important; /* Resets body zoom to 100% for printer output */
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 color-adjust: exact !important;
@@ -549,8 +608,10 @@
                 left: 0 !important; 
                 top: 0 !important; 
                 width: 100% !important; 
+                max-width: 100% !important; /* Overrides inline max-width: 900px */
+                box-sizing: border-box !important;
                 margin: 0 !important;
-                padding: 20px !important;
+                padding: 15mm !important;
                 background: transparent !important; 
                 transform: none !important;
                 box-shadow: none !important;
@@ -694,7 +755,7 @@
                         <div class="card speed-card p-3 rounded-4 d-flex flex-row justify-content-between align-items-center">
                             <div>
                                 <span class="text-secondary small d-block mb-1">Completed Services</span>
-                                <h3 class="fw-bold text-white mb-0">{{ $completedCount ?? $transactions->count() }}</h3>
+                                <h3 class="fw-bold text-white mb-0">{{ $completedCount ?? (method_exists($transactions, 'total') ? $transactions->total() : $transactions->count()) }}</h3>
                             </div>
                             <div class="stat-icon bg-speed-pink text-white fs-4 shadow-sm">
                                 <i class="bi bi-check-circle-fill"></i>
@@ -733,7 +794,7 @@
                                 <label class="form-label small fw-semibold text-light opacity-75 mb-1">Search Records</label>
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text input-group-text-dark"><i class="bi bi-search text-speed-blue"></i></span>
-                                    <input type="text" name="search" id="transactionSearchInput" class="form-control form-control-dark" placeholder="Customer, mechanic, plate, code..." value="{{ request('search') }}">
+                                    <input type="text" name="search" id="transactionSearchInput" class="form-control form-control-dark" placeholder="Customer, mechanic, plate..." value="{{ request('search') }}">
                                 </div>
                             </div>
 
@@ -791,16 +852,16 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-1">
+                            <div class="col-md-2">
                                 <label class="form-label small fw-semibold text-light opacity-75 mb-1">Date</label>
                                 <input type="date" name="date" class="form-control form-control-sm form-control-dark" value="{{ request('date') }}" onchange="this.form.submit()">
                             </div>
 
-                            <div class="col-md-2 d-flex align-items-end gap-2">
-                                <button type="submit" class="btn btn-speed-gradient btn-sm rounded-3 w-100 fw-semibold">
-                                    <i class="bi bi-funnel"></i> Filter
+                            <div class="col-md-1 d-flex align-items-end gap-1">
+                                <button type="submit" class="btn btn-speed-gradient btn-sm rounded-3 w-100 fw-semibold" title="Apply Filters">
+                                    <i class="bi bi-funnel"></i>
                                 </button>
-                                <a href="{{ route('admin.transactions') }}" class="btn btn-outline-light btn-sm rounded-3 px-3" title="Reset Filters">
+                                <a href="{{ route('admin.transactions') }}" class="btn btn-outline-light btn-sm rounded-3 px-2" title="Reset Filters">
                                     <i class="bi bi-arrow-counterclockwise"></i>
                                 </a>
                             </div>
@@ -814,9 +875,19 @@
                         <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2 fs-6">
                             <i class="bi bi-file-earmark-text text-speed-pink"></i> Service Records Log
                         </h5>
-                        <span class="badge bg-black bg-opacity-50 text-secondary border border-secondary border-opacity-25 px-3 py-2 rounded-pill small">
-                            Showing {{ $transactions->count() }} record(s)
-                        </span>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="text-secondary small me-1">Show:</span>
+                                <select name="per_page" form="searchFilterForm" class="form-select form-select-sm form-select-dark py-1 px-2" style="width: auto;" onchange="document.getElementById('searchFilterForm').submit()">
+                                    <option value="20" {{ request('per_page', 20) == 20 ? 'selected' : '' }}>20 per page</option>
+                                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 per page</option>
+                                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 per page</option>
+                                </select>
+                            </div>
+                            <span class="badge bg-black bg-opacity-50 text-secondary border border-secondary border-opacity-25 px-3 py-2 rounded-pill small">
+                                Showing {{ method_exists($transactions, 'count') ? $transactions->count() : count($transactions) }} record(s)
+                            </span>
+                        </div>
                     </div>
 
                     <div class="table-responsive">
@@ -909,9 +980,6 @@
         </td>
         <td class="text-center">
             <div class="d-flex justify-content-center gap-1">
-                <button type="button" class="btn btn-outline-info btn-sm rounded-2 px-2 py-1 d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#viewModal{{ $service->id }}">
-                    <i class="bi bi-eye"></i> View
-                </button>
                 <button type="button" class="btn btn-outline-danger btn-sm rounded-2 px-2 py-1 d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#pdfPreviewModal{{ $service->id }}">
                     <i class="bi bi-file-earmark-pdf"></i> PDF
                 </button>
@@ -928,6 +996,47 @@
 @endforelse
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Pagination Navigation Controls with Arrows -->
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-3 border-top border-secondary border-opacity-25 mt-3 gap-2">
+                        <div class="text-secondary small">
+                            @if(method_exists($transactions, 'firstItem') && $transactions->firstItem())
+                                Showing {{ $transactions->firstItem() }} to {{ $transactions->lastItem() }} of {{ $transactions->total() }} records
+                            @else
+                                Showing {{ method_exists($transactions, 'count') ? $transactions->count() : count($transactions) }} record(s)
+                            @endif
+                        </div>
+
+                        <div>
+                            @if(method_exists($transactions, 'hasPages') && $transactions->hasPages())
+                                {{ $transactions->withQueryString()->links('pagination::bootstrap-5') }}
+                            @else
+                                @php
+                                    $currentPage = (int) request('page', 1);
+                                    $perPage = (int) request('per_page', 20);
+                                    $totalRecords = isset($completedCount) ? $completedCount : (method_exists($transactions, 'total') ? $transactions->total() : (method_exists($transactions, 'count') ? $transactions->count() : count($transactions)));
+                                    $hasMorePages = ($currentPage * $perPage) < $totalRecords;
+                                @endphp
+                                <nav aria-label="Transaction pagination">
+                                    <ul class="pagination pagination-sm mb-0">
+                                        <li class="page-item {{ $currentPage <= 1 ? 'disabled' : '' }}">
+                                            <a class="page-link px-3" href="{{ request()->fullUrlWithQuery(['page' => max(1, $currentPage - 1)]) }}">
+                                                <i class="bi bi-arrow-left me-1"></i> Previous
+                                            </a>
+                                        </li>
+                                        <li class="page-item active">
+                                            <span class="page-link px-3">Page {{ $currentPage }}</span>
+                                        </li>
+                                        <li class="page-item {{ !$hasMorePages ? 'disabled' : '' }}">
+                                            <a class="page-link px-3" href="{{ request()->fullUrlWithQuery(['page' => $currentPage + 1]) }}">
+                                                Next <i class="bi bi-arrow-right ms-1"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            @endif
+                        </div>
                     </div>
                 </div>
 
@@ -985,147 +1094,6 @@
         $vehicleYear  = $service->vehicle_year ?? $service->year ?? 'N/A';
         $plateNumber  = $service->plate_number ?? $service->plate_no ?? $service->plate ?? 'N/A';
     @endphp
-
-    <!-- View Record Modal (Always White Theme, No Direct Print) -->
-    <div class="modal fade" id="viewModal{{ $service->id }}" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content modal-content-dark rounded-4 shadow">
-                <div class="modal-header border-bottom border-secondary border-opacity-25 py-3">
-                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2 fs-6">
-                        <i class="bi bi-file-earmark-text text-speed-pink fs-5"></i> Service Record Details
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4 bg-black bg-opacity-30">
-                    <div class="printable-area p-4 border rounded-3 bg-white shadow-sm text-dark mx-auto" style="max-width: 750px;">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pb-3 mb-3 gap-2">
-                            <div>
-                                <h4 class="fw-bold mb-1 d-flex align-items-center gap-2 fs-5">
-                                    <i class="bi bi-car-front-fill text-speed-pink"></i>
-                                    <span><span class="text-speed-pink">SPEED</span><span class="text-speed-blue">LANE</span></span>
-                                </h4>
-                                <p class="text-muted small mb-0">Official Transaction & Service Record</p>
-                            </div>
-                            <div class="text-end">
-                                <span class="badge badge-paid-pdf px-3 py-1.5 rounded-pill mb-1 fw-bold">
-                                    <i class="bi bi-check-circle-fill me-1"></i> PAID
-                                </span>
-                                <p class="text-muted small mb-0">Tracking Code: <strong class="font-monospace text-dark">{{ $service->tracking_code }}</strong></p>
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mb-3 p-3 bg-light rounded-3 border-0 mx-0">
-                            <div class="col-md-6 border-end-md">
-                                <span class="text-muted extra-small d-block fw-bold text-uppercase mb-1">Customer Details</span>
-                                <strong class="text-dark fs-6 d-block">{{ $customerName }}</strong>
-                                <small class="text-dark font-monospace"><i class="bi bi-telephone me-1 text-primary"></i>{{ $contactPhone }}</small>
-                            </div>
-                            <div class="col-md-6 ps-md-3">
-                                <span class="text-muted extra-small d-block fw-bold text-uppercase mb-1">Assigned Mechanic</span>
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1.5 fs-6 fw-semibold d-inline-flex align-items-center gap-1 mt-1">
-                                    <i class="bi bi-wrench me-1"></i>{{ $mechanicName }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="p-3 border rounded-3 bg-light-subtle mb-3">
-                            <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2 border-bottom pb-2 fs-6">
-                                <i class="bi bi-card-heading text-primary"></i> Vehicle Information
-                            </h6>
-                            <div class="row g-3">
-                                <div class="col-md-3 col-6">
-                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Brand & Model</span>
-                                    <span class="fw-bold text-dark small">{{ $vehicleBrand }} {{ $vehicleModel }}</span>
-                                </div>
-                                <div class="col-md-3 col-6">
-                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Vehicle Type</span>
-                                    <span class="fw-bold text-dark small">{{ $vehicleType }}</span>
-                                </div>
-                                <div class="col-md-3 col-6">
-                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Plate Number</span>
-                                    <span class="fw-bold font-monospace text-uppercase text-dark small">{{ $plateNumber }}</span>
-                                </div>
-                                <div class="col-md-3 col-6">
-                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Year</span>
-                                    <span class="fw-bold text-dark small">{{ $vehicleYear }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row g-2 mb-3 p-2 bg-light rounded-3 border-0 mx-0">
-                            <div class="col-md-6 border-end-md">
-                                <span class="text-muted extra-small d-block">Date Registered:</span>
-                                <strong class="text-dark small">{{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y h:i A') }}</strong>
-                            </div>
-                            <div class="col-md-6 ps-md-3">
-                                <span class="text-muted extra-small d-block">Date Completed:</span>
-                                <strong class="text-dark small">{{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y h:i A') }}</strong>
-                            </div>
-                        </div>
-
-                        <!-- Price Adjustment Note Box -->
-                        <div class="p-3 border rounded-3 bg-light-subtle mb-3">
-                            <span class="text-muted extra-small d-block text-uppercase fw-semibold mb-1">
-                                <i class="bi bi-sticky me-1 text-primary"></i> Price Adjustment Note
-                            </span>
-                            <p class="mb-0 small fw-medium text-dark" style="word-break: break-word;">
-                                {{ $service->price_adjustment_note ?? $service->adjustment_note ?? $service->price_note ?? $service->notes ?? $service->price_adjustment_reason ?? 'No price adjustment notes recorded for this transaction.' }}
-                            </p>
-                        </div>
-
-                        <div class="table-responsive mb-0">
-                            <table class="table table-sm table-bordered align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr class="small text-dark">
-                                        <th style="width: 40px;" class="text-center">#</th>
-                                        <th>Completed Service Description</th>
-                                        <th class="text-end" style="width: 120px;">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if(count($serviceNames) > 0)
-                                        @foreach($serviceNames as $idx => $sName)
-                                            <tr>
-                                                <td class="text-center small text-dark">{{ $idx + 1 }}</td>
-                                                <td class="fw-semibold text-dark">{{ $sName }}</td>
-                                                <td class="text-end text-success small fw-bold">
-                                                    <i class="bi bi-check-circle me-1"></i>Completed
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @else
-                                        <tr>
-                                            <td class="text-center small text-dark">1</td>
-                                            <td class="fw-semibold text-dark">General Detailing & Care Service</td>
-                                            <td class="text-end text-success small fw-bold">
-                                                <i class="bi bi-check-circle me-1"></i>Completed
-                                            </td>
-                                        </tr>
-                                    @endif
-                                </tbody>
-                                <tfoot>
-                                    <tr class="table-light">
-                                        <td colspan="2" class="text-end fw-bold text-dark">Total Cost Paid:</td>
-                                        <td class="text-end fw-bold text-primary font-monospace fs-5 text-nowrap">
-                                            <span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0), 2) }}
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-top border-secondary border-opacity-25 py-2 d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm px-3" data-bs-dismiss="modal">Close</button>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-danger btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#pdfPreviewModal{{ $service->id }}">
-                            <i class="bi bi-file-earmark-pdf"></i> Switch to PDF Receipt Preview
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- PDF Receipt Preview Modal (With Price Note & Thermal Receipt Direct Print) -->
     <div class="modal fade" id="pdfPreviewModal{{ $service->id }}" tabindex="-1" aria-hidden="true">
@@ -1269,8 +1237,12 @@
                             <strong class="font-monospace text-uppercase">{{ $service->tracking_code }}</strong>
                         </div>
                         <div class="d-flex justify-content-between extra-small">
-                            <span>Date:</span>
-                            <span>{{ \Carbon\Carbon::parse($service->updated_at ?? $service->created_at)->format('m/d/Y h:i A') }}</span>
+                            <span>Date Registered:</span>
+                            <span>{{ \Carbon\Carbon::parse($service->created_at)->format('m/d/Y h:i A') }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between extra-small">
+                            <span>Date Completed:</span>
+                            <span>{{ \Carbon\Carbon::parse($service->updated_at)->format('m/d/Y h:i A') }}</span>
                         </div>
                         <div class="d-flex justify-content-between extra-small">
                             <span>Customer:</span>
