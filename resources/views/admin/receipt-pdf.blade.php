@@ -38,12 +38,19 @@
         }
 
         .brand-title { 
-            font-size: 15px; 
+            font-size: 16px; 
             font-weight: 900; 
-            color: #0f172a; 
             text-transform: uppercase;
             letter-spacing: 0.8px;
             margin-bottom: 1px;
+        }
+
+        .brand-pink {
+            color: #f42582;
+        }
+
+        .brand-blue {
+            color: #00a2ff;
         }
 
         .brand-subtitle { 
@@ -121,7 +128,7 @@
 
         /* Vehicle Details Card */
         .vehicle-card {
-            border: 1px solid #0f172a;
+            border: 1px solid #e2e8f0;
             border-radius: 3px;
             background-color: #f8fafc;
             padding: 6px 8px;
@@ -214,14 +221,14 @@
         }
 
         .services-table th { 
-            background-color: #0f172a; 
-            color: #ffffff; 
+            background-color: #f8fafc; 
+            color: #0f172a; 
             padding: 5px 6px; 
             font-size: 7.5px; 
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border: 1px solid #0f172a;
+            border: 1px solid #cbd5e1;
             text-align: left;
         }
 
@@ -234,7 +241,7 @@
 
         .services-table tfoot td {
             background-color: #f8fafc;
-            border: 1px solid #0f172a;
+            border: 1px solid #cbd5e1;
             padding: 6px 8px;
         }
 
@@ -245,7 +252,6 @@
         .fw-bold { font-weight: bold; }
         .text-muted { color: #64748b; }
         .text-primary { color: #0f172a; }
-        .text-success { color: #15803d; }
 
         /* Footer Note */
         .footer-note { 
@@ -320,7 +326,7 @@
         <table class="header-table">
             <tr>
                 <td width="60%" style="vertical-align: top;">
-                    <div class="brand-title">SpeedLane</div>
+                    <div class="brand-title"><span class="brand-pink">SPEED</span><span class="brand-blue">LANE</span></div>
                     <div class="brand-subtitle">Official Transaction & Service Record Receipt</div>
                 </td>
                 <td width="40%" style="vertical-align: top;" class="text-end">
@@ -335,7 +341,7 @@
         <!-- Customer & Mechanic Info Block -->
         <table class="info-block-table">
             <tr>
-                <td width="50%" style="border-right: 1px solid #cbd5e1;">
+                <td width="50%">
                     <span class="block-label">Customer Information</span>
                     <div class="block-value">{{ $customerName }}</div>
                     <div class="block-subvalue">{{ $contactPhone }}</div>
@@ -407,14 +413,14 @@
                         <tr>
                             <td class="text-center">{{ $idx + 1 }}</td>
                             <td class="fw-bold">{{ $sName }}</td>
-                            <td class="text-end fw-bold text-success">Completed</td>
+                            <td class="text-end fw-bold">Completed</td>
                         </tr>
                     @endforeach
                 @else
                     <tr>
                         <td class="text-center">1</td>
                         <td class="fw-bold">General Detailing & Care Service</td>
-                        <td class="text-end fw-bold text-success">Completed</td>
+                        <td class="text-end fw-bold">Completed</td>
                     </tr>
                 @endif
             </tbody>

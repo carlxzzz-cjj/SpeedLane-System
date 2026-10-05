@@ -19,7 +19,7 @@
             padding: 0;
         }
         .peso {
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: 'DejaVu Sans', sans-serif !important;
         }
         .header-table {
             width: 100%;
@@ -223,9 +223,9 @@
         $isVehicle    = in_array($typeKey, ['vehicle', 'vehicles', '6']);
         $isTechnician = in_array($typeKey, ['technician', 'technicians', '2']);
 
-        // Standardized Helper for Currency Formatting
+        // Standardized Helper for Currency Formatting (Explicit DejaVu Sans inline font for Dompdf)
         $formatMoney = function($amount) {
-            return '<span class="peso">&#8369;</span>' . number_format((float)($amount ?? 0), 2);
+            return '<span style="white-space: nowrap;"><span class="peso" style="font-family: \'DejaVu Sans\', sans-serif;">&#8369;</span>' . number_format((float)($amount ?? 0), 2) . '</span>';
         };
 
         $getDateRegistered = function($trx) {
@@ -336,8 +336,8 @@
         <tr>
             <td style="width: 60%;">
                <div class="brand-title">
-    <span style="color: #f42582;">SPEED</span><span style="color: #00a2ff;">LANE</span>
-</div>
+                    <span style="color: #f42582;">SPEED</span><span style="color: #00a2ff;">LANE</span>
+               </div>
                 <div class="brand-address">23 Ramos St., Brgy. Dadiangas East, General Santos City, Philippines, 9500</div>
                 <div class="sub-title">
                     {{ $isFinancial ? 'Executive Financial Summary' : 'Executive Business & Intelligence Analytics' }}
@@ -401,8 +401,8 @@
             </tbody>
             <tfoot>
                 <tr style="background-color: #f8fafc; font-weight: bold;">
-                    <td colspan="7" class="text-end" style="font-size: 8.5px; text-transform: uppercase;">Total Realized Revenue:</td>
-                    <td class="text-end font-mono text-primary-val">{!! $formatMoney($grossRevenue) !!}</td>
+                    <td colspan="7" class="text-end" style="font-size: 8.5px; text-transform: uppercase; vertical-align: middle;">Total Realized Revenue:</td>
+                    <td class="text-end font-mono text-primary-val" style="white-space: nowrap; vertical-align: middle;">{!! $formatMoney($grossRevenue) !!}</td>
                 </tr>
             </tfoot>
         </table>
@@ -410,7 +410,7 @@
         <div class="analysis-box">
             <div class="analysis-title">Executive Revenue Summary & Strategic Analysis</div>
             <p class="analysis-text">
-                During this period, SpeedLane AutoSpa generated a total realized gross revenue of <strong>{!! $formatMoney($grossRevenue) !!}</strong> across <strong>{{ number_format($totalJobsCount) }}</strong> completed and processed service sessions. The average ticket value per vehicle stood firmly at <strong>{!! $formatMoney($avgOrderValue) !!}</strong>.
+                During this period, SpeedLane AutoSpa generated a total realized gross revenue of  <strong> {!! $formatMoney($grossRevenue) !!}</strong> across <strong>{{ number_format($totalJobsCount) }}</strong> completed and processed service sessions. The average ticket value per vehicle stood firmly at <strong>{!! $formatMoney($avgOrderValue) !!}</strong>.
             </p>
             <p class="analysis-text" style="margin-bottom: 0;">
                 <strong>Financial Note:</strong> Higher-value detailed packages and custom pricing adjustments contributed significantly to overall profit margins. It is recommended to bundle complimentary minor services into premium packages to maintain or increase the average transaction value in subsequent quarters.

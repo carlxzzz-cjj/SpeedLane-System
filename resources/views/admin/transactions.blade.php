@@ -73,11 +73,11 @@
             box-shadow: 0 0 10px rgba(0, 162, 255, 0.1);
         }
 
-        /* High-Contrast "PAID" Badges for Dark & Light Mode */
+        /* High-Contrast "PAID" Badges */
         .badge-paid-view {
-            background-color: rgba(34, 197, 94, 0.2) !important;
-            color: #4ade80 !important;
-            border: 1px solid rgba(34, 197, 94, 0.4) !important;
+            background-color: #15803d !important;
+            color: #ffffff !important;
+            border: 1px solid #166534 !important;
             font-weight: 700 !important;
             letter-spacing: 0.5px;
         }
@@ -88,20 +88,6 @@
             border: 1px solid #166534 !important;
             font-weight: 700 !important;
             letter-spacing: 0.5px;
-        }
-
-        html.light-theme .badge-paid-view {
-            background-color: #dcfce7 !important;
-            color: #15803d !important;
-            border: 1px solid #86efac !important;
-            font-weight: 700 !important;
-        }
-
-        html.light-theme .badge-paid-pdf {
-            background-color: #15803d !important;
-            color: #ffffff !important;
-            border: 1px solid #166534 !important;
-            font-weight: 700 !important;
         }
 
         .navbar-speed {
@@ -460,6 +446,7 @@
             font-size: 0.75rem;
             letter-spacing: 0.5px;
             padding: 12px 16px;
+            white-space: nowrap;
         }
         .custom-admin-table td {
             background-color: transparent !important;
@@ -506,30 +493,56 @@
             color: #e2e8f0;
         }
 
-        .printable-area {
+        .printable-area, .thermal-receipt-container {
             height: auto !important;
             max-height: none !important;
             overflow: visible !important;
         }
 
+        /* Prevent currency symbols and amounts from line-wrapping & PDF overlay issues */
+        .text-nowrap, td.text-nowrap, th.text-nowrap {
+            white-space: nowrap !important;
+        }
+
+        .peso-symbol, span.peso-symbol {
+            font-family: 'DejaVu Sans', Arial, sans-serif !important;
+            display: inline !important;
+            margin-right: 2px;
+            white-space: nowrap !important;
+        }
+
         @media print {
             @page {
-                size: A4 portrait;
-                margin: 10mm;
+                size: auto;
+                margin: 0mm;
+            }
+            *, *::before, *::after {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
             }
             html, body {
                 margin: 0 !important;
                 padding: 0 !important;
                 background: #ffffff !important;
-                color: #000000 !important;
                 height: auto !important;
+                min-height: 0 !important;
                 overflow: visible !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
             }
             body * { 
                 visibility: hidden !important; 
             }
+            header, .navbar, .container-fluid, .modal-backdrop {
+                display: none !important;
+            }
             .print-active, .print-active * { 
                 visibility: visible !important; 
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
             }
             .print-active { 
                 position: absolute !important; 
@@ -537,12 +550,29 @@
                 top: 0 !important; 
                 width: 100% !important; 
                 margin: 0 !important;
-                padding: 0 !important;
-                background: #ffffff !important; 
-                color: #000000 !important;
+                padding: 20px !important;
+                background: transparent !important; 
                 transform: none !important;
                 box-shadow: none !important;
                 border: none !important;
+            }
+            .print-active.thermal-receipt-container {
+                display: block !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                max-width: 80mm !important;
+                margin: 0 auto !important;
+                padding: 5px !important;
+                font-family: 'Courier New', Courier, monospace !important;
+                color: #000000 !important;
+                background: #ffffff !important;
+            }
+            .print-active.thermal-receipt-container * {
+                font-family: 'Courier New', Courier, monospace !important;
+                color: #000000 !important;
             }
             .modal, .modal-dialog, .modal-content, .modal-body {
                 position: static !important;
@@ -554,10 +584,10 @@
                 overflow: visible !important;
                 display: block !important;
             }
-            .no-print, .modal-header, .modal-footer, .btn-close, .navbar, aside, main > *:not(.modal) { 
+            .no-print, .modal-header, .modal-footer, .btn-close, .navbar, aside, main { 
                 display: none !important; 
             }
-       }
+        }
         body {
             zoom: 80%;
         }
@@ -686,7 +716,7 @@
                         <div class="card speed-card p-3 rounded-4 d-flex flex-row justify-content-between align-items-center">
                             <div>
                                 <span class="text-secondary small d-block mb-1">Total Revenue</span>
-                                <h3 class="fw-bold text-speed-blue mb-0">₱{{ number_format($totalRevenue ?? 0, 2) }}</h3>
+                                <h3 class="fw-bold text-speed-blue mb-0 text-nowrap"><span class="peso-symbol">&#8369;</span>{{ number_format($totalRevenue ?? 0, 2) }}</h3>
                             </div>
                             <div class="stat-icon bg-speed-blue text-white fs-4 shadow-sm">
                                 <i class="bi bi-cash-stack"></i>
@@ -802,7 +832,7 @@
                                     <th>Services Completed</th>
                                     <th>Date Registered</th>
                                     <th>Date Completed</th>
-                                    <th>Total Cost</th>
+                                    <th class="text-nowrap">Total Cost</th>
                                     <th class="text-center pe-3">Actions</th>
                                 </tr>
                             </thead>
@@ -874,8 +904,8 @@
         <td class="small text-secondary">
             {{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y') }}
         </td>
-        <td class="fw-bold font-monospace text-speed-pink">
-            ₱{{ number_format((float)($service->total_cost ?? 0), 2) }}
+        <td class="fw-bold font-monospace text-speed-pink text-nowrap">
+            <span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0), 2) }}
         </td>
         <td class="text-center">
             <div class="d-flex justify-content-center gap-1">
@@ -956,7 +986,7 @@
         $plateNumber  = $service->plate_number ?? $service->plate_no ?? $service->plate ?? 'N/A';
     @endphp
 
-    <!-- View Record Modal -->
+    <!-- View Record Modal (Always White Theme, No Direct Print) -->
     <div class="modal fade" id="viewModal{{ $service->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content modal-content-dark rounded-4 shadow">
@@ -966,86 +996,87 @@
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4">
-                    <div class="printable-area p-4 border border-secondary border-opacity-25 rounded-4 bg-black bg-opacity-40 shadow-sm">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom border-secondary border-opacity-25 pb-3 mb-3 gap-2">
+                <div class="modal-body p-4 bg-black bg-opacity-30">
+                    <div class="printable-area p-4 border rounded-3 bg-white shadow-sm text-dark mx-auto" style="max-width: 750px;">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pb-3 mb-3 gap-2">
                             <div>
-                                <h4 class="fw-bold text-speed-pink mb-1 d-flex align-items-center gap-2 fs-5">
-                                    <i class="bi bi-car-front-fill"></i> SPEEDLANE
+                                <h4 class="fw-bold mb-1 d-flex align-items-center gap-2 fs-5">
+                                    <i class="bi bi-car-front-fill text-speed-pink"></i>
+                                    <span><span class="text-speed-pink">SPEED</span><span class="text-speed-blue">LANE</span></span>
                                 </h4>
-                                <p class="text-secondary small mb-0">Official Transaction & Service Record</p>
+                                <p class="text-muted small mb-0">Official Transaction & Service Record</p>
                             </div>
                             <div class="text-end">
-                                <span class="badge badge-paid-view px-3 py-1.5 rounded-pill mb-1 fw-bold">
+                                <span class="badge badge-paid-pdf px-3 py-1.5 rounded-pill mb-1 fw-bold">
                                     <i class="bi bi-check-circle-fill me-1"></i> PAID
                                 </span>
-                                <p class="text-secondary small mb-0">Tracking Code: <strong class="font-monospace text-speed-blue">{{ $service->tracking_code }}</strong></p>
+                                <p class="text-muted small mb-0">Tracking Code: <strong class="font-monospace text-dark">{{ $service->tracking_code }}</strong></p>
                             </div>
                         </div>
 
-                        <div class="row g-3 mb-3 p-3 bg-black bg-opacity-50 rounded-3 border border-secondary border-opacity-25 mx-0">
+                        <div class="row g-3 mb-3 p-3 bg-light rounded-3 border-0 mx-0">
                             <div class="col-md-6 border-end-md">
-                                <span class="text-secondary extra-small d-block fw-bold text-uppercase mb-1">Customer Details</span>
-                                <strong class="text-white fs-6 d-block">{{ $customerName }}</strong>
-                                <small class="text-secondary font-monospace"><i class="bi bi-telephone me-1 text-speed-blue"></i>{{ $contactPhone }}</small>
+                                <span class="text-muted extra-small d-block fw-bold text-uppercase mb-1">Customer Details</span>
+                                <strong class="text-dark fs-6 d-block">{{ $customerName }}</strong>
+                                <small class="text-dark font-monospace"><i class="bi bi-telephone me-1 text-primary"></i>{{ $contactPhone }}</small>
                             </div>
                             <div class="col-md-6 ps-md-3">
-                                <span class="text-secondary extra-small d-block fw-bold text-uppercase mb-1">Assigned Mechanic</span>
-                                <span class="badge badge-mechanic rounded-pill px-3 py-1.5 fs-6 fw-semibold d-inline-flex align-items-center gap-1 mt-1">
-                                    <i class="bi bi-wrench me-1 text-speed-blue"></i>{{ $mechanicName }}
+                                <span class="text-muted extra-small d-block fw-bold text-uppercase mb-1">Assigned Mechanic</span>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1.5 fs-6 fw-semibold d-inline-flex align-items-center gap-1 mt-1">
+                                    <i class="bi bi-wrench me-1"></i>{{ $mechanicName }}
                                 </span>
                             </div>
                         </div>
 
-                        <div class="p-3 border border-secondary border-opacity-25 rounded-3 bg-black bg-opacity-30 mb-3">
-                            <h6 class="fw-bold text-white mb-3 d-flex align-items-center gap-2 border-bottom border-secondary border-opacity-25 pb-2 fs-6">
-                                <i class="bi bi-card-heading text-speed-blue"></i> Vehicle Information
+                        <div class="p-3 border rounded-3 bg-light-subtle mb-3">
+                            <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2 border-bottom pb-2 fs-6">
+                                <i class="bi bi-card-heading text-primary"></i> Vehicle Information
                             </h6>
                             <div class="row g-3">
                                 <div class="col-md-3 col-6">
-                                    <span class="text-secondary extra-small d-block text-uppercase fw-semibold">Brand & Model</span>
-                                    <span class="fw-bold text-white small">{{ $vehicleBrand }} {{ $vehicleModel }}</span>
+                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Brand & Model</span>
+                                    <span class="fw-bold text-dark small">{{ $vehicleBrand }} {{ $vehicleModel }}</span>
                                 </div>
                                 <div class="col-md-3 col-6">
-                                    <span class="text-secondary extra-small d-block text-uppercase fw-semibold">Vehicle Type</span>
-                                    <span class="fw-bold text-white small">{{ $vehicleType }}</span>
+                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Vehicle Type</span>
+                                    <span class="fw-bold text-dark small">{{ $vehicleType }}</span>
                                 </div>
                                 <div class="col-md-3 col-6">
-                                    <span class="text-secondary extra-small d-block text-uppercase fw-semibold">Plate Number</span>
-                                    <span class="fw-bold font-monospace text-uppercase text-white small">{{ $plateNumber }}</span>
+                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Plate Number</span>
+                                    <span class="fw-bold font-monospace text-uppercase text-dark small">{{ $plateNumber }}</span>
                                 </div>
                                 <div class="col-md-3 col-6">
-                                    <span class="text-secondary extra-small d-block text-uppercase fw-semibold">Year</span>
-                                    <span class="fw-bold text-white small">{{ $vehicleYear }}</span>
+                                    <span class="text-muted extra-small d-block text-uppercase fw-semibold">Year</span>
+                                    <span class="fw-bold text-dark small">{{ $vehicleYear }}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row g-2 mb-3 p-2 bg-black bg-opacity-50 rounded-3 border border-secondary border-opacity-25 mx-0">
+                        <div class="row g-2 mb-3 p-2 bg-light rounded-3 border-0 mx-0">
                             <div class="col-md-6 border-end-md">
-                                <span class="text-secondary extra-small d-block">Date Registered:</span>
-                                <strong class="text-white small">{{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y h:i A') }}</strong>
+                                <span class="text-muted extra-small d-block">Date Registered:</span>
+                                <strong class="text-dark small">{{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y h:i A') }}</strong>
                             </div>
                             <div class="col-md-6 ps-md-3">
-                                <span class="text-secondary extra-small d-block">Date Completed:</span>
-                                <strong class="text-white small">{{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y h:i A') }}</strong>
+                                <span class="text-muted extra-small d-block">Date Completed:</span>
+                                <strong class="text-dark small">{{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y h:i A') }}</strong>
                             </div>
                         </div>
 
                         <!-- Price Adjustment Note Box -->
-                        <div class="p-3 border border-secondary border-opacity-25 rounded-3 bg-black bg-opacity-30 mb-3">
-                            <span class="text-secondary extra-small d-block text-uppercase fw-semibold mb-1">
-                                <i class="bi bi-sticky me-1 text-speed-blue"></i> Price Adjustment Note
+                        <div class="p-3 border rounded-3 bg-light-subtle mb-3">
+                            <span class="text-muted extra-small d-block text-uppercase fw-semibold mb-1">
+                                <i class="bi bi-sticky me-1 text-primary"></i> Price Adjustment Note
                             </span>
-                            <p class="mb-0 small fw-medium text-white">
+                            <p class="mb-0 small fw-medium text-dark" style="word-break: break-word;">
                                 {{ $service->price_adjustment_note ?? $service->adjustment_note ?? $service->price_note ?? $service->notes ?? $service->price_adjustment_reason ?? 'No price adjustment notes recorded for this transaction.' }}
                             </p>
                         </div>
 
                         <div class="table-responsive mb-0">
-                            <table class="table table-sm custom-admin-table mb-0">
-                                <thead>
-                                    <tr>
+                            <table class="table table-sm table-bordered align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr class="small text-dark">
                                         <th style="width: 40px;" class="text-center">#</th>
                                         <th>Completed Service Description</th>
                                         <th class="text-end" style="width: 120px;">Status</th>
@@ -1055,8 +1086,8 @@
                                     @if(count($serviceNames) > 0)
                                         @foreach($serviceNames as $idx => $sName)
                                             <tr>
-                                                <td class="text-center small text-secondary">{{ $idx + 1 }}</td>
-                                                <td class="fw-semibold text-white">{{ $sName }}</td>
+                                                <td class="text-center small text-dark">{{ $idx + 1 }}</td>
+                                                <td class="fw-semibold text-dark">{{ $sName }}</td>
                                                 <td class="text-end text-success small fw-bold">
                                                     <i class="bi bi-check-circle me-1"></i>Completed
                                                 </td>
@@ -1064,8 +1095,8 @@
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td class="text-center small text-secondary">1</td>
-                                            <td class="fw-semibold text-white">General Detailing & Care Service</td>
+                                            <td class="text-center small text-dark">1</td>
+                                            <td class="fw-semibold text-dark">General Detailing & Care Service</td>
                                             <td class="text-end text-success small fw-bold">
                                                 <i class="bi bi-check-circle me-1"></i>Completed
                                             </td>
@@ -1073,10 +1104,10 @@
                                     @endif
                                 </tbody>
                                 <tfoot>
-                                    <tr>
-                                        <td colspan="2" class="text-end fw-bold text-white">Total Cost Paid:</td>
-                                        <td class="text-end fw-bold text-speed-pink font-monospace fs-5">
-                                            ₱{{ number_format((float)($service->total_cost ?? 0), 2) }}
+                                    <tr class="table-light">
+                                        <td colspan="2" class="text-end fw-bold text-dark">Total Cost Paid:</td>
+                                        <td class="text-end fw-bold text-primary font-monospace fs-5 text-nowrap">
+                                            <span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0), 2) }}
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -1087,9 +1118,6 @@
                 <div class="modal-footer border-top border-secondary border-opacity-25 py-2 d-flex justify-content-between">
                     <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm px-3" data-bs-dismiss="modal">Close</button>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-light btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" onclick="printElement('viewModal{{ $service->id }}')">
-                            <i class="bi bi-printer-fill"></i> Direct Print
-                        </button>
                         <button type="button" class="btn btn-outline-danger btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#pdfPreviewModal{{ $service->id }}">
                             <i class="bi bi-file-earmark-pdf"></i> Switch to PDF Receipt Preview
                         </button>
@@ -1099,7 +1127,7 @@
         </div>
     </div>
 
-    <!-- PDF Receipt Preview Modal -->
+    <!-- PDF Receipt Preview Modal (With Price Note & Thermal Receipt Direct Print) -->
     <div class="modal fade" id="pdfPreviewModal{{ $service->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content modal-content-dark rounded-4 shadow">
@@ -1110,11 +1138,13 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4 bg-black bg-opacity-30">
+                    <!-- Screen PDF Document View -->
                     <div class="printable-area p-4 border rounded-3 bg-white shadow-sm text-dark mx-auto" style="max-width: 750px;">
                         <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
                             <div>
-                                <h4 class="fw-bold text-primary mb-1 d-flex align-items-center gap-2">
-                                    <i class="bi bi-car-front-fill"></i> SPEEDLANE
+                                <h4 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                                    <i class="bi bi-car-front-fill text-speed-pink"></i>
+                                    <span><span class="text-speed-pink">SPEED</span><span class="text-speed-blue">LANE</span></span>
                                 </h4>
                                 <p class="text-muted small mb-0">Official Transaction & Service Record Receipt</p>
                             </div>
@@ -1171,6 +1201,16 @@
                             </div>
                         </div>
 
+                        <!-- Price Adjustment Note Box -->
+                        <div class="p-3 border rounded-3 bg-light-subtle mb-3">
+                            <span class="text-muted extra-small d-block text-uppercase fw-semibold mb-1">
+                                <i class="bi bi-sticky me-1 text-primary"></i> Price Adjustment Note
+                            </span>
+                            <p class="mb-0 small fw-medium text-dark" style="word-break: break-word;">
+                                {{ $service->price_adjustment_note ?? $service->adjustment_note ?? $service->price_note ?? $service->notes ?? $service->price_adjustment_reason ?? 'No price adjustment notes recorded for this transaction.' }}
+                            </p>
+                        </div>
+
                         <div class="table-responsive mb-3">
                             <table class="table table-sm table-bordered align-middle mb-0">
                                 <thead class="table-light">
@@ -1200,8 +1240,8 @@
                                 <tfoot>
                                     <tr class="table-light">
                                         <td colspan="2" class="text-end fw-bold text-dark">Total Cost Paid:</td>
-                                        <td class="text-end fw-bold text-dark font-monospace fs-5">
-                                            ₱{{ number_format((float)($service->total_cost ?? 0), 2) }}
+                                        <td class="text-end fw-bold text-dark font-monospace fs-5 text-nowrap">
+                                            <span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0), 2) }}
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -1212,12 +1252,101 @@
                             Thank you for choosing SpeedLane AutoSpa! Keep this receipt for warranty records.
                         </div>
                     </div>
+
+                    <!-- Thermal POS Receipt Container (Hidden on screen, targeted for Direct Print) -->
+                    <div id="thermalReceipt{{ $service->id }}" class="thermal-receipt-container d-none p-3 bg-white text-dark font-monospace" style="max-width: 320px; margin: 0 auto; font-size: 12px; line-height: 1.4; color: #000000 !important;">
+                        <div class="text-center mb-2">
+                            <div class="fw-bold text-uppercase fs-6" style="letter-spacing: 1px;">SPEEDLANE AUTOSPA</div>
+                            <div class="extra-small mb-1" style="font-size: 10px; line-height: 1.2;">23 Ramos St., Brgy. Dadiangas East, General Santos City, Philippines, 9500</div>
+                            <div class="small">Official Service Receipt</div>
+                            <div class="extra-small">Tel: 0938-027-4988</div>
+                        </div>
+
+                        <div class="my-2" style="border-top: 1px dashed #000;"></div>
+
+                        <div class="d-flex justify-content-between extra-small">
+                            <span>Receipt #:</span>
+                            <strong class="font-monospace text-uppercase">{{ $service->tracking_code }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between extra-small">
+                            <span>Date:</span>
+                            <span>{{ \Carbon\Carbon::parse($service->updated_at ?? $service->created_at)->format('m/d/Y h:i A') }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between extra-small">
+                            <span>Customer:</span>
+                            <strong class="text-truncate" style="max-width: 170px;">{{ $customerName }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between extra-small">
+                            <span>Phone:</span>
+                            <span>{{ $contactPhone }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between extra-small">
+                            <span>Vehicle:</span>
+                            <span>{{ $vehicleBrand }} {{ $vehicleModel }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between extra-small">
+                            <span>Plate No:</span>
+                            <strong class="text-uppercase">{{ $plateNumber }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between extra-small">
+                            <span>Mechanic:</span>
+                            <span>{{ $mechanicName }}</span>
+                        </div>
+
+                        <div class="my-2" style="border-top: 1px dashed #000;"></div>
+
+                        <div class="d-flex justify-content-between fw-bold extra-small mb-1">
+                            <span>SERVICES</span>
+                            <span>PRICE</span>
+                        </div>
+
+                        @if(count($serviceNames) > 0)
+                            @foreach($serviceNames as $sName)
+                                <div class="d-flex justify-content-between extra-small mb-1">
+                                    <span class="pe-2" style="word-break: break-word;">{{ $sName }}</span>
+                                    <span class="fw-semibold text-nowrap"><span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0) / count($serviceNames), 2) }}</span>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="d-flex justify-content-between extra-small mb-1">
+                                <span>General Detailing</span>
+                                <span class="fw-semibold text-nowrap"><span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0), 2) }}</span>
+                            </div>
+                        @endif
+
+                        <div class="my-2" style="border-top: 1px dashed #000;"></div>
+
+                        <div class="d-flex justify-content-between fw-bold fs-6 my-1">
+                            <span>TOTAL:</span>
+                            <span class="text-nowrap"><span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0), 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between extra-small">
+                            <span>STATUS:</span>
+                            <strong class="text-uppercase">PAID</strong>
+                        </div>
+
+                        <div class="my-2" style="border-top: 1px dashed #000;"></div>
+
+                        <div class="mb-2">
+                            <div class="fw-bold extra-small text-uppercase mb-1">PRICE ADJUSTMENT NOTE:</div>
+                            <div class="extra-small p-2 bg-light rounded border border-secondary border-opacity-25" style="font-size: 11px; white-space: pre-wrap; word-break: break-word;">{{ $service->price_adjustment_note ?? $service->adjustment_note ?? $service->price_note ?? $service->notes ?? $service->price_adjustment_reason ?? 'No price adjustment notes recorded for this transaction.' }}</div>
+                        </div>
+
+                        <div class="my-2" style="border-top: 1px dashed #000;"></div>
+
+                        <div class="text-center extra-small mt-2 fw-bold text-uppercase" style="text-align: center;">
+                            THANK YOU FOR CHOOSING SPEEDLANE!
+                        </div>
+                        <div class="text-center text-muted" style="font-size: 9px; text-align: center;">
+                            Keep this receipt for warranty records.
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer border-top border-secondary border-opacity-25 py-2 d-flex justify-content-between align-items-center">
                     <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm px-3" data-bs-dismiss="modal">Close</button>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-light btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" onclick="printElement('pdfPreviewModal{{ $service->id }}')">
-                            <i class="bi bi-printer-fill"></i> Print
+                        <button type="button" class="btn btn-outline-light btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" onclick="printElement('thermalReceipt{{ $service->id }}')">
+                            <i class="bi bi-printer-fill"></i> Direct Print
                         </button>
                         <a href="{{ route('admin.transactions.pdf', $service->id) }}" class="btn btn-danger btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" target="_blank">
                             <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
@@ -1350,15 +1479,16 @@
                             </div>
                         </div>
 
-                        <!-- 2. Evaluation Timeframe -->
+                        <!-- 2. Evaluation Timeframe Scope -->
                         <div class="mb-4">
                             <label class="form-label fw-bold text-white small text-uppercase mb-2 d-flex align-items-center gap-2">
                                 <span class="badge bg-speed-pink rounded-circle" style="width: 20px; height: 20px; line-height: 12px;">2</span>
                                 Timeframe Scope
                             </label>
                             
-                            <div class="row g-2 align-items-center">
+                            <div class="row g-2 align-items-start">
                                 <div class="col-md-5">
+                                    <label class="form-label extra-small text-secondary fw-bold mb-1 d-block">Select Timeframe</label>
                                     <select name="timeframe" id="filter_timeframe" class="form-select form-select-sm form-select-dark fw-semibold" onchange="toggleTimeframeFields()">
                                         <option value="all_time" {{ request('date') ? '' : 'selected' }}>All-Time Cumulative</option>
                                         <option value="monthly">Monthly Performance</option>
@@ -1370,22 +1500,27 @@
 
                                 <div class="col-md-7">
                                     <div id="field_weekly" style="display: none;">
+                                        <label class="form-label extra-small text-secondary fw-bold mb-1 d-block">
+                                            Date Started
+                                        </label>
                                         <div class="input-group input-group-sm">
-                                            <span class="input-group-text input-group-text-dark small">Start Date</span>
+                                            <span class="input-group-text input-group-text-dark small"><i class="bi bi-calendar3"></i></span>
                                             <input type="date" name="start_date" class="form-control form-control-dark" value="{{ date('Y-m-d', strtotime('-7 days')) }}">
                                         </div>
                                     </div>
 
                                     <div id="field_monthly" style="display: none;">
+                                        <label class="form-label extra-small text-secondary fw-bold mb-1 d-block">Select Month</label>
                                         <div class="input-group input-group-sm">
-                                            <span class="input-group-text input-group-text-dark small">Month</span>
+                                            <span class="input-group-text input-group-text-dark small"><i class="bi bi-calendar-month"></i></span>
                                             <input type="month" name="month_year" class="form-control form-control-dark" value="{{ date('Y-m') }}">
                                         </div>
                                     </div>
 
                                     <div id="field_yearly" style="display: none;">
+                                        <label class="form-label extra-small text-secondary fw-bold mb-1 d-block">Select Year</label>
                                         <div class="input-group input-group-sm">
-                                            <span class="input-group-text input-group-text-dark small">Year</span>
+                                            <span class="input-group-text input-group-text-dark small"><i class="bi bi-calendar-event"></i></span>
                                             <select name="year" class="form-select form-select-dark">
                                                 @for($y = date('Y'); $y >= date('Y') - 5; $y--)
                                                     <option value="{{ $y }}">{{ $y }}</option>
@@ -1397,10 +1532,16 @@
                                     <div id="field_custom_start" style="display: none;">
                                         <div class="row g-2">
                                             <div class="col-6">
-                                                <input type="date" name="date_from" class="form-control form-control-sm form-control-dark" value="{{ request('date') ?? date('Y-m-01') }}" placeholder="From">
+                                                <label class="form-label extra-small text-secondary fw-bold mb-1 d-block">
+                                                    Date Started
+                                                </label>
+                                                <input type="date" name="date_from" class="form-control form-control-sm form-control-dark" value="{{ date('Y-m-01') }}">
                                             </div>
                                             <div class="col-6" id="field_custom_end">
-                                                <input type="date" name="date_to" class="form-control form-control-sm form-control-dark" value="{{ request('date') ?? date('Y-m-d') }}" placeholder="To">
+                                                <label class="form-label extra-small text-secondary fw-bold mb-1 d-block">
+                                                    Date Ended
+                                                </label>
+                                                <input type="date" name="date_to" class="form-control form-control-sm form-control-dark" value="{{ date('Y-m-d') }}">
                                             </div>
                                         </div>
                                     </div>
@@ -1580,7 +1721,10 @@
             let el = (typeof target === 'string') ? document.getElementById(target) : target;
             if (!el) return;
             
-            let printTarget = el.classList.contains('printable-area') ? el : (el.querySelector('.printable-area') || el);
+            let printTarget = el.classList.contains('printable-area') || el.classList.contains('thermal-receipt-container') 
+                ? el 
+                : (el.querySelector('.printable-area') || el.querySelector('.thermal-receipt-container') || el);
+            
             printTarget.classList.add('print-active');
             
             window.print();
@@ -1629,7 +1773,7 @@
             let activeClasses = [];
             switch (selectedType) {
                 case 'financial':
-                    activeClasses = ['.filter-status', '.filter-service'];
+                    activeClasses = ['.filter-status', '.filter-service', '.filter-customer'];
                     break;
                 case 'technician':
                     activeClasses = ['.filter-status', '.filter-mechanic', '.filter-service'];
