@@ -548,7 +548,7 @@
             color: #e2e8f0;
         }
 
-        .printable-area, .thermal-receipt-container {
+        .printable-area {
             height: auto !important;
             max-height: none !important;
             overflow: visible !important;
@@ -566,89 +566,87 @@
             white-space: nowrap !important;
         }
 
+        /* Direct Print Formatting Styles */
         @media print {
             @page {
-                size: auto;
-                margin: 0mm;
+                size: portrait;
+                margin: 10mm;
             }
+
             tfoot {
                 display: table-row-group !important;
             }
+
             *, *::before, *::after {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 color-adjust: exact !important;
             }
+
             html, body {
                 margin: 0 !important;
                 padding: 0 !important;
                 background: #ffffff !important;
+                color: #000000 !important;
                 height: auto !important;
                 min-height: 0 !important;
                 overflow: visible !important;
-                zoom: 100% !important; /* Resets body zoom to 100% for printer output */
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
+                zoom: 100% !important;
             }
+
             body * { 
                 visibility: hidden !important; 
             }
-            header, .navbar, .container-fluid, .modal-backdrop {
-                display: none !important;
-            }
-            .print-active, .print-active * { 
+
+            .print-active, 
+            .print-active * { 
                 visibility: visible !important; 
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
             }
+
             .print-active { 
                 position: absolute !important; 
                 left: 0 !important; 
                 top: 0 !important; 
                 width: 100% !important; 
-                max-width: 100% !important; /* Overrides inline max-width: 900px */
-                box-sizing: border-box !important;
+                max-width: 100% !important;
                 margin: 0 !important;
-                padding: 15mm !important;
-                background: transparent !important; 
+                padding: 0 !important;
+                background: #ffffff !important; 
                 transform: none !important;
                 box-shadow: none !important;
                 border: none !important;
+                border-radius: 0 !important;
+                overflow: visible !important;
+                height: auto !important;
+                min-height: 0 !important;
             }
-            .print-active.thermal-receipt-container {
-                display: block !important;
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
+
+            .printable-area {
+                max-width: 100% !important;
                 width: 100% !important;
-                max-width: 80mm !important;
-                margin: 0 auto !important;
-                padding: 5px !important;
-                font-family: 'Courier New', Courier, monospace !important;
-                color: #000000 !important;
-                background: #ffffff !important;
-            }
-            .print-active.thermal-receipt-container * {
-                font-family: 'Courier New', Courier, monospace !important;
-                color: #000000 !important;
-            }
-            .modal, .modal-dialog, .modal-content, .modal-body {
-                position: static !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 border: none !important;
                 box-shadow: none !important;
-                transform: none !important;
-                overflow: visible !important;
-                display: block !important;
+                border-radius: 0 !important;
+                background: #ffffff !important;
             }
-            .no-print, .modal-header, .modal-footer, .btn-close, .navbar, aside, main { 
-                display: none !important; 
+
+            .table-responsive {
+                overflow: visible !important;
+            }
+
+            table {
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+            }
+
+            tr, blockquote, img, svg {
+                page-break-inside: avoid;
+                break-inside: avoid;
             }
         }
+
         body {
             zoom: 80%;
         }
@@ -789,6 +787,7 @@
                 <!-- Dynamic Search and Filter Bar -->
                 <div class="card speed-card rounded-4 p-3 mb-4">
                     <form method="GET" action="{{ route('admin.transactions') }}" id="searchFilterForm">
+                        <input type="hidden" name="per_page" id="per_page_hidden" value="{{ request('per_page', method_exists($transactions, 'perPage') ? $transactions->perPage() : 20) }}">
                         <div class="row g-2">
                             <div class="col-md-3">
                                 <label class="form-label small fw-semibold text-light opacity-75 mb-1">Search Records</label>
@@ -871,6 +870,24 @@
 
                 <!-- Completed Transactions Table -->
                 <div class="card speed-card rounded-4 p-4 mb-4">
+                    @php
+                        $requestedPerPage = (int) request('per_page', method_exists($transactions, 'perPage') ? $transactions->perPage() : 20);
+                        $currentPage = (int) request('page', 1);
+
+                        if (method_exists($transactions, 'hasPages') && $transactions->hasPages()) {
+                            $displayTransactions = $transactions->take($requestedPerPage);
+                        } elseif (method_exists($transactions, 'slice')) {
+                            $offset = ($currentPage - 1) * $requestedPerPage;
+                            $displayTransactions = $transactions->slice($offset, $requestedPerPage);
+                        } elseif (is_array($transactions)) {
+                            $offset = ($currentPage - 1) * $requestedPerPage;
+                            $displayTransactions = array_slice($transactions, $offset, $requestedPerPage);
+                        } else {
+                            $displayTransactions = $transactions;
+                        }
+
+                        $displayCount = method_exists($displayTransactions, 'count') ? $displayTransactions->count() : count($displayTransactions);
+                    @endphp
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2 fs-6">
                             <i class="bi bi-file-earmark-text text-speed-pink"></i> Service Records Log
@@ -878,14 +895,16 @@
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-1">
                                 <span class="text-secondary small me-1">Show:</span>
-                                <select name="per_page" form="searchFilterForm" class="form-select form-select-sm form-select-dark py-1 px-2" style="width: auto;" onchange="document.getElementById('searchFilterForm').submit()">
-                                    <option value="20" {{ request('per_page', 20) == 20 ? 'selected' : '' }}>20 per page</option>
-                                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 per page</option>
-                                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 per page</option>
+                                <select name="per_page" form="searchFilterForm" class="form-select form-select-sm form-select-dark py-1 px-2" style="width: auto;" onchange="if(document.getElementById('per_page_hidden')) { document.getElementById('per_page_hidden').value = this.value; } document.getElementById('searchFilterForm').submit();">
+                                    <option value="10" {{ $requestedPerPage == 10 ? 'selected' : '' }}>10 per page</option>
+                                    <option value="20" {{ $requestedPerPage == 20 ? 'selected' : '' }}>20 per page</option>
+                                    <option value="30" {{ $requestedPerPage == 30 ? 'selected' : '' }}>30 per page</option>
+                                    <option value="50" {{ $requestedPerPage == 50 ? 'selected' : '' }}>50 per page</option>
+                                    <option value="100" {{ $requestedPerPage == 100 ? 'selected' : '' }}>100 per page</option>
                                 </select>
                             </div>
                             <span class="badge bg-black bg-opacity-50 text-secondary border border-secondary border-opacity-25 px-3 py-2 rounded-pill small">
-                                Showing {{ method_exists($transactions, 'count') ? $transactions->count() : count($transactions) }} record(s)
+                                Showing {{ $displayCount }} record(s)
                             </span>
                         </div>
                     </div>
@@ -908,7 +927,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                              @forelse($transactions as $service)
+                              @forelse($displayTransactions as $service)
     @php
         $mechanicName = $service->mechanic_assigned 
             ?? ($service->technician->name ?? $service->technician->full_name ?? null)
@@ -1002,9 +1021,18 @@
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-3 border-top border-secondary border-opacity-25 mt-3 gap-2">
                         <div class="text-secondary small">
                             @if(method_exists($transactions, 'firstItem') && $transactions->firstItem())
-                                Showing {{ $transactions->firstItem() }} to {{ $transactions->lastItem() }} of {{ $transactions->total() }} records
+                                @php
+                                    $firstItem = $transactions->firstItem();
+                                    $lastItem = $firstItem ? ($firstItem + $displayCount - 1) : 0;
+                                @endphp
+                                Showing {{ $firstItem }} to {{ $lastItem }} of {{ $transactions->total() }} records
                             @else
-                                Showing {{ method_exists($transactions, 'count') ? $transactions->count() : count($transactions) }} record(s)
+                                @php
+                                    $totalRecs = isset($completedCount) ? $completedCount : (method_exists($transactions, 'total') ? $transactions->total() : (method_exists($transactions, 'count') ? $transactions->count() : count($transactions)));
+                                    $firstItem = $totalRecs > 0 ? (($currentPage - 1) * $requestedPerPage + 1) : 0;
+                                    $lastItem = min($firstItem + $displayCount - 1, $totalRecs);
+                                @endphp
+                                Showing {{ $firstItem }} to {{ $lastItem }} of {{ $totalRecs }} records
                             @endif
                         </div>
 
@@ -1013,10 +1041,8 @@
                                 {{ $transactions->withQueryString()->links('pagination::bootstrap-5') }}
                             @else
                                 @php
-                                    $currentPage = (int) request('page', 1);
-                                    $perPage = (int) request('per_page', 20);
                                     $totalRecords = isset($completedCount) ? $completedCount : (method_exists($transactions, 'total') ? $transactions->total() : (method_exists($transactions, 'count') ? $transactions->count() : count($transactions)));
-                                    $hasMorePages = ($currentPage * $perPage) < $totalRecords;
+                                    $hasMorePages = ($currentPage * $requestedPerPage) < $totalRecords;
                                 @endphp
                                 <nav aria-label="Transaction pagination">
                                     <ul class="pagination pagination-sm mb-0">
@@ -1045,7 +1071,7 @@
     </div>
 
     <!-- RECORD MODALS LOOP -->
-@foreach($transactions as $service)
+@foreach($displayTransactions as $service)
     @php
         $mechanicName = $service->mechanic_assigned 
             ?? ($service->technician->name ?? $service->technician->full_name ?? null)
@@ -1220,105 +1246,13 @@
                             Thank you for choosing SpeedLane AutoSpa! Keep this receipt for warranty records.
                         </div>
                     </div>
-
-                    <!-- Thermal POS Receipt Container (Hidden on screen, targeted for Direct Print) -->
-                    <div id="thermalReceipt{{ $service->id }}" class="thermal-receipt-container d-none p-3 bg-white text-dark font-monospace" style="max-width: 320px; margin: 0 auto; font-size: 12px; line-height: 1.4; color: #000000 !important;">
-                        <div class="text-center mb-2">
-                            <div class="fw-bold text-uppercase fs-6" style="letter-spacing: 1px;">SPEEDLANE AUTOSPA</div>
-                            <div class="extra-small mb-1" style="font-size: 10px; line-height: 1.2;">23 Ramos St., Brgy. Dadiangas East, General Santos City, Philippines, 9500</div>
-                            <div class="small">Official Service Receipt</div>
-                            <div class="extra-small">Tel: 0938-027-4988</div>
-                        </div>
-
-                        <div class="my-2" style="border-top: 1px dashed #000;"></div>
-
-                        <div class="d-flex justify-content-between extra-small">
-                            <span>Receipt #:</span>
-                            <strong class="font-monospace text-uppercase">{{ $service->tracking_code }}</strong>
-                        </div>
-                        <div class="d-flex justify-content-between extra-small">
-                            <span>Date Registered:</span>
-                            <span>{{ \Carbon\Carbon::parse($service->created_at)->format('m/d/Y h:i A') }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between extra-small">
-                            <span>Date Completed:</span>
-                            <span>{{ \Carbon\Carbon::parse($service->updated_at)->format('m/d/Y h:i A') }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between extra-small">
-                            <span>Customer:</span>
-                            <strong class="text-truncate" style="max-width: 170px;">{{ $customerName }}</strong>
-                        </div>
-                        <div class="d-flex justify-content-between extra-small">
-                            <span>Phone:</span>
-                            <span>{{ $contactPhone }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between extra-small">
-                            <span>Vehicle:</span>
-                            <span>{{ $vehicleBrand }} {{ $vehicleModel }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between extra-small">
-                            <span>Plate No:</span>
-                            <strong class="text-uppercase">{{ $plateNumber }}</strong>
-                        </div>
-                        <div class="d-flex justify-content-between extra-small">
-                            <span>Mechanic:</span>
-                            <span>{{ $mechanicName }}</span>
-                        </div>
-
-                        <div class="my-2" style="border-top: 1px dashed #000;"></div>
-
-                        <div class="d-flex justify-content-between fw-bold extra-small mb-1">
-                            <span>SERVICES</span>
-                            <span>PRICE</span>
-                        </div>
-
-                        @if(count($serviceNames) > 0)
-                            @foreach($serviceNames as $sName)
-                                <div class="d-flex justify-content-between extra-small mb-1">
-                                    <span class="pe-2" style="word-break: break-word;">{{ $sName }}</span>
-                                    <span class="fw-semibold text-nowrap"><span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0) / count($serviceNames), 2) }}</span>
-                                </div>
-                            @endforeach
-                        @else
-                            <div class="d-flex justify-content-between extra-small mb-1">
-                                <span>General Detailing</span>
-                                <span class="fw-semibold text-nowrap"><span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0), 2) }}</span>
-                            </div>
-                        @endif
-
-                        <div class="my-2" style="border-top: 1px dashed #000;"></div>
-
-                        <div class="d-flex justify-content-between fw-bold fs-6 my-1">
-                            <span>TOTAL:</span>
-                            <span class="text-nowrap"><span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0), 2) }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between extra-small">
-                            <span>STATUS:</span>
-                            <strong class="text-uppercase">PAID</strong>
-                        </div>
-
-                        <div class="my-2" style="border-top: 1px dashed #000;"></div>
-
-                        <div class="mb-2">
-                            <div class="fw-bold extra-small text-uppercase mb-1">PRICE ADJUSTMENT NOTE:</div>
-                            <div class="extra-small p-2 bg-light rounded border border-secondary border-opacity-25" style="font-size: 11px; white-space: pre-wrap; word-break: break-word;">{{ $service->price_adjustment_note ?? $service->adjustment_note ?? $service->price_note ?? $service->notes ?? $service->price_adjustment_reason ?? 'No price adjustment notes recorded for this transaction.' }}</div>
-                        </div>
-
-                        <div class="my-2" style="border-top: 1px dashed #000;"></div>
-
-                        <div class="text-center extra-small mt-2 fw-bold text-uppercase" style="text-align: center;">
-                            THANK YOU FOR CHOOSING SPEEDLANE!
-                        </div>
-                        <div class="text-center text-muted" style="font-size: 9px; text-align: center;">
-                            Keep this receipt for warranty records.
-                        </div>
-                    </div>
                 </div>
                 <div class="modal-footer border-top border-secondary border-opacity-25 py-2 d-flex justify-content-between align-items-center">
                     <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm px-3" data-bs-dismiss="modal">Close</button>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-light btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" onclick="printElement('thermalReceipt{{ $service->id }}')">
-                            <i class="bi bi-printer-fill"></i> Direct Print
+                        <!-- Direct Thermal Receipt Print Button -->
+                        <button type="button" onclick="printThermalReceipt('{{ route('admin.transactions.thermal', $service->id) }}')" class="btn btn-outline-light btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1">
+                            <i class="bi bi-printer-fill"></i> Print Receipt
                         </button>
                         <a href="{{ route('admin.transactions.pdf', $service->id) }}" class="btn btn-danger btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" target="_blank">
                             <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
@@ -1687,23 +1621,168 @@
     <script src="{{ asset('js/theme-toggle.js') }}"></script>
 
     <script>
-        function printElement(target) {
-            document.querySelectorAll('.print-active').forEach(el => el.classList.remove('print-active'));
+        // Thermal Receipt Printer via iframe
+        function printThermalReceipt(url) {
+            let iframe = document.getElementById('thermalPrintIframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'thermalPrintIframe';
+                iframe.style.position = 'fixed';
+                iframe.style.right = '0';
+                iframe.style.bottom = '0';
+                iframe.style.width = '0';
+                iframe.style.height = '0';
+                iframe.style.border = '0';
+                iframe.style.visibility = 'hidden';
+                document.body.appendChild(iframe);
+            }
             
+            iframe.src = url;
+            
+            iframe.onload = function() {
+                setTimeout(function() {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                }, 300);
+            };
+        }
+
+        // Direct Report Printable Document Print Handler via Dedicated Frame
+        function printElement(target) {
             let el = (typeof target === 'string') ? document.getElementById(target) : target;
             if (!el) return;
             
-            let printTarget = el.classList.contains('printable-area') || el.classList.contains('thermal-receipt-container') 
+            let printTarget = el.classList.contains('printable-area') 
                 ? el 
-                : (el.querySelector('.printable-area') || el.querySelector('.thermal-receipt-container') || el);
-            
-            printTarget.classList.add('print-active');
-            
-            window.print();
-            
-            setTimeout(() => {
-                printTarget.classList.remove('print-active');
-            }, 1000);
+                : (el.querySelector('.printable-area') || el);
+
+            if (!printTarget) return;
+
+            let iframe = document.getElementById('reportPrintIframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'reportPrintIframe';
+                iframe.style.position = 'fixed';
+                iframe.style.right = '0';
+                iframe.style.bottom = '0';
+                iframe.style.width = '0';
+                iframe.style.height = '0';
+                iframe.style.border = '0';
+                iframe.style.visibility = 'hidden';
+                document.body.appendChild(iframe);
+            }
+
+            // Copy all styles from current page head to guarantee visual parity
+            let stylesHTML = '';
+            document.querySelectorAll('style, link[rel="stylesheet"]').forEach(node => {
+                stylesHTML += node.outerHTML;
+            });
+
+            let doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Executive Business Report</title>
+                    ${stylesHTML}
+                    <style>
+                        @page {
+                            size: portrait;
+                            margin: 10mm;
+                        }
+                        *, *::before, *::after {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
+                        }
+                        html, body {
+                            background: #ffffff !important;
+                            color: #1e293b !important;
+                            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+                            padding: 0 !important;
+                            margin: 0 !important;
+                            height: auto !important;
+                            min-height: 0 !important;
+                            overflow: visible !important;
+                        }
+                        body *, .print-active, .print-active *, .printable-area, .printable-area * {
+                            visibility: visible !important;
+                        }
+                        .printable-area {
+                            width: 100% !important;
+                            max-width: 100% !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            border: none !important;
+                            box-shadow: none !important;
+                            background: #ffffff !important;
+                            height: auto !important;
+                            overflow: visible !important;
+                        }
+                        .table-responsive, div, section, article {
+                            overflow: visible !important;
+                            height: auto !important;
+                            max-height: none !important;
+                        }
+                        .text-nowrap, td.text-nowrap, th.text-nowrap {
+                            white-space: nowrap !important;
+                        }
+                        .peso-symbol, span.peso-symbol {
+                            font-family: 'DejaVu Sans', Arial, sans-serif !important;
+                            display: inline !important;
+                            margin-right: 2px;
+                            white-space: nowrap !important;
+                        }
+                        table {
+                            width: 100% !important;
+                            border-collapse: collapse !important;
+                            page-break-inside: auto !important;
+                            break-inside: auto !important;
+                        }
+                        tr, blockquote, img, svg {
+                            page-break-inside: avoid !important;
+                            break-inside: avoid !important;
+                        }
+                        thead {
+                            display: table-header-group !important;
+                        }
+                        tfoot {
+                            display: table-row-group !important;
+                        }
+                        .text-muted, .text-secondary {
+                            color: #475569 !important;
+                        }
+                        .text-speed-pink {
+                            color: #f42582 !important;
+                        }
+                        .text-speed-blue {
+                            color: #00a2ff !important;
+                        }
+                        .bg-speed-pink {
+                            background-color: #f42582 !important;
+                            color: #ffffff !important;
+                        }
+                        .bg-speed-blue {
+                            background-color: #00a2ff !important;
+                            color: #ffffff !important;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="printable-area print-active">
+                        ${printTarget.innerHTML}
+                    </div>
+                </body>
+                </html>
+            `);
+            doc.close();
+
+            setTimeout(function() {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            }, 400);
         }
 
         function toggleTimeframeFields() {

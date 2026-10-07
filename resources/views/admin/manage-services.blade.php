@@ -853,18 +853,16 @@
                             </button>
                         </div>
 
-                        <!-- SEARCH & VEHICLE FILTER BAR -->
+                        <!-- SEARCH & VEHICLE FILTER BAR (COMPACT & FIT) -->
                         <div class="card speed-card border-0 shadow-sm rounded-4 p-3 mb-4">
-                            <div class="row g-2">
-                                <div class="col-md-8">
-                                    <div class="input-group">
-                                        <span class="input-group-text input-group-text-dark rounded-start-3">
-                                            <i class="bi bi-search"></i>
-                                        </span>
-                                        <input type="text" id="serviceSearchInput" class="form-control form-control-dark rounded-end-3" placeholder="Search service name, sub-services, or price (e.g. Wash, Sedan, 500)...">
-                                    </div>
+                            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+                                <div class="input-group" style="max-width: 400px;">
+                                    <span class="input-group-text input-group-text-dark rounded-start-3">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text" id="serviceSearchInput" class="form-control form-control-dark rounded-end-3" placeholder="Search service name, sub-services, or price (e.g. Wash, Sedan, 500)...">
                                 </div>
-                                <div class="col-md-4">
+                                <div style="max-width: 250px;">
                                     <select id="vehicleFilterSelect" class="form-select form-select-dark rounded-3">
                                         <option value="">Filter by Vehicle: All Types</option>
                                         <option value="Sedan">Sedan</option>

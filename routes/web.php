@@ -86,11 +86,14 @@ Route::middleware('auth')->group(function () {
 
     // Update Status Page & Additional Services
     Route::get('/admin/update', [ServiceController::class, 'index'])->name('admin.update');
-    Route::put('/admin/update/{id}', [ServiceController::class, 'updateStatus'])->name('admin.update-status');
-    Route::patch('/admin/update/{id}', [ServiceController::class, 'updateStatus'])->name('services.updateStatus');
+Route::put('/admin/update/{id}', [ServiceController::class, 'updateStatus'])
+    ->name('services.update-status');
+        Route::patch('/admin/update/{id}', [ServiceController::class, 'updateStatus'])->name('services.updateStatus');
 
     Route::post('/admin/update/{id}/add-service', [ServiceController::class, 'addAdditional'])->name('admin.add-additional');
     Route::post('/admin/update/{id}/add-service-alt', [ServiceController::class, 'addAdditional'])->name('services.addAdditional');
+
+    Route::put('/admin/update-status/{id}', [App\Http\Controllers\Admin\ManageServiceController::class, 'updateStatus'])->name('admin.update-status');
 
     // Transactions History, System Reports & PDF Export
     Route::get('/admin/transactions', [TransactionController::class, 'index'])->name('admin.transactions');
@@ -102,6 +105,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/reports/download', [TransactionController::class, 'downloadReport'])->name('admin.reports.download');
     Route::get('/admin/reports/pdf', [TransactionController::class, 'downloadReport'])->name('admin.reports.pdf');
     Route::get('/admin/transactions/report/download', [TransactionController::class, 'downloadReport'])->name('admin.transactions.reports.download');
+
+    Route::get('/admin/transactions/thermal/{id}', [App\Http\Controllers\Admin\TransactionController::class, 'thermal'])
+    ->name('admin.transactions.thermal');
     
     Route::get('/admin/transactions/{id}/pdf', [TransactionController::class, 'downloadPdf'])->name('admin.transactions.pdf');
     

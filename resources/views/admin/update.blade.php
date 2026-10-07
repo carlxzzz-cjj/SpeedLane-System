@@ -762,6 +762,13 @@
                     </div>
                 @endif
 
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4 bg-danger bg-opacity-20 text-white border-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
                 @php
                     // Dynamic extraction of Vehicle Types, Vehicle Brands, and Services from active queue records combined with full defaults
                     $extractedTypes = collect();
@@ -1318,7 +1325,7 @@
                                                                                            data-initial-price="{{ $formattedInitialPrice }}" 
                                                                                            placeholder="0.00" 
                                                                                            required 
-                                                                                           {{ $isItemCompletedInDb ? 'readonly' : 'readonly' }}>
+                                                                                           {{ $isItemCompletedInDb ? 'readonly' : '' }}>
                                                                                 </div>
                                                                                 <small class="text-secondary d-block mt-1 cost-editable-hint" style="font-size: 0.72rem;">
                                                                                     @if($isItemCompletedInDb)
@@ -1382,6 +1389,7 @@
                                                                 Checking this option moves this active job to <strong>Transaction Records</strong>, archiving the final verified costs so it shows as <strong>Total Cost</strong> (instead of estimated cost).
                                                             </small>
                                                         </div>
+
 
                                                     </div>
                                                     <div class="modal-footer border-top-0 pt-0">
@@ -1581,7 +1589,7 @@
                 }
             }
 
-            // Function to recalculate modal Overall Estimated Cost, Progress Status, and Registration Note Requirement/Editability
+            // Function to recalculate modal Overall Estimated Cost, Progress Status, Registration Note, and toggle SMS Notification option
             function syncModalSummary(modal) {
                 if (!modal) return;
 
@@ -1641,8 +1649,7 @@
                         }
                     });
 
-                    // Handle Price Adjustment Note Requirement:
-                    // Note is required ONLY when there is an adjustment in the price. If none, then optional.
+                    // Handle Price Adjustment Note Requirement
                     const regNoteInput = vBlock.querySelector('.registration-note-input');
                     const regNoteBadge = vBlock.querySelector('.registration-note-badge');
 
@@ -1686,6 +1693,26 @@
                     } else {
                         statusBadge.className = 'badge badge-in-progress fs-6 px-3 py-2 mt-1 modal-overall-status-badge';
                         statusBadge.innerHTML = '<i class="bi bi-gear-wide-connected me-1"></i> In Progress';
+                    }
+                }
+
+                // Show/Hide SMS Notification Option dynamically when "Completed & Ready for Pick Up" is selected
+                const smsContainer = modal.querySelector('.sms-option-container');
+                if (smsContainer) {
+                    const hasCompletedAndReadyStage = allStatuses.some(st => 
+                        st.includes('completed & ready for pick up') || 
+                        st.includes('ready for pick up') || 
+                        st.includes('ready for pickup')
+                    );
+
+                    if (hasCompletedAndReadyStage) {
+                        smsContainer.classList.remove('d-none');
+                    } else {
+                        smsContainer.classList.add('d-none');
+                        const smsSwitch = smsContainer.querySelector('.send-sms-switch-input');
+                        if (smsSwitch) {
+                            smsSwitch.checked = false;
+                        }
                     }
                 }
             }

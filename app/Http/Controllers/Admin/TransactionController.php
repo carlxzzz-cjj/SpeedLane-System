@@ -797,6 +797,15 @@ private function getFilteredReportData(Request $request): array
         return $pdf->download("Receipt-{$service->tracking_code}.pdf");
     }
 
+
+    public function thermal($id)
+{
+    $service = ServiceRecord::findOrFail($id);
+    $this->repairTransactionPrices($service);
+
+    return view('admin.thermal-receipt', compact('service'));
+}
+
     /**
      * Price Repair Logic
      */
