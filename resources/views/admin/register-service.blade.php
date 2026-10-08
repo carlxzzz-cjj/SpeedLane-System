@@ -660,7 +660,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label small text-secondary fw-semibold">Phone Number <span class="text-speed-pink">*</span></label>
-                                        <input type="text" name="contact_number" id="customer_phone" class="form-control form-control-dark" placeholder="e.g., 09123456789" value="{{ old('contact_number') }}" required>
+                                        <input type="text" name="contact_number" id="customer_phone" class="form-control form-control-dark" placeholder="e.g., 0912 345 6789" value="{{ old('contact_number') }}" maxlength="13" required>
                                     </div>
                                 </div>
                             </div>
@@ -1235,11 +1235,18 @@
         function validateVehicleServiceInfo() {
             const custName = (customerNameInput?.value || '').trim();
             const custPhone = (customerPhoneInput?.value || '').trim();
+            const phoneDigits = custPhone.replace(/\D/g, '');
 
             if (!custName || !custPhone) {
                 alert('Please fill out the Customer Name and Phone Number first.');
                 if (!custName && customerNameInput) customerNameInput.focus();
                 else if (customerPhoneInput) customerPhoneInput.focus();
+                return false;
+            }
+
+            if (phoneDigits.length !== 11 || !phoneDigits.startsWith('09')) {
+                alert('Please enter a valid mobile number in domestic format: 09XX XXX XXXX (11 digits total starting with 09).');
+                if (customerPhoneInput) customerPhoneInput.focus();
                 return false;
             }
 
@@ -1627,7 +1634,7 @@
             }
         }
 
-        // --- CUSTOMER INFORMATION PREVIEW ---
+        // --- CUSTOMER INFORMATION PREVIEW & LIVE 09XX XXX XXXX FORMATTING ---
         function updateCustomerPreview() {
             const custName = customerNameInput?.value.trim() || '---';
             const custPhone = customerPhoneInput?.value.trim() || '---';
@@ -1640,7 +1647,27 @@
         }
 
         if (customerNameInput) customerNameInput.addEventListener('input', updateCustomerPreview);
-        if (customerPhoneInput) customerPhoneInput.addEventListener('input', updateCustomerPreview);
+
+        if (customerPhoneInput) {
+            customerPhoneInput.addEventListener('input', function() {
+                // Strip all non-digit characters and limit to 11 digits
+                let digits = this.value.replace(/\D/g, '');
+                if (digits.length > 11) {
+                    digits = digits.substring(0, 11);
+                }
+
+                // Format live as 09XX XXX XXXX
+                let formatted = digits;
+                if (digits.length > 4 && digits.length <= 7) {
+                    formatted = `${digits.substring(0, 4)} ${digits.substring(4)}`;
+                } else if (digits.length > 7) {
+                    formatted = `${digits.substring(0, 4)} ${digits.substring(4, 7)} ${digits.substring(7)}`;
+                }
+
+                this.value = formatted;
+                updateCustomerPreview();
+            });
+        }
 
         // --- TRACKING CODE GENERATOR BUTTON WITH VALIDATION ---
         if (generateCodeBtn) {

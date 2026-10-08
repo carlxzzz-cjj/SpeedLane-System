@@ -676,8 +676,8 @@
 
                         <!-- Error Alert Message -->
                         @if(session('error'))
-                            <div class="alert alert-danger alert-dismissible fade show rounded-2 mb-3 bg-danger bg-opacity-20 text-white border-danger" role="alert">
-                                <i class="bi bi-exclamation-circle-fill me-2"></i> {{ session('error') }}
+                            <div id="serverAlertBox" class="alert alert-danger alert-dismissible fade show rounded-2 mb-3 bg-danger bg-opacity-20 text-white border-danger" role="alert">
+                                <i class="bi bi-exclamation-circle-fill me-2"></i> There's no service with that code
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         @endif
@@ -959,5 +959,88 @@
     <!-- Light Mode Toggle JS -->
     <script src="{{ asset('js/theme-toggle.js') }}"></script>
 
+    <!-- Rate-Limiting Brute-Force Protection Mechanism (5 Failed Attempts = 1 Min Lockout) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const trackingForm = document.getElementById('trackingForm');
+            const trackingInput = document.getElementById('trackingCode');
+            const submitBtn = trackingForm ? trackingForm.querySelector('button[type="submit"]') : null;
+
+            if (!trackingForm || !trackingInput) return;
+
+            const MAX_ATTEMPTS = 5;
+            const LOCKOUT_TIME_MS = 60000; // 1 minute in milliseconds
+
+            function checkLockoutStatus() {
+                const lockoutUntil = parseInt(localStorage.getItem('speedlane_lockout_until') || '0', 10);
+                const now = Date.now();
+
+                if (now < lockoutUntil) {
+                    const remainingSec = Math.ceil((lockoutUntil - now) / 1000);
+                    
+                    trackingInput.disabled = true;
+                    if (submitBtn) submitBtn.disabled = true;
+
+                    const warningMsg = `Too many failed tracking attempts! Restricted for ${remainingSec} second(s).`;
+                    showWarning(warningMsg);
+
+                    setTimeout(checkLockoutStatus, 1000);
+                    return true;
+                } else {
+                    if (lockoutUntil > 0) {
+                        localStorage.removeItem('speedlane_lockout_until');
+                        localStorage.setItem('speedlane_track_attempts', '0');
+                    }
+                    trackingInput.disabled = false;
+                    if (submitBtn) submitBtn.disabled = false;
+                    clearWarning();
+                    return false;
+                }
+            }
+
+            function showWarning(msg) {
+                let errAlert = document.getElementById('lockoutAlertBox');
+                if (!errAlert) {
+                    errAlert = document.createElement('div');
+                    errAlert.id = 'lockoutAlertBox';
+                    errAlert.className = 'alert alert-danger rounded-2 mb-3 bg-danger bg-opacity-20 text-white border-danger small';
+                    trackingForm.parentNode.insertBefore(errAlert, trackingForm);
+                }
+                errAlert.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> ${msg}`;
+            }
+
+            function clearWarning() {
+                const errAlert = document.getElementById('lockoutAlertBox');
+                if (errAlert) errAlert.remove();
+            }
+
+            // Handle server alert / failed code submission
+            const serverAlert = document.getElementById('serverAlertBox') || document.querySelector('.alert-danger');
+            if (serverAlert && !serverAlert.id?.includes('lockoutAlertBox')) {
+                serverAlert.innerHTML = `<i class="bi bi-exclamation-circle-fill me-2"></i> There's no service with that code <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>`;
+
+                if (!checkLockoutStatus()) {
+                    let attempts = parseInt(localStorage.getItem('speedlane_track_attempts') || '0', 10) + 1;
+                    localStorage.setItem('speedlane_track_attempts', attempts.toString());
+
+                    if (attempts >= MAX_ATTEMPTS) {
+                        const lockoutTime = Date.now() + LOCKOUT_TIME_MS;
+                        localStorage.setItem('speedlane_lockout_until', lockoutTime.toString());
+                        localStorage.setItem('speedlane_track_attempts', '0');
+                        checkLockoutStatus();
+                    }
+                }
+            } else {
+                checkLockoutStatus();
+            }
+
+            trackingForm.addEventListener('submit', function(e) {
+                if (checkLockoutStatus()) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
 </body>
 </html>

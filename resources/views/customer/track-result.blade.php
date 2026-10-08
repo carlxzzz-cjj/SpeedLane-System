@@ -412,6 +412,18 @@
                 });
 
                 $contactNum = $customerInfo->contact_number ?? $customerInfo->phone_number ?? null;
+                $maskedContact = 'N/A';
+                if ($contactNum) {
+                    $digitsOnly = preg_replace('/[^0-9]/', '', $contactNum);
+                    $len = strlen($digitsOnly);
+                    if ($len >= 7) {
+                        $first = substr($digitsOnly, 0, 2);
+                        $last = substr($digitsOnly, -3);
+                        $maskedContact = $first . str_repeat('*', max(1, $len - 5)) . $last;
+                    } else {
+                        $maskedContact = $contactNum;
+                    }
+                }
             @endphp
 
             <!-- Customer & Order Overview -->
@@ -439,7 +451,7 @@
                                 <span class="text-secondary extra-small d-block">Contact Number</span>
                                 @if($contactNum)
                                     <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contactNum) }}" class="fw-bold text-speed-blue text-decoration-none fs-6">
-                                        <i class="bi bi-telephone me-1"></i>{{ $contactNum }}
+                                        <i class="bi bi-telephone me-1"></i>{{ $maskedContact }}
                                     </a>
                                 @else
                                     <span class="fw-bold text-white fs-6">N/A</span>
@@ -757,7 +769,7 @@
                     <div class="bg-black bg-opacity-40 text-secondary d-inline-flex p-3 rounded-circle mb-3 border border-secondary border-opacity-25 empty-state-icon-wrapper">
                         <i class="bi bi-search fs-1 text-secondary"></i>
                     </div>
-                    <h5 class="fw-bold text-white mb-2">No Service Record Found</h5>
+                    <h5 class="fw-bold text-white mb-2">There's no service with that code</h5>
                     <p class="text-secondary small mx-auto mb-4" style="max-width: 450px;">
                         No active vehicles were found matching that tracking code or plate number.
                     </p>
@@ -766,6 +778,22 @@
                     </a>
                 </div>
             </div>
+
+            <script>
+                // Track failed attempt on empty search result
+                (function() {
+                    const MAX_ATTEMPTS = 5;
+                    const LOCKOUT_TIME_MS = 60000;
+                    let attempts = parseInt(localStorage.getItem('speedlane_track_attempts') || '0', 10) + 1;
+                    localStorage.setItem('speedlane_track_attempts', attempts.toString());
+
+                    if (attempts >= MAX_ATTEMPTS) {
+                        const lockoutTime = Date.now() + LOCKOUT_TIME_MS;
+                        localStorage.setItem('speedlane_lockout_until', lockoutTime.toString());
+                        localStorage.setItem('speedlane_track_attempts', '0');
+                    }
+                })();
+            </script>
         @endif
 
         <!-- Support Card with Clickable Contacts -->

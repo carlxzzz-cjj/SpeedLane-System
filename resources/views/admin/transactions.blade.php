@@ -1250,10 +1250,12 @@
                 <div class="modal-footer border-top border-secondary border-opacity-25 py-2 d-flex justify-content-between align-items-center">
                     <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm px-3" data-bs-dismiss="modal">Close</button>
                     <div class="d-flex gap-2">
+                        {{--
                         <!-- Direct Thermal Receipt Print Button -->
                         <button type="button" onclick="printThermalReceipt('{{ route('admin.transactions.thermal', $service->id) }}')" class="btn btn-outline-light btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1">
                             <i class="bi bi-printer-fill"></i> Print Receipt
                         </button>
+                        --}}
                         <a href="{{ route('admin.transactions.pdf', $service->id) }}" class="btn btn-danger btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" target="_blank">
                             <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
                         </a>
@@ -1621,9 +1623,12 @@
     <script src="{{ asset('js/theme-toggle.js') }}"></script>
 
     <script>
-        // Thermal Receipt Printer via iframe
+        // Thermal Receipt Printer via hidden iframe
+        // Loads the dedicated thermal-receipt Blade and sends only that
+        // document to the browser's print command.
         function printThermalReceipt(url) {
             let iframe = document.getElementById('thermalPrintIframe');
+
             if (!iframe) {
                 iframe = document.createElement('iframe');
                 iframe.id = 'thermalPrintIframe';
@@ -1634,17 +1639,25 @@
                 iframe.style.height = '0';
                 iframe.style.border = '0';
                 iframe.style.visibility = 'hidden';
+                iframe.setAttribute('aria-hidden', 'true');
                 document.body.appendChild(iframe);
             }
-            
-            iframe.src = url;
-            
-            iframe.onload = function() {
-                setTimeout(function() {
-                    iframe.contentWindow.focus();
-                    iframe.contentWindow.print();
+
+            // Clear any previous handler before loading a new receipt.
+            iframe.onload = null;
+
+            iframe.onload = function () {
+                setTimeout(function () {
+                    try {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    } catch (error) {
+                        console.error('Thermal receipt print failed:', error);
+                    }
                 }, 300);
             };
+
+            iframe.src = url;
         }
 
         // Direct Report Printable Document Print Handler via Dedicated Frame

@@ -105,59 +105,124 @@
         /* =========================================================
            PRINT MEDIA QUERIES (58MM THERMAL MONOSPACE FIX)
         ========================================================== */
-        @media print {
-            @page {
-                size: 58mm auto;
-                margin: 0mm !important;
-            }
+      @media print {
 
-            html, body {
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                background: #ffffff !important;
-                font-family: 'Courier New', Courier, monospace !important;
-                letter-spacing: -0.3px !important;
-            }
+    @page {
+        size: 58mm 200mm;
+        margin: 0 !important;
+    }
 
-            .no-print-bar {
-                display: none !important;
-            }
+    html,
+    body {
+        width: 58mm !important;
+        min-width: 58mm !important;
+        max-width: 58mm !important;
 
-            .receipt-wrapper,
-            .receipt-container {
-                width: 100% !important;
-                max-width: 100% !important;
-                margin: 0 !important;
-                padding: 1mm 1mm !important;
-                border: none !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-            }
+        margin: 0 !important;
+        padding: 0 !important;
 
-            .divider {
-                border-bottom: 1px dashed #000000 !important;
-                margin: 1.5mm 0 !important;
-            }
+        background: #ffffff !important;
 
-            table.receipt-table td {
-                font-size: 8.5px !important;
-                line-height: 1.2 !important;
-                padding: 1px 0 !important;
-            }
+        font-family: "Courier New", Courier, monospace !important;
+        letter-spacing: 0 !important;
 
-            .note-box {
-                border: 1px solid #000000 !important;
-                font-size: 8px !important;
-                line-height: 1.2 !important;
-                padding: 1mm !important;
-            }
+        overflow: visible !important;
+    }
 
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-        }
+    .no-print-bar {
+        display: none !important;
+    }
+
+    .receipt-wrapper {
+        width: 48mm !important;
+        max-width: 48mm !important;
+        min-width: 48mm !important;
+
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+
+    .receipt-container {
+        width: 48mm !important;
+        max-width: 48mm !important;
+        min-width: 48mm !important;
+
+        margin: 0 !important;
+        padding: 1mm 0 !important;
+
+        background: #ffffff !important;
+
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .divider {
+        width: 100% !important;
+
+        border: 0 !important;
+        border-bottom: 1px dashed #000000 !important;
+
+        margin: 1.5mm 0 !important;
+    }
+
+    table.receipt-table {
+        width: 48mm !important;
+        max-width: 48mm !important;
+
+        table-layout: fixed !important;
+        border-collapse: collapse !important;
+
+        margin: 2px 0 !important;
+    }
+
+    table.receipt-table td {
+        font-size: 8.5px !important;
+        line-height: 1.2 !important;
+
+        padding: 1px 0 !important;
+
+        vertical-align: top !important;
+
+        overflow-wrap: break-word !important;
+        word-break: normal !important;
+    }
+
+    .col-label {
+        width: 30% !important;
+    }
+
+    .col-val {
+        width: 70% !important;
+    }
+
+    .nowrap {
+        white-space: normal !important;
+    }
+
+    .note-box {
+        width: 48mm !important;
+        max-width: 48mm !important;
+
+        border: 1px solid #000000 !important;
+
+        padding: 1mm !important;
+
+        font-size: 8px !important;
+        line-height: 1.2 !important;
+
+        white-space: pre-wrap !important;
+        overflow-wrap: break-word !important;
+        word-break: normal !important;
+
+        margin-top: 1mm !important;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -313,11 +378,14 @@
     </div>
 
     <script>
-        window.onload = function() {
-            if (window.self === window.top) {
-                window.print();
-            }
-        };
+        /*
+         * Printing is controlled by transactions.blade.php.
+         * This page must NOT call window.print() on load because it is
+         * loaded inside the hidden thermal-print iframe.
+         *
+         * The parent page loads this exact thermal-receipt Blade and then
+         * invokes print() once. This prevents duplicate print commands.
+         */
     </script>
 </body>
 </html>

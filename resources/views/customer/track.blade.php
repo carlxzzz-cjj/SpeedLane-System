@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -96,5 +96,96 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Reusing your central JS validation layer -->
         <script src="{{ asset('js/main.js') }}"></script>
+
+        <!-- Rate-Limiting Brute-Force Protection Mechanism (5 Failed Attempts = 1 Min Lockout) -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const trackingForm = document.getElementById('trackingForm');
+                const trackingInput = document.getElementById('trackingCode');
+                const validationFeedback = document.getElementById('validationFeedback');
+                const submitBtn = trackingForm ? trackingForm.querySelector('button[type="submit"]') : null;
+
+                if (!trackingForm || !trackingInput) return;
+
+                const MAX_ATTEMPTS = 5;
+                const LOCKOUT_TIME_MS = 60000; // 1 minute in milliseconds
+
+                function checkLockoutStatus() {
+                    const lockoutUntil = parseInt(localStorage.getItem('speedlane_lockout_until') || '0', 10);
+                    const now = Date.now();
+
+                    if (now < lockoutUntil) {
+                        const remainingSec = Math.ceil((lockoutUntil - now) / 1000);
+                        
+                        trackingInput.disabled = true;
+                        if (submitBtn) submitBtn.disabled = true;
+
+                        const warningMsg = `Too many failed tracking attempts! Please wait ${remainingSec} second(s) before trying again.`;
+                        showWarning(warningMsg);
+
+                        setTimeout(checkLockoutStatus, 1000);
+                        return true;
+                    } else {
+                        if (lockoutUntil > 0) {
+                            localStorage.removeItem('speedlane_lockout_until');
+                            localStorage.setItem('speedlane_track_attempts', '0');
+                        }
+                        trackingInput.disabled = false;
+                        if (submitBtn) submitBtn.disabled = false;
+                        clearWarning();
+                        return false;
+                    }
+                }
+
+                function showWarning(msg) {
+                    if (validationFeedback) {
+                        validationFeedback.textContent = msg;
+                        validationFeedback.style.display = 'block';
+                        validationFeedback.className = 'invalid-feedback d-block mt-2 text-danger fw-bold';
+                    } else {
+                        let errAlert = document.getElementById('lockoutAlertBox');
+                        if (!errAlert) {
+                            errAlert = document.createElement('div');
+                            errAlert.id = 'lockoutAlertBox';
+                            errAlert.className = 'alert alert-danger rounded-2 mb-3 bg-danger bg-opacity-20 text-white border-danger small';
+                            trackingForm.parentNode.insertBefore(errAlert, trackingForm);
+                        }
+                        errAlert.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> ${msg}`;
+                    }
+                }
+
+                function clearWarning() {
+                    if (validationFeedback) {
+                        validationFeedback.textContent = '';
+                        validationFeedback.style.display = 'none';
+                    }
+                    const errAlert = document.getElementById('lockoutAlertBox');
+                    if (errAlert) errAlert.remove();
+                }
+
+                // Check for server-side error return
+                const hasServerError = document.querySelector('.alert-danger') !== null;
+                if (hasServerError && !checkLockoutStatus()) {
+                    let attempts = parseInt(localStorage.getItem('speedlane_track_attempts') || '0', 10) + 1;
+                    localStorage.setItem('speedlane_track_attempts', attempts.toString());
+
+                    if (attempts >= MAX_ATTEMPTS) {
+                        const lockoutTime = Date.now() + LOCKOUT_TIME_MS;
+                        localStorage.setItem('speedlane_lockout_until', lockoutTime.toString());
+                        localStorage.setItem('speedlane_track_attempts', '0');
+                        checkLockoutStatus();
+                    }
+                } else {
+                    checkLockoutStatus();
+                }
+
+                trackingForm.addEventListener('submit', function(e) {
+                    if (checkLockoutStatus()) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            });
+        </script>
     </body>
     </html>

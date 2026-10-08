@@ -560,7 +560,100 @@
     <!-- Bootstrap 5 JS Bundle CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Light Mode Toggle JS -->
-    <script src="{{ asset('js/theme-toggle.js') }}"></script>
+    <script src="{{ asset('css/theme-toggle.css') }}"></script>
+
+    <!-- Failed Login Attempts & Rate-Limiting Security Mechanism -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginForm = document.querySelector('form[action*="login"]');
+            const usernameInput = document.getElementById('loginUsername');
+            const passwordInput = document.getElementById('loginPassword');
+            const submitBtn = loginForm ? loginForm.querySelector('button[type="submit"]') : null;
+
+            if (!loginForm) return;
+
+            const WARN_ATTEMPTS = 3;
+            const MAX_ATTEMPTS = 5;
+            const LOCKOUT_TIME_MS = 60000; // 1 minute in milliseconds
+
+            function checkLockoutStatus() {
+                const lockoutUntil = parseInt(localStorage.getItem('speedlane_login_lockout_until') || '0', 10);
+                const now = Date.now();
+
+                if (now < lockoutUntil) {
+                    const remainingSec = Math.ceil((lockoutUntil - now) / 1000);
+                    
+                    if (usernameInput) usernameInput.disabled = true;
+                    if (passwordInput) passwordInput.disabled = true;
+                    if (submitBtn) submitBtn.disabled = true;
+
+                    const msg = `Too many failed login attempts! Restricted for ${remainingSec} second(s).`;
+                    showLoginAlert('danger', msg);
+
+                    setTimeout(checkLockoutStatus, 1000);
+                    return true;
+                } else {
+                    if (lockoutUntil > 0) {
+                        localStorage.removeItem('speedlane_login_lockout_until');
+                        localStorage.setItem('speedlane_login_attempts', '0');
+                    }
+                    if (usernameInput) usernameInput.disabled = false;
+                    if (passwordInput) passwordInput.disabled = false;
+                    if (submitBtn) submitBtn.disabled = false;
+                    clearLockoutAlert();
+                    return false;
+                }
+            }
+
+            function showLoginAlert(type, msg) {
+                let alertBox = document.getElementById('loginLockoutAlertBox');
+                if (!alertBox) {
+                    alertBox = document.createElement('div');
+                    alertBox.id = 'loginLockoutAlertBox';
+                    loginForm.parentNode.insertBefore(alertBox, loginForm);
+                }
+                alertBox.className = `alert alert-${type} rounded-3 mb-3 bg-${type} bg-opacity-20 text-white border-${type} small shadow-sm`;
+                alertBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> ${msg}`;
+            }
+
+            function clearLockoutAlert() {
+                const alertBox = document.getElementById('loginLockoutAlertBox');
+                if (alertBox) alertBox.remove();
+            }
+
+            // Detect if a server-side authentication failure occurred
+            const hasServerError = document.querySelector('.alert-danger:not(#loginLockoutAlertBox)') !== null ||
+                                   document.querySelector('.is-invalid') !== null ||
+                                   document.querySelector('.text-danger') !== null;
+
+            if (hasServerError && !checkLockoutStatus()) {
+                let attempts = parseInt(localStorage.getItem('speedlane_login_attempts') || '0', 10) + 1;
+                localStorage.setItem('speedlane_login_attempts', attempts.toString());
+
+                if (attempts >= MAX_ATTEMPTS) {
+                    const lockoutTime = Date.now() + LOCKOUT_TIME_MS;
+                    localStorage.setItem('speedlane_login_lockout_until', lockoutTime.toString());
+                    localStorage.setItem('speedlane_login_attempts', '0');
+                    checkLockoutStatus();
+                } else if (attempts >= WARN_ATTEMPTS) {
+                    showLoginAlert('warning', `Warning: ${attempts} failed login attempts recorded. Account access will be temporarily locked after ${MAX_ATTEMPTS} failed attempts.`);
+                }
+            } else {
+                checkLockoutStatus();
+                let attempts = parseInt(localStorage.getItem('speedlane_login_attempts') || '0', 10);
+                if (attempts >= WARN_ATTEMPTS && !checkLockoutStatus()) {
+                    showLoginAlert('warning', `Warning: ${attempts} failed login attempts recorded. Account access will be temporarily locked after ${MAX_ATTEMPTS} failed attempts.`);
+                }
+            }
+
+            loginForm.addEventListener('submit', function(e) {
+                if (checkLockoutStatus()) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
 
     <!-- Modal Workflow JavaScript -->
     <script>
@@ -666,7 +759,7 @@
                 } finally {
                     btnSendOtp.disabled = false;
                     btnSendOtpText.classList.remove('d-none');
-                    btnSendOtpSpinner.add('d-none');
+                    btnSendOtpSpinner.classList.add('d-none');
                 }
             });
 
