@@ -5,77 +5,74 @@
     <title>Receipt - {{ $service->tracking_code }}</title>
     <style>
         @page {
-            margin: 10px;
+            size: letter portrait;
+            margin: 12mm 15mm;
         }
         body { 
             font-family: 'DejaVu Sans', sans-serif; 
-            font-size: 8.5px; 
+            font-size: 9.5px; 
             color: #0f172a; 
             margin: 0;
             padding: 0;
             background-color: #ffffff;
-            line-height: 1.3;
+            line-height: 1.35;
         }
 
-        /* Compact Receipt Slip Card */
+        /* DomPDF Safe Container - NO width: 100% so padding doesn't overflow page */
         .receipt-card {
-            max-width: 460px;
-            margin: 0 auto;
-            border: 1px solid #cbd5e1;
-            border-top: 6px solid #0f172a;
-            border-radius: 4px;
-            padding: 14px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 16px 18px;
             background-color: #ffffff;
+        }
+
+        /* Base Table Reset for DomPDF */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
         }
 
         /* Header Layout */
         .header-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             padding-bottom: 8px;
-            border-bottom: 2px solid #0f172a;
+            border-bottom: 1.5px solid #e2e8f0;
         }
 
         .brand-title { 
-            font-size: 16px; 
+            font-size: 18px; 
             font-weight: 900; 
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 1px;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            font-style: italic;
         }
 
-        .brand-pink {
-            color: #f42582;
-        }
-
-        .brand-blue {
-            color: #00a2ff;
-        }
+        .brand-pink { color: #f42582; }
+        .brand-blue { color: #00a2ff; }
 
         .brand-subtitle { 
-            font-size: 7.5px; 
+            font-size: 8.5px; 
             color: #64748b; 
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
+            font-weight: 600;
         }
 
         .badge-paid {
             display: inline-block;
             background-color: #15803d;
             color: #ffffff;
-            font-size: 8px;
+            font-size: 8.5px;
             font-weight: 800;
-            padding: 2px 7px;
-            border-radius: 2px;
+            padding: 2px 8px;
+            border-radius: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
         .tracking-text {
-            font-size: 8px;
+            font-size: 8.5px;
             color: #64748b;
         }
 
@@ -84,28 +81,26 @@
             font-weight: bold;
             color: #0f172a;
             background-color: #f1f5f9;
-            padding: 1px 4px;
-            border-radius: 2px;
-            border: 1px solid #e2e8f0;
+            padding: 1px 5px;
+            border-radius: 3px;
+            border: 1px solid #cbd5e1;
         }
 
         /* Customer & Mechanic Info Block */
         .info-block-table {
-            width: 100%;
-            border-collapse: collapse;
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 3px;
-            margin-bottom: 8px;
+            border-radius: 5px;
+            margin-bottom: 10px;
         }
 
         .info-block-table td {
-            padding: 6px 8px;
+            padding: 8px 12px;
             vertical-align: top;
         }
 
         .block-label {
-            font-size: 7px;
+            font-size: 7.5px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -115,90 +110,83 @@
         }
 
         .block-value {
-            font-size: 9.5px;
+            font-size: 10px;
             font-weight: 800;
             color: #0f172a;
         }
 
         .block-subvalue {
-            font-size: 8px;
+            font-size: 8.5px;
             color: #475569;
             font-family: 'DejaVu Sans Mono', monospace;
+            margin-top: 2px;
         }
 
         /* Vehicle Details Card */
         .vehicle-card {
             border: 1px solid #e2e8f0;
-            border-radius: 3px;
+            border-radius: 5px;
             background-color: #f8fafc;
-            padding: 6px 8px;
-            margin-bottom: 8px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
         }
 
         .vehicle-title {
-            font-size: 7.5px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
+            font-size: 9px;
+            font-weight: 800;
             color: #0f172a;
-            border-bottom: 1px solid #cbd5e1;
-            padding-bottom: 3px;
-            margin-bottom: 5px;
-        }
-
-        .vehicle-table {
-            width: 100%;
-            border-collapse: collapse;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .vehicle-table td {
-            width: 25%;
             vertical-align: top;
-            padding: 1px 0;
+            padding: 2px 0;
+            word-wrap: break-word;
         }
 
         .veh-label {
-            font-size: 6.5px;
+            font-size: 7px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.4px;
             color: #64748b;
-            margin-bottom: 1px;
+            margin-bottom: 2px;
             display: block;
         }
 
         .veh-value {
-            font-size: 8.5px;
+            font-size: 9px;
             font-weight: 800;
             color: #0f172a;
         }
 
         /* Dates Info Row */
         .dates-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #f1f5f9;
-            border-radius: 3px;
-            margin-bottom: 8px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            margin-bottom: 10px;
         }
 
         .dates-table td {
-            padding: 5px 8px;
-            font-size: 7.5px;
-            color: #334155;
+            padding: 6px 12px;
+            font-size: 8px;
+            color: #475569;
         }
 
         /* Price Adjustment Note Box */
         .note-card {
             border: 1px solid #e2e8f0;
-            border-radius: 3px;
+            border-radius: 5px;
             background-color: #f8fafc;
-            padding: 6px 8px;
-            margin-bottom: 8px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
         }
 
         .note-label {
-            font-size: 7px;
+            font-size: 7.5px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -208,41 +196,39 @@
         }
 
         .note-value {
-            font-size: 8px;
+            font-size: 8.5px;
             font-weight: 600;
             color: #0f172a;
         }
 
         /* Services Table */
         .services-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-bottom: 8px; 
+            margin-bottom: 10px; 
         }
 
         .services-table th { 
             background-color: #f8fafc; 
             color: #0f172a; 
-            padding: 5px 6px; 
-            font-size: 7.5px; 
+            padding: 6px 8px; 
+            font-size: 8px; 
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             border: 1px solid #cbd5e1;
             text-align: left;
         }
 
         .services-table td { 
             border: 1px solid #cbd5e1; 
-            padding: 5px 6px; 
-            font-size: 8.5px; 
+            padding: 6px 8px; 
+            font-size: 9px; 
             color: #0f172a;
         }
 
         .services-table tfoot td {
-            background-color: #f8fafc;
+            background-color: #ffffff;
             border: 1px solid #cbd5e1;
-            padding: 6px 8px;
+            padding: 8px;
         }
 
         /* Utilities & Typography */
@@ -251,16 +237,15 @@
         .font-mono { font-family: 'DejaVu Sans Mono', monospace; }
         .fw-bold { font-weight: bold; }
         .text-muted { color: #64748b; }
-        .text-primary { color: #0f172a; }
 
         /* Footer Note */
         .footer-note { 
-            margin-top: 10px; 
+            margin-top: 12px; 
             text-align: center; 
-            font-size: 7.5px; 
+            font-size: 8px; 
             color: #64748b; 
-            border-top: 1px dashed #94a3b8; 
-            padding-top: 6px; 
+            border-top: 1px dashed #cbd5e1; 
+            padding-top: 8px; 
             letter-spacing: 0.2px;
         }
     </style>
@@ -358,19 +343,19 @@
             <div class="vehicle-title">Vehicle Information</div>
             <table class="vehicle-table">
                 <tr>
-                    <td>
+                    <td width="30%">
                         <span class="veh-label">Brand & Model</span>
                         <div class="veh-value">{{ $vehicleBrand }} {{ $vehicleModel }}</div>
                     </td>
-                    <td>
+                    <td width="25%">
                         <span class="veh-label">Vehicle Type</span>
                         <div class="veh-value">{{ $vehicleType }}</div>
                     </td>
-                    <td>
+                    <td width="25%">
                         <span class="veh-label">Plate Number</span>
                         <div class="veh-value font-mono">{{ $plateNumber }}</div>
                     </td>
-                    <td>
+                    <td width="20%">
                         <span class="veh-label">Year</span>
                         <div class="veh-value">{{ $vehicleYear }}</div>
                     </td>
@@ -402,9 +387,9 @@
         <table class="services-table">
             <thead>
                 <tr>
-                    <th width="30px" class="text-center">#</th>
+                    <th width="35px" class="text-center">#</th>
                     <th>Completed Service Description</th>
-                    <th width="100px" class="text-end">Status</th>
+                    <th width="110px" class="text-end">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -426,8 +411,8 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="2" class="text-end fw-bold" style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px;">Total Cost Paid:</td>
-                    <td class="text-end fw-bold font-mono" style="font-size: 11px; color: #0f172a;">
+                    <td colspan="2" class="text-end fw-bold" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px;">Total Cost Paid:</td>
+                    <td class="text-end fw-bold font-mono" style="font-size: 13px; color: #0f172a;">
                         &#8369;{{ number_format((float)($service->total_cost ?? 0), 2) }}
                     </td>
                 </tr>

@@ -259,9 +259,58 @@ class ManageServiceController extends Controller
             );
 
             /*
+             * Check EVERY service item under EVERY service record
+             * sharing this tracking code. A pickup SMS must wait
+             * until all service items are ready for pickup.
+             */
+            $trackingCodeRecords = ServiceRecord::where(
+                'tracking_code',
+                $trackingCode
+            )->get();
+
+            $allTrackingCodeServicesReady = $trackingCodeRecords->isNotEmpty();
+            $trackingCodeServiceCount = 0;
+
+            foreach ($trackingCodeRecords as $trackingRecord) {
+                $recordServices = json_decode(
+                    (string) $trackingRecord->selected_services,
+                    true
+                );
+
+                if (!is_array($recordServices) || empty($recordServices)) {
+                    $allTrackingCodeServicesReady = false;
+                    continue;
+                }
+
+                foreach ($recordServices as $recordServiceItem) {
+                    if (!is_array($recordServiceItem)) {
+                        $allTrackingCodeServicesReady = false;
+                        continue;
+                    }
+
+                    $trackingCodeServiceCount++;
+                    $itemStatus = strtolower(trim(
+                        (string) ($recordServiceItem['status'] ?? '')
+                    ));
+
+                    $itemIsReady =
+                        str_contains($itemStatus, 'completed & ready for pick up') ||
+                        str_contains($itemStatus, 'ready for pick up') ||
+                        str_contains($itemStatus, 'ready for pickup');
+
+                    if (!$itemIsReady) {
+                        $allTrackingCodeServicesReady = false;
+                    }
+                }
+            }
+
+            // Require at least one service item and all items ready.
+            $hasCompletedAndReady =
+                $allTrackingCodeServicesReady &&
+                $trackingCodeServiceCount > 0;
+
+            /*
              * Log the values before attempting SMS.
-             *
-             * This is useful for diagnosing SMS problems.
              */
             Log::info(
                 'SpeedLane SMS evaluation', [
@@ -270,19 +319,17 @@ class ManageServiceController extends Controller
                     'customer_name' => $customerName,
                     'contact_number' => $contactPhone,
                     'send_sms_requested' => $sendSmsRequested,
-                    'has_completed_and_ready' => $hasCompletedAndReady,
+                    'tracking_code_service_count' => $trackingCodeServiceCount,
+                    'all_services_ready' => $hasCompletedAndReady,
                 ]
             );
 
             /*
-             * Send SMS when:
-             *
-             * 1. Staff explicitly checked the SMS switch, OR
-             * 2. A service was marked ready for pickup.
+             * Only send the pickup SMS after ALL services under
+             * this tracking code are ready. Checking the SMS switch
+             * cannot bypass the all-services-ready requirement.
              */
-            $shouldSendSms =
-                $sendSmsRequested ||
-                $hasCompletedAndReady;
+            $shouldSendSms = $hasCompletedAndReady;
 
             if ($shouldSendSms) {
 

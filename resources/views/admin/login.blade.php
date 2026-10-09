@@ -33,7 +33,9 @@
             --speed-blue: #00a2ff;
             --speed-dark-bg: #07090e;
             --speed-card-bg: #0e111a;
-            --speed-card-border: rgba(255, 255, 255, 0.07);
+            --speed-card-border: rgba(255, 255, 255, 0.08);
+            --speed-glow-pink: rgba(244, 37, 130, 0.25);
+            --speed-glow-blue: rgba(0, 162, 255, 0.25);
         }
 
         /* Hide browser default password reveal icons (Edge / IE) */
@@ -42,33 +44,68 @@
             display: none;
         }
 
-        /* Dark Theme Default */
+        /* Dark Theme Default with Minimal Automotive Vector Background */
         body {
             background-color: var(--speed-dark-bg) !important;
             color: #e2e8f0;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
-            background: radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%) !important;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(244, 37, 130, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(0, 162, 255, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 50% 0%, #121624 0%, #07090e 75%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.015' fill-rule='evenodd'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E") !important;
             background-attachment: fixed;
             margin: 0;
             transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Subtle Ambient Glow Orbs */
+        .ambient-orb {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        .ambient-orb-1 {
+            top: -100px;
+            left: -100px;
+            background: radial-gradient(circle, var(--speed-pink) 0%, transparent 70%);
+        }
+
+        .ambient-orb-2 {
+            bottom: -100px;
+            right: -100px;
+            background: radial-gradient(circle, var(--speed-blue) 0%, transparent 70%);
         }
 
         /* Light Mode Styling Overrides */
         html.light-theme {
             --speed-dark-bg: #f8fafc;
             --speed-card-bg: #ffffff;
-            --speed-card-border: rgba(0, 0, 0, 0.1);
+            --speed-card-border: rgba(0, 0, 0, 0.08);
         }
 
         html.light-theme body {
-            background: #f8fafc !important;
+            background-color: #f8fafc !important;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(244, 37, 130, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 162, 255, 0.05) 0%, transparent 40%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.02' fill-rule='evenodd'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E") !important;
             color: #1e293b !important;
         }
 
         html.light-theme .navbar-speed {
-            background: rgba(255, 255, 255, 0.95) !important;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
 
@@ -77,14 +114,28 @@
             color: #0f172a !important;
         }
 
+        html.light-theme .form-label {
+            color: #334155 !important;
+        }
+
+        html.light-theme .text-secondary {
+            color: #475569 !important;
+        }
+
         html.light-theme .admin-login-card {
             background-color: #ffffff !important;
             border: 1px solid rgba(0, 0, 0, 0.08) !important;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06) !important;
         }
 
+        html.light-theme .login-master-wrapper {
+            background: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08) !important;
+        }
+
         html.light-theme .form-control-dark {
-            background-color: #f1f5f9 !important;
+            background-color: #f8fafc !important;
             border: 1px solid #cbd5e1 !important;
             color: #0f172a !important;
         }
@@ -208,8 +259,11 @@
 
         /* Navigation Header */
         .navbar-speed {
-            background: rgba(7, 9, 14, 0.95);
+            background: rgba(7, 9, 14, 0.85);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--speed-card-border);
+            position: relative;
+            z-index: 10;
         }
 
         .brand-logo-text {
@@ -227,11 +281,85 @@
             font-weight: 700;
         }
 
-        /* Login Card */
-        .admin-login-card {
-            background-color: var(--speed-card-bg) !important;
-            border: 1px solid var(--speed-card-border) !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        /* Master Split Container (Enterprise System Styling) */
+        .login-master-wrapper {
+            background-color: rgba(14, 17, 26, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--speed-card-border);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 162, 255, 0.05);
+            overflow: hidden;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* AutoSpa Brand Showcase Side Panel */
+        .autospa-brand-panel {
+            background: linear-gradient(135deg, rgba(7, 9, 14, 0.95) 0%, rgba(18, 22, 36, 0.95) 100%);
+            border-right: 1px solid var(--speed-card-border);
+            position: relative;
+            overflow: hidden;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        html.light-theme .autospa-brand-panel {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff !important;
+        }
+
+        html.light-theme .autospa-brand-panel .text-secondary {
+            color: #cbd5e1 !important;
+        }
+
+        html.light-theme .autospa-brand-panel .text-white {
+            color: #ffffff !important;
+        }
+
+        .autospa-brand-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(244, 37, 130, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Decorative Speed Graphic Rings */
+        .speed-ring-graphic {
+            position: absolute;
+            right: -80px;
+            bottom: -80px;
+            width: 320px;
+            height: 320px;
+            border: 2px dashed rgba(0, 162, 255, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: spinRing 40s linear infinite;
+        }
+
+        @keyframes spinRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Feature Pill Badges */
+        .system-feature-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         /* Form Inputs */
@@ -244,7 +372,7 @@
 
         .form-control-dark:focus {
             border-color: var(--speed-blue) !important;
-            box-shadow: 0 0 12px rgba(0, 162, 255, 0.25) !important;
+            box-shadow: 0 0 14px rgba(0, 162, 255, 0.3) !important;
             color: #ffffff !important;
         }
 
@@ -276,20 +404,20 @@
             color: #ffffff !important;
             font-weight: 700;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(244, 37, 130, 0.3);
+            box-shadow: 0 6px 20px rgba(244, 37, 130, 0.35);
         }
 
         .btn-speed-gradient:hover {
             opacity: 0.95;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 162, 255, 0.45);
             color: #ffffff !important;
         }
 
         /* Icon Badge Header */
         .icon-circle-theme {
-            width: 50px;
-            height: 50px;
+            width: 54px;
+            height: 54px;
             border-radius: 50%;
             background: rgba(244, 37, 130, 0.15);
             border: 1px solid rgba(244, 37, 130, 0.3);
@@ -297,7 +425,7 @@
             align-items: center;
             justify-content: center;
             color: var(--speed-pink);
-            box-shadow: 0 0 15px rgba(244, 37, 130, 0.25);
+            box-shadow: 0 0 20px rgba(244, 37, 130, 0.25);
         }
 
         /* Dark Modal Styling */
@@ -329,7 +457,7 @@
             color: #d946ef !important;
         }
 
-         body {
+        body {
             zoom: 80%;
         }
 
@@ -342,8 +470,12 @@
 </head>
 <body>
 
+    <!-- Ambient Glow Orbs -->
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+
     <!-- Top Navigation -->
-    <div class="navbar-speed py-3 px-4 mb-5">
+    <div class="navbar-speed py-3 px-4 mb-4">
         <div class="container d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3">
                 <a href="/" class="back-btn text-decoration-none d-flex align-items-center justify-content-center rounded-circle" style="width: 38px; height: 38px;" title="Back to Home">
@@ -369,98 +501,148 @@
         </div>
     </div>
 
-    <!-- Main Login Container -->
-    <div class="container pb-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-4 text-center">
+    <!-- Main Enterprise Split-Container -->
+    <div class="container pb-5 my-auto">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-12 col-xl-10">
                 
-                <!-- Lock Icon Badge -->
-                <div class="icon-circle-theme mb-3 mx-auto">
-                    <i class="bi bi-shield-lock-fill fs-4"></i>
-                </div>
-                
-                <!-- Screen Headings -->
-                <h2 class="fw-bold mb-1 text-white">
-                    SpeedLane <span class="text-speed-pink">Admin</span> <span class="text-speed-blue">Login</span>
-                </h2>
-                <p class="text-secondary mb-4 small">Access the administrative dashboard</p>
-
-                <!-- Login Form Card -->
-                <div class="card border-0 rounded-4 text-start p-4 admin-login-card">
-                    <h6 class="fw-bold mb-1 text-white fs-5">Administrator Access</h6>
-                    <p class="text-secondary small mb-4">Enter your credentials to continue</p>
-
-                    {{-- Session Success Alert --}}
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show text-start mb-3 bg-success bg-opacity-20 text-white border-success rounded-3" role="alert">
-                            <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    {{-- General Error Alert --}}
-                    @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show text-start mb-3 bg-danger bg-opacity-20 text-white border-danger rounded-3" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    <form action="{{ route('admin.login.submit') }}" method="POST">
-                        @csrf
+                <div class="login-master-wrapper">
+                    <div class="row g-0">
                         
-                        <!-- Username Field -->
-                        <div class="mb-3">
-                            <label class="form-label small fw-semibold text-secondary">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text input-group-text-dark"><i class="bi bi-person text-speed-blue"></i></span>
-                                <input type="text" 
-                                       id="loginUsername"
-                                       name="username" 
-                                       class="form-control form-control-dark @error('username') is-invalid @enderror" 
-                                       placeholder="Enter username" 
-                                       value="{{ old('username') }}" 
-                                       required>
+                        <!-- LEFT PANEL: Enterprise AutoSpa Visual Hero (Visible on Desktop) -->
+                        <div class="col-lg-6 autospa-brand-panel d-none d-lg-flex">
+                            <div class="speed-ring-graphic"></div>
+                            
+                            <!-- Top Brand Info -->
+                            <div>
+                                <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill mb-4" style="background: rgba(244, 37, 130, 0.12); border: 1px solid rgba(244, 37, 130, 0.3);">
+                                    <i class="bi bi-speedometer2 text-speed-pink"></i>
+                                    <span class="text-speed-pink fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">AutoSpa Management System</span>
+                                </div>
+                                <h2 class="fw-black display-6 mb-3" style="line-height: 1.15; font-weight: 900;">
+                                    <span class="text-speed-pink">SPEED</span><span class="text-speed-blue">LANE</span> <span class="text-white">AUTOSPA</span>
+                                    <span class="text-speed-pink fs-5 d-block mt-2 fw-bold text-uppercase" style="letter-spacing: 2px;">GENERAL SANTOS CITY</span>
+                                </h2>
+                                <p class="text-secondary small mb-4" style="max-width: 380px;">
+                                    Delivering premier, high-quality auto care services — from luxury car washing and ceramic coating detailing to comprehensive interior and exterior vehicle care.
+                                </p>
                             </div>
 
-                            @error('username')
-                                <small class="text-danger d-block mt-1">{{ $message }}</small>
-                            @enderror
+                            <!-- System Metrics & Feature Badges -->
+                            <div>
+                                <div class="d-flex flex-wrap gap-2 mb-4">
+                                    <span class="system-feature-badge"><i class="bi bi-shield-check text-speed-blue"></i> Encrypted Access</span>
+                                    <span class="system-feature-badge"><i class="bi bi-droplet-half text-speed-pink"></i> Ceramic Detailing</span>
+                                    <span class="system-feature-badge"><i class="bi bi-kanban text-warning"></i> Wash Bay Control</span>
+                                </div>
+
+                                <div class="p-3 rounded-4 d-flex align-items-center gap-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);">
+                                    <div class="p-2.5 rounded-circle bg-speed-pink bg-opacity-20 text-speed-pink">
+                                        <i class="bi bi-check2-circle fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-white small">Authorized Personnel Portal</div>
+                                        <div class="text-secondary" style="font-size: 0.725rem;">SpeedLane AutoSpa • General Santos City</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Password Field with Forgot Password Link & See Password Toggle -->
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <label class="form-label small fw-semibold text-secondary mb-0">Password</label>
-                                <a href="#" id="triggerForgotPassword" class="small text-decoration-none fw-semibold forgot-link" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
-                                    Forgot password?
-                                </a>
-                            </div>
-                            <div class="input-group">
-                                <span class="input-group-text input-group-text-dark"><i class="bi bi-lock text-speed-pink"></i></span>
-                                <input type="password" 
-                                       id="loginPassword"
-                                       name="password" 
-                                       class="form-control form-control-dark @error('password') is-invalid @enderror" 
-                                       placeholder="Enter password" 
-                                       style="border-right: none !important;"
-                                       required>
-                                <button class="btn input-group-text-dark-right text-secondary" type="button" id="togglePassword" title="Toggle Password Visibility">
-                                    <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
-                                </button>
+                        <!-- RIGHT PANEL: Login Form Container -->
+                        <div class="col-12 col-lg-6 p-4 p-md-5">
+                            <div class="text-center text-lg-start mb-4">
+                                <!-- Lock Icon Badge -->
+                                <div class="icon-circle-theme mb-3 mx-auto mx-lg-0">
+                                    <i class="bi bi-shield-lock-fill fs-4"></i>
+                                </div>
+                                
+                                <!-- Screen Headings -->
+                                <h2 class="fw-bold mb-1 text-white">
+                                    SpeedLane <span class="text-speed-pink">Admin</span> <span class="text-speed-blue">Login</span>
+                                </h2>
+                                <p class="text-secondary small">Access the administrative dashboard</p>
                             </div>
 
-                            @error('password')
-                                <small class="text-danger d-block mt-1">{{ $message }}</small>
-                            @enderror
+                            <!-- Login Form Card -->
+                            <div class="card border-0 bg-transparent text-start admin-login-card p-0">
+                                <h6 class="fw-bold mb-1 text-white fs-6">Administrator Access</h6>
+                                <p class="text-secondary small mb-4">Enter your credentials to continue</p>
+
+                                {{-- Session Success Alert --}}
+                                @if(session('success'))
+                                    <div class="alert alert-success alert-dismissible fade show text-start mb-3 bg-success bg-opacity-20 text-white border-success rounded-3" role="alert">
+                                        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                @endif
+
+                                {{-- General Error Alert --}}
+                                @if(session('error'))
+                                    <div class="alert alert-danger alert-dismissible fade show text-start mb-3 bg-danger bg-opacity-20 text-white border-danger rounded-3" role="alert">
+                                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                @endif
+
+                                <form action="{{ route('admin.login.submit') }}" method="POST">
+                                    @csrf
+                                    
+                                    <!-- Username Field -->
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold text-secondary">Email</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text input-group-text-dark"><i class="bi bi-person text-speed-blue"></i></span>
+                                            <input type="text" 
+                                                   id="loginUsername"
+                                                   name="username" 
+                                                   class="form-control form-control-dark @error('username') is-invalid @enderror" 
+                                                   placeholder="Enter username" 
+                                                   value="{{ old('username') }}" 
+                                                   required>
+                                        </div>
+
+                                        @error('username')
+                                            <small class="text-danger d-block mt-1">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+
+                                    <!-- Password Field with Forgot Password Link & See Password Toggle -->
+                                    <div class="mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label small fw-semibold text-secondary mb-0">Password</label>
+                                            <a href="#" id="triggerForgotPassword" class="small text-decoration-none fw-semibold forgot-link" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
+                                                Forgot password?
+                                            </a>
+                                        </div>
+                                        <div class="input-group">
+                                            <span class="input-group-text input-group-text-dark"><i class="bi bi-lock text-speed-pink"></i></span>
+                                            <input type="password" 
+                                                   id="loginPassword"
+                                                   name="password" 
+                                                   class="form-control form-control-dark @error('password') is-invalid @enderror" 
+                                                   placeholder="Enter password" 
+                                                   style="border-right: none !important;"
+                                                   required>
+                                            <button class="btn input-group-text-dark-right text-secondary" type="button" id="togglePassword" title="Toggle Password Visibility">
+                                                <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
+                                            </button>
+                                        </div>
+
+                                        @error('password')
+                                            <small class="text-danger d-block mt-1">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+
+                                    <!-- Login Button -->
+                                    <button type="submit" class="btn btn-speed-gradient w-100 py-2.5 fw-bold rounded-3 mb-2 fs-6">
+                                        Login to Dashboard
+                                    </button>
+                                </form>
+
+                            </div>
                         </div>
 
-                        <!-- Login Button -->
-                        <button type="submit" class="btn btn-speed-gradient w-100 py-2.5 fw-bold rounded-3 mb-2 fs-6">
-                            Login to Dashboard
-                        </button>
-                    </form>
-
+                    </div>
                 </div>
 
             </div>
@@ -557,10 +739,12 @@
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS Bundle CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+     <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS Link -->
+    <script src="{{ asset('js/main.js') }}"></script>
     <!-- Light Mode Toggle JS -->
-    <script src="{{ asset('css/theme-toggle.css') }}"></script>
+    <script src="{{ asset('js/theme-toggle.js') }}"></script>
 
     <!-- Failed Login Attempts & Rate-Limiting Security Mechanism -->
     <script>
@@ -621,12 +805,17 @@
                 if (alertBox) alertBox.remove();
             }
 
-            // Detect if a server-side authentication failure occurred
+            // Detect if a server-side authentication success or failure occurred
+            const hasSuccessAlert = document.querySelector('.alert-success') !== null;
             const hasServerError = document.querySelector('.alert-danger:not(#loginLockoutAlertBox)') !== null ||
                                    document.querySelector('.is-invalid') !== null ||
                                    document.querySelector('.text-danger') !== null;
 
-            if (hasServerError && !checkLockoutStatus()) {
+            if (hasSuccessAlert) {
+                localStorage.removeItem('speedlane_login_attempts');
+                localStorage.removeItem('speedlane_login_lockout_until');
+                clearLockoutAlert();
+            } else if (hasServerError && !checkLockoutStatus()) {
                 let attempts = parseInt(localStorage.getItem('speedlane_login_attempts') || '0', 10) + 1;
                 localStorage.setItem('speedlane_login_attempts', attempts.toString());
 
