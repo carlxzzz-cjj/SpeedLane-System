@@ -51,14 +51,12 @@
 
         /* Color Utility Classes */
         .text-speed-pink { color: var(--speed-pink) !important; }
-        .text-speed-blue { color: #38bdf8 !important; } /* High-contrast bright blue for perfect dark mode text readability */
+        .text-speed-blue { color: #38bdf8 !important; }
         .bg-speed-pink { background-color: var(--speed-pink) !important; }
         .bg-speed-blue { background-color: var(--speed-blue) !important; }
 
-        /* High-Contrast Success/Green for Dark Mode Readability */
         .text-success { color: #4ade80 !important; }
 
-        /* Soft High-Contrast Status Badges matching register-service.blade.php */
         .badge-status-completed {
             background-color: rgba(34, 197, 94, 0.18) !important;
             color: #4ade80 !important;
@@ -80,14 +78,9 @@
             font-weight: 600;
         }
 
-        .extra-small {
-            font-size: 0.75rem;
-        }
-        .pointer-none {
-            pointer-events: none;
-        }
+        .extra-small { font-size: 0.75rem; }
+        .pointer-none { pointer-events: none; }
 
-        /* Top Navigation Header */
         .navbar-speed {
             background: rgba(7, 9, 14, 0.95);
             border-bottom: 1px solid var(--speed-card-border);
@@ -102,14 +95,12 @@
             line-height: 1;
         }
 
-        /* Speed Card Theme */
         .speed-card {
             background-color: var(--speed-card-bg) !important;
             border: 1px solid var(--speed-card-border) !important;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
-        /* Easy-on-the-eyes Soft Action Buttons */
         .btn-status-completed {
             background-color: rgba(34, 197, 94, 0.18) !important;
             color: #4ade80 !important;
@@ -149,22 +140,14 @@
             transform: translateY(-1px);
         }
 
-        .hover-shadow {
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-        }
+        .hover-shadow { transition: background-color 0.2s ease, border-color 0.2s ease; }
         .hover-shadow:hover {
             background-color: rgba(15, 19, 34, 0.8) !important;
             border-color: rgba(0, 162, 255, 0.4) !important;
         }
 
-        /* Timeline Container */
-        .timeline-container {
-            position: relative;
-            padding-left: 0.5rem;
-        }
-        .timeline-step {
-            position: relative;
-        }
+        .timeline-container { position: relative; padding-left: 0.5rem; }
+        .timeline-step { position: relative; }
         .timeline-step:not(:last-child)::before {
             content: '';
             position: absolute;
@@ -176,16 +159,13 @@
             z-index: 0;
         }
 
-        /* Dark Theme Toggle Button */
         #theme-toggle-btn {
             background-color: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.15);
             transition: all 0.25s ease;
         }
 
-        #theme-toggle-btn:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-        }
+        #theme-toggle-btn:hover { background-color: rgba(255, 255, 255, 0.15); }
 
         /* LIGHT MODE HIGH-CONTRAST OVERRIDES */
         html.light-theme {
@@ -211,9 +191,7 @@
             color: #0f172a !important;
         }
 
-        html.light-theme #theme-toggle-btn:hover {
-            background-color: #cbd5e1 !important;
-        }
+        html.light-theme #theme-toggle-btn:hover { background-color: #cbd5e1 !important; }
 
         html.light-theme .speed-card {
             background-color: #ffffff !important;
@@ -221,27 +199,12 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
         }
 
-        html.light-theme .text-white {
-            color: #0f172a !important;
-        }
+        html.light-theme .text-white { color: #0f172a !important; }
+        html.light-theme .text-secondary { color: #64748b !important; }
+        html.light-theme .text-speed-blue { color: #0284c7 !important; }
+        html.light-theme .text-speed-pink { color: #db2777 !important; }
+        html.light-theme .text-success { color: #16a34a !important; }
 
-        html.light-theme .text-secondary {
-            color: #64748b !important;
-        }
-
-        html.light-theme .text-speed-blue {
-            color: #0284c7 !important;
-        }
-
-        html.light-theme .text-speed-pink {
-            color: #db2777 !important;
-        }
-
-        html.light-theme .text-success {
-            color: #16a34a !important;
-        }
-
-        /* Light Mode Badges & Buttons */
         html.light-theme .badge-status-completed,
         html.light-theme .btn-status-completed {
             background-color: #dcfce7 !important;
@@ -279,7 +242,6 @@
             color: #000000 !important;
         }
 
-        /* Inner Boxes & Cards in Light Mode */
         html.light-theme .inner-dark-box {
             background-color: #f8fafc !important;
             border-color: rgba(0, 0, 0, 0.1) !important;
@@ -295,46 +257,34 @@
             border-color: rgba(0, 162, 255, 0.4) !important;
         }
 
-        /* Timeline in Light Mode */
         html.light-theme .timeline-step:not(:last-child)::before {
             background-color: rgba(0, 0, 0, 0.12) !important;
         }
 
-        html.light-theme .timeline-step i {
-            background-color: #ffffff !important;
-        }
+        html.light-theme .timeline-step i { background-color: #ffffff !important; }
 
-        /* Technician Progress Note in Light Mode */
         html.light-theme .tech-note-box {
             background-color: #e0f2fe !important;
             border-color: #7dd3fc !important;
         }
 
-        html.light-theme .tech-note-box p {
-            color: #0f172a !important;
-        }
+        html.light-theme .tech-note-box p { color: #0f172a !important; }
 
-        /* Empty State Icon Wrapper */
         html.light-theme .empty-state-icon-wrapper {
             background-color: #f1f5f9 !important;
             border-color: #cbd5e1 !important;
         }
 
-        html.light-theme .empty-state-icon-wrapper i {
-            color: #64748b !important;
-        }
+        html.light-theme .empty-state-icon-wrapper i { color: #64748b !important; }
 
-        /* Estimate Badge in Light Mode */
         html.light-theme .badge-estimate {
             background-color: #fef3c7 !important;
             color: #b45309 !important;
             border-color: #fcd34d !important;
         }
-         body {
-            zoom: 80%;
-        }
 
-        /* FIX: Remove black/grayish modal backdrop shadow */
+        body { zoom: 80%; }
+
         .modal-backdrop {
             background-color: transparent !important;
             opacity: 0 !important;
@@ -396,19 +346,68 @@
                     return is_array($prop) ? $prop : [];
                 };
 
-                // Check if all items across all vehicles are completed
-                $allCompleted = $transactions->every(function($t) use ($parseProp) {
-                    $rawServices = $parseProp($t->selected_services ?? $t->services ?? []);
-                    if (empty($rawServices)) {
-                        return str_contains(strtolower($t->status ?? ''), 'completed');
+                // Extract value from object or array searching multiple candidate keys
+                $getVal = function($source, array $keys, $default = '') {
+                    foreach ($keys as $key) {
+                        if (is_object($source)) {
+                            if (isset($source->$key) && !empty($source->$key)) {
+                                $val = $source->$key;
+                                if (is_object($val) && isset($val->name)) return trim($val->name);
+                                if (is_array($val) && isset($val['name'])) return trim($val['name']);
+                                if (is_string($val) || is_numeric($val)) return trim((string)$val);
+                            }
+                        } elseif (is_array($source)) {
+                            if (isset($source[$key]) && !empty($source[$key])) {
+                                $val = $source[$key];
+                                if (is_array($val) && isset($val['name'])) return trim($val['name']);
+                                if (is_string($val) || is_numeric($val)) return trim((string)$val);
+                            }
+                        }
                     }
+                    return $default;
+                };
+
+                // Check if a status string represents completed
+                $isStatusDone = function($status) {
+                    $s = strtolower(trim((string)$status));
+                    if (empty($s)) return false;
+                    return str_contains($s, 'completed')
+                        || str_contains($s, 'ready for pick up')
+                        || str_contains($s, 'ready for pickup')
+                        || str_contains($s, 'released')
+                        || str_contains($s, 'done')
+                        || str_contains($s, 'finished')
+                        || str_contains($s, 'claimed');
+                };
+
+                // Check if a vehicle object is completely completed
+                $isVehicleDone = function($vehicle) use ($parseProp, $isStatusDone, $getVal) {
+                    $vStatus = $getVal($vehicle, ['status', 'overall_status', 'service_status', 'state'], '');
+
+                    $rawServices = $parseProp($vehicle->selected_services ?? $vehicle->services ?? []);
+                    if (empty($rawServices)) {
+                        return $isStatusDone($vStatus);
+                    }
+
                     foreach ($rawServices as $srv) {
-                        $status = is_array($srv) ? ($srv['status'] ?? '') : '';
-                        if (!str_contains(strtolower($status), 'completed')) {
-                            return false;
+                        if (is_array($srv)) {
+                            $status = $getVal($srv, ['status', 'current_stage', 'stage', 'service_status', 'step'], '');
+                            if (empty($status)) $status = $vStatus;
+                            if (!$isStatusDone($status)) {
+                                return false; // Found an incomplete service!
+                            }
+                        } else {
+                            if (!$isStatusDone($vStatus)) {
+                                return false;
+                            }
                         }
                     }
                     return true;
+                };
+
+                // Check if all vehicles are completed
+                $allCompleted = $transactions->every(function($t) use ($isVehicleDone) {
+                    return $isVehicleDone($t);
                 });
 
                 $contactNum = $customerInfo->contact_number ?? $customerInfo->phone_number ?? null;
@@ -424,6 +423,11 @@
                         $maskedContact = $contactNum;
                     }
                 }
+
+                // Sort vehicles: Incomplete/Ongoing vehicles on top (0), Completed vehicles below (1)
+                $sortedTransactions = $transactions->sortBy(function($item) use ($isVehicleDone) {
+                    return $isVehicleDone($item) ? 1 : 0;
+                })->values();
             @endphp
 
             <!-- Customer & Order Overview -->
@@ -517,25 +521,34 @@
                 <i class="bi bi-car-front-fill me-2 text-speed-blue"></i>Vehicles Registered Under Code: {{ $trackingCode }}
             </h5>
             
-            @foreach($transactions as $index => $item)
+            @foreach($sortedTransactions as $index => $item)
                 @php
                     $rawSelectedServices = $parseProp($item->selected_services ?? $item->services ?? []);
+                    $itemOverallStatus = $getVal($item, ['status', 'service_status', 'overall_status'], 'Pending Queue');
                     
                     $serviceItems = [];
                     foreach ($rawSelectedServices as $srv) {
                         if (is_array($srv)) {
+                            $sName = $getVal($srv, ['name', 'service_name', 'title'], 'Service');
+                            $sStatus = $getVal($srv, ['status', 'current_stage', 'stage', 'service_status', 'step'], '');
+                            if (empty($sStatus)) $sStatus = $itemOverallStatus;
+                            $sNote = $getVal($srv, ['note', 'status_note', 'remark', 'remarks'], '');
+                            $sUpdatedAt = $srv['updated_at'] ?? null;
+                            $sStageTimestamps = $srv['stage_timestamps'] ?? [];
+
                             $serviceItems[] = [
-                                'name'   => $srv['name'] ?? $srv['service_name'] ?? 'Service',
-                                'status' => $srv['status'] ?? 'Pending Queue',
-                                'note'   => $srv['note'] ?? $srv['status_note'] ?? '',
-                                'updated_at' => $srv['updated_at'] ?? null,
-                                'stage_timestamps' => $srv['stage_timestamps'] ?? []
+                                'name'   => $sName,
+                                'status' => $sStatus,
+                                'note'   => $sNote,
+                                'updated_at' => $sUpdatedAt,
+                                'stage_timestamps' => $sStageTimestamps
                             ];
                         } else {
+                            $sName = trim((string)$srv);
                             $serviceItems[] = [
-                                'name'   => (string)$srv,
-                                'status' => 'Pending Queue',
-                                'note'   => '',
+                                'name'   => !empty($sName) ? $sName : 'Service',
+                                'status' => $itemOverallStatus,
+                                'note'   => $getVal($item, ['price_adjustment_note', 'note', 'remarks'], ''),
                                 'updated_at' => null,
                                 'stage_timestamps' => []
                             ];
@@ -545,25 +558,58 @@
                     // Fallback if empty array
                     if (empty($serviceItems)) {
                         $serviceItems[] = [
-                            'name'   => $item->service_type ?? 'General Service',
-                            'status' => $item->status ?? 'Pending Queue',
-                            'note'   => $item->price_adjustment_note ?? $item->note ?? '',
+                            'name'   => $getVal($item, ['service_type', 'service_name', 'service'], 'General Service'),
+                            'status' => $itemOverallStatus,
+                            'note'   => $getVal($item, ['price_adjustment_note', 'note', 'remarks'], ''),
                             'updated_at' => null,
                             'stage_timestamps' => []
                         ];
                     }
 
-                    $isVehicleCompleted = array_reduce($serviceItems, function($carry, $s) {
-                        return $carry && str_contains(strtolower($s['status']), 'completed');
-                    }, true);
+                    $isVehicleCompleted = $isVehicleDone($item);
+
+                    // Sort service items: incomplete services on top (0), completed services below (1)
+                    usort($serviceItems, function($a, $b) use ($isStatusDone) {
+                        $aDone = $isStatusDone($a['status']) ? 1 : 0;
+                        $bDone = $isStatusDone($b['status']) ? 1 : 0;
+                        return $aDone <=> $bDone;
+                    });
+
+                    // Build full vehicle title checking all possible Brand, Model, and Year attributes
+                    $vBrand = $getVal($item, ['vehicle_brand', 'brand', 'make', 'vehicle_make', 'car_brand', 'car_make', 'manufacturer', 'brand_name']);
+                    $vModel = $getVal($item, ['vehicle_model', 'model', 'car_model', 'vehicle_name', 'model_name']);
+                    $vYear  = $getVal($item, ['vehicle_year', 'year_model', 'year', 'model_year', 'car_year']);
+
+                    $titleParts = [];
+                    if (!empty($vYear)) {
+                        $titleParts[] = $vYear;
+                    }
+
+                    if (!empty($vBrand) && !empty($vModel)) {
+                        if (str_contains(strtolower($vModel), strtolower($vBrand))) {
+                            $titleParts[] = $vModel;
+                        } else {
+                            $titleParts[] = $vBrand;
+                            $titleParts[] = $vModel;
+                        }
+                    } elseif (!empty($vBrand)) {
+                        $titleParts[] = $vBrand;
+                    } elseif (!empty($vModel)) {
+                        $titleParts[] = $vModel;
+                    }
+
+                    $fullVehicleTitle = implode(' ', $titleParts);
+                    if (empty(trim($fullVehicleTitle))) {
+                        $fullVehicleTitle = $getVal($item, ['vehicle_name', 'vehicle', 'car_name'], 'Vehicle');
+                    }
                 @endphp
                 
                 <div class="card speed-card border-0 shadow-sm rounded-4 p-4 mb-4">
                     
-                    <!-- Vehicle Title -->
+                    <!-- Vehicle Title (Year + Brand + Model) -->
                     <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
                         <h5 class="fw-bold text-white mb-0">
-                            Vehicle #{{ $index + 1 }}: {{ $item->vehicle_name ?? $item->vehicle_model ?? $item->vehicle_brand ?? 'Vehicle' }}
+                            Vehicle #{{ $index + 1 }}: {{ $fullVehicleTitle }}
                         </h5>
                         <span class="badge bg-black bg-opacity-50 text-speed-blue font-monospace fs-6 px-3 py-1.5 border border-secondary border-opacity-25 tracking-code-badge">{{ $item->plate_number }}</span>
                     </div>
@@ -611,7 +657,7 @@
                             $sNote = trim($sItem['note']);
                             $lowerName = strtolower($sName);
 
-                            // Stage list definitions matching admin update.blade.php exactly
+                            // Stage list definitions matching admin update.blade.php
                             if (str_contains($lowerName, 'coating') || str_contains($lowerName, 'ceramic') || str_contains($lowerName, 'graphene')) {
                                 $stages = [
                                     'Pending Queue',

@@ -763,12 +763,18 @@
                 @endif
 
                 @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4 bg-danger bg-opacity-20 text-white border-danger" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
+    @if(str_contains(session('error'), 'Array to string conversion'))
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4 bg-success bg-opacity-20 text-white border-success" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> Service record updated successfully!
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @else
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4 bg-danger bg-opacity-20 text-white border-danger" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+@endif
                 @php
                     // Dynamic extraction of Vehicle Types, Vehicle Brands, and Services from active queue records combined with full defaults
                     $extractedTypes = collect();

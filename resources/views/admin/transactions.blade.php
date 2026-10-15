@@ -1,3 +1,7 @@
+<!-- ========================================================================= -->
+<!-- FILE LOCATION: resources/views/admin/transactions.blade.php               -->
+<!-- ========================================================================= -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -554,7 +558,6 @@
             overflow: visible !important;
         }
 
-        /* Prevent currency symbols and amounts from line-wrapping & PDF overlay issues */
         .text-nowrap, td.text-nowrap, th.text-nowrap {
             white-space: nowrap !important;
         }
@@ -566,7 +569,6 @@
             white-space: nowrap !important;
         }
 
-        /* Direct Print Formatting Styles */
         @media print {
             @page {
                 size: portrait;
@@ -651,7 +653,6 @@
             zoom: 80%;
         }
 
-        /* FIX: Remove black/grayish modal backdrop shadow */
         .modal-backdrop {
             background-color: transparent !important;
             opacity: 0 !important;
@@ -918,8 +919,6 @@
                                     <th>Contact</th>
                                     <th>Vehicle</th>
                                     <th>Plate Number</th>
-                                    <th>Assigned Mechanic</th>
-                                    <th>Services Completed</th>
                                     <th>Date Registered</th>
                                     <th>Date Completed</th>
                                     <th class="text-nowrap">Total Cost</th>
@@ -928,91 +927,55 @@
                             </thead>
                             <tbody>
                               @forelse($displayTransactions as $service)
-    @php
-        $mechanicName = $service->mechanic_assigned 
-            ?? ($service->technician->name ?? $service->technician->full_name ?? null)
-            ?? ($service->mechanic->name ?? $service->mechanic->full_name ?? null)
-            ?? $service->technician_name 
-            ?? $service->mechanic_name 
-            ?? 'Unassigned';
+                                @php
+                                    $customerName = $service->customer_name 
+                                        ?? ($service->customer->name ?? null)
+                                        ?? ($service->user->name ?? null)
+                                        ?? $service->client_name 
+                                        ?? $service->name 
+                                        ?? 'N/A';
 
-        $customerName = $service->customer_name 
-            ?? ($service->customer->name ?? null)
-            ?? ($service->user->name ?? null)
-            ?? $service->client_name 
-            ?? $service->name 
-            ?? 'N/A';
+                                    $contactPhone = $service->contact_number 
+                                        ?? $service->phone_number 
+                                        ?? $service->customer_phone 
+                                        ?? $service->phone 
+                                        ?? ($service->customer->phone ?? 'N/A');
 
-        $contactPhone = $service->contact_number 
-            ?? $service->phone_number 
-            ?? $service->customer_phone 
-            ?? $service->phone 
-            ?? ($service->customer->phone ?? 'N/A');
-
-        $servicesArr = is_array($service->selected_services) 
-            ? $service->selected_services 
-            : json_decode($service->selected_services ?? '[]', true);
-
-        if (!is_array($servicesArr)) {
-            $servicesArr = array_filter(explode(', ', (string)($service->selected_services ?? '')));
-        }
-
-        $serviceNames = array_map(function($item) {
-            return is_array($item) ? ($item['name'] ?? '') : $item;
-        }, $servicesArr ?? []);
-        $serviceNames = array_filter($serviceNames);
-
-        // FILTER SPECIFIC SERVICE WHEN SERVICE_TYPE FILTER IS APPLIED
-        $reqService = request('service_type');
-        if (!empty($reqService)) {
-            $serviceNames = array_values(array_filter($serviceNames, function($s) use ($reqService) {
-                return stripos((string)$s, (string)$reqService) !== false;
-            }));
-        }
-
-        $vehicleBrand = $service->vehicle_make ?? $service->vehicle_brand ?? $service->brand ?? $service->make ?? 'N/A';
-        $vehicleModel = $service->vehicle_model ?? $service->model ?? 'N/A';
-        $vehicleType  = $service->vehicle_type ?? $service->body_type ?? 'Sedan';
-    @endphp
-    <tr>
-        <td class="fw-bold font-monospace text-speed-blue small">{{ $service->tracking_code }}</td>
-        <td class="fw-semibold text-white">{{ $customerName }}</td>
-        <td class="text-secondary small font-monospace">{{ $contactPhone }}</td>
-        <td class="fw-medium text-white small">{{ $vehicleBrand }} {{ $vehicleModel }} ({{ $vehicleType }})</td>
-        <td class="font-monospace text-uppercase small text-secondary fw-bold">{{ $service->plate_number ?? 'N/A' }}</td>
-        <td>
-            <span class="badge badge-mechanic rounded-pill px-3 py-1.5 small fw-semibold d-inline-flex align-items-center gap-1">
-                <i class="bi bi-wrench-adjustable text-speed-blue"></i> {{ $mechanicName }}
-            </span>
-        </td>
-        <td class="small text-truncate text-secondary" style="max-width: 180px;">
-            {{ count($serviceNames) > 0 ? implode(', ', $serviceNames) : 'General Detailing' }}
-        </td>
-        <td class="small text-secondary">
-            {{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y') }}
-        </td>
-        <td class="small text-secondary">
-            {{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y') }}
-        </td>
-        <td class="fw-bold font-monospace text-speed-pink text-nowrap">
-            <span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0), 2) }}
-        </td>
-        <td class="text-center">
-            <div class="d-flex justify-content-center gap-1">
-                <button type="button" class="btn btn-outline-danger btn-sm rounded-2 px-2 py-1 d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#pdfPreviewModal{{ $service->id }}">
-                    <i class="bi bi-file-earmark-pdf"></i> PDF
-                </button>
-            </div>
-        </td>
-    </tr>
-@empty
-    <tr>
-        <td colspan="11" class="text-center py-5 text-secondary">
-            <i class="bi bi-inbox fs-2 text-secondary d-block mb-2"></i>
-            No completed services found matching your filters.
-        </td>
-    </tr>
-@endforelse
+                                    $vehicleBrand = $service->vehicle_make ?? $service->vehicle_brand ?? $service->brand ?? $service->make ?? 'N/A';
+                                    $vehicleModel = $service->vehicle_model ?? $service->model ?? 'N/A';
+                                    $vehicleType  = $service->vehicle_type ?? $service->body_type ?? 'Sedan';
+                                @endphp
+                                <tr>
+                                    <td class="fw-bold font-monospace text-speed-blue small">{{ $service->tracking_code }}</td>
+                                    <td class="fw-semibold text-white">{{ $customerName }}</td>
+                                    <td class="text-secondary small font-monospace">{{ $contactPhone }}</td>
+                                    <td class="fw-medium text-white small">{{ $vehicleBrand }} {{ $vehicleModel }} ({{ $vehicleType }})</td>
+                                    <td class="font-monospace text-uppercase small text-secondary fw-bold">{{ $service->plate_number ?? 'N/A' }}</td>
+                                    <td class="small text-secondary">
+                                        {{ \Carbon\Carbon::parse($service->created_at)->format('M d, Y') }}
+                                    </td>
+                                    <td class="small text-secondary">
+                                        {{ \Carbon\Carbon::parse($service->updated_at)->format('M d, Y') }}
+                                    </td>
+                                    <td class="fw-bold font-monospace text-speed-pink text-nowrap">
+                                        <span class="peso-symbol">&#8369;</span>{{ number_format((float)($service->total_cost ?? 0), 2) }}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <button type="button" class="btn btn-outline-info btn-sm rounded-2 px-2.5 py-1 d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#pdfPreviewModal{{ $service->id }}" title="View Service Record & Download PDF">
+                                                <i class="bi bi-eye"></i> View
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="text-center py-5 text-secondary">
+                                        <i class="bi bi-inbox fs-2 text-secondary d-block mb-2"></i>
+                                        No completed services found matching your filters.
+                                    </td>
+                                </tr>
+                            @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -1106,7 +1069,6 @@
         }, $servicesArr ?? []);
         $serviceNames = array_filter($serviceNames);
 
-        // FILTER SPECIFIC SERVICE WHEN SERVICE_TYPE FILTER IS APPLIED
         $reqService = request('service_type');
         if (!empty($reqService)) {
             $serviceNames = array_values(array_filter($serviceNames, function($s) use ($reqService) {
@@ -1121,13 +1083,13 @@
         $plateNumber  = $service->plate_number ?? $service->plate_no ?? $service->plate ?? 'N/A';
     @endphp
 
-    <!-- PDF Receipt Preview Modal (With Price Note & Thermal Receipt Direct Print) -->
+    <!-- Service Record Details & PDF View Modal -->
     <div class="modal fade" id="pdfPreviewModal{{ $service->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content modal-content-dark rounded-4 shadow">
                 <div class="modal-header border-bottom border-secondary border-opacity-25 py-3">
                     <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2 fs-6">
-                        <i class="bi bi-file-earmark-pdf text-danger fs-5"></i> Official PDF Receipt ({{ $service->tracking_code }})
+                        <i class="bi bi-eye-fill text-speed-blue fs-5"></i> Service Record Details ({{ $service->tracking_code }})
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -1250,12 +1212,6 @@
                 <div class="modal-footer border-top border-secondary border-opacity-25 py-2 d-flex justify-content-between align-items-center">
                     <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm px-3" data-bs-dismiss="modal">Close</button>
                     <div class="d-flex gap-2">
-                        {{--
-                        <!-- Direct Thermal Receipt Print Button -->
-                        <button type="button" onclick="printThermalReceipt('{{ route('admin.transactions.thermal', $service->id) }}')" class="btn btn-outline-light btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1">
-                            <i class="bi bi-printer-fill"></i> Print Receipt
-                        </button>
-                        --}}
                         <a href="{{ route('admin.transactions.pdf', $service->id) }}" class="btn btn-danger btn-sm rounded-3 fw-semibold d-flex align-items-center gap-1" target="_blank">
                             <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
                         </a>
@@ -1623,9 +1579,6 @@
     <script src="{{ asset('js/theme-toggle.js') }}"></script>
 
     <script>
-        // Thermal Receipt Printer via hidden iframe
-        // Loads the dedicated thermal-receipt Blade and sends only that
-        // document to the browser's print command.
         function printThermalReceipt(url) {
             let iframe = document.getElementById('thermalPrintIframe');
 
@@ -1643,7 +1596,6 @@
                 document.body.appendChild(iframe);
             }
 
-            // Clear any previous handler before loading a new receipt.
             iframe.onload = null;
 
             iframe.onload = function () {
@@ -1660,7 +1612,6 @@
             iframe.src = url;
         }
 
-        // Direct Report Printable Document Print Handler via Dedicated Frame
         function printElement(target) {
             let el = (typeof target === 'string') ? document.getElementById(target) : target;
             if (!el) return;
@@ -1685,7 +1636,6 @@
                 document.body.appendChild(iframe);
             }
 
-            // Copy all styles from current page head to guarantee visual parity
             let stylesHTML = '';
             document.querySelectorAll('style, link[rel="stylesheet"]').forEach(node => {
                 stylesHTML += node.outerHTML;

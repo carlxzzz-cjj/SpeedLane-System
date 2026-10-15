@@ -71,7 +71,7 @@ class ServiceController extends Controller
     /**
      * Store service registration record.
      */
-    public function store(Request $request)
+  public function store(Request $request)
     {
         $validated = $request->validate([
             'customer_name'                     => 'required|string|max:255',
@@ -88,7 +88,7 @@ class ServiceController extends Controller
             'vehicles.*.mechanic_assigned'      => 'required|string|max:255',
             'vehicles.*.technician_id'          => 'nullable|integer',
             'vehicles.*.services'               => 'nullable|array',
-            'vehicles.*.price_adjustment_note' => 'nullable|string',
+            'vehicles.*.price_adjustment_note' => 'nullable',
             'vehicles.*.total_cost'             => 'nullable|numeric',
         ]);
 
@@ -100,6 +100,22 @@ class ServiceController extends Controller
         $trackingCode = !empty($validated['tracking_code']) 
             ? strtoupper(trim($validated['tracking_code'])) 
             : ServiceRecord::generateUniqueTrackingCode();
+
+        /*
+         * 1. Resolve a shared common note across the customer's registration.
+         * If a vehicle card note was left blank, it falls back to the first non-empty note found.
+         */
+        $commonNote = $request->input('price_adjustment_note') 
+            ?? $request->input('service_note');
+
+        if (empty($commonNote) && !empty($validated['vehicles'])) {
+            foreach ($validated['vehicles'] as $v) {
+                if (!empty($v['price_adjustment_note'])) {
+                    $commonNote = $v['price_adjustment_note'];
+                    break;
+                }
+            }
+        }
 
         DB::beginTransaction();
         try {
@@ -211,7 +227,21 @@ class ServiceController extends Controller
                 $record->vehicle_type             = $vehicleData['vehicle_type'] ?? '';
                 $record->vehicle_year             = $vehicleData['vehicle_year'] ?? '';
                 $record->plate_number             = strtoupper($vehicleData['plate_number']);
-                $record->price_adjustment_note    = $vehicleData['price_adjustment_note'] ?? null;
+
+                /*
+                 * 3. Assign vehicle note, falling back to $commonNote if this vehicle's note input is empty.
+                 * Safely handles array or string values.
+                 */
+                $rawNote = !empty($vehicleData['price_adjustment_note']) 
+                    ? $vehicleData['price_adjustment_note'] 
+                    : $commonNote;
+
+                if (is_array($rawNote)) {
+                    $record->price_adjustment_note = implode(' | ', array_filter(array_map('strval', $rawNote)));
+                } else {
+                    $record->price_adjustment_note = !empty($rawNote) ? trim((string)$rawNote) : null;
+                }
+
                 $record->total_cost               = $finalVehicleCost;
                 $record->status                   = 'Pending Queue';
 

@@ -240,49 +240,6 @@
             letter-spacing: 0.04em;
         }
 
-        .tracking-code-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background-color: var(--speed-card-bg);
-            padding: 1rem;
-            border-radius: 12px;
-            border: 1px solid var(--speed-card-border);
-        }
-
-        .btn-generate {
-            background: linear-gradient(90deg, var(--speed-pink) 0%, var(--speed-blue) 100%);
-            color: #ffffff !important;
-            border: none;
-            padding: 0.5rem 1.1rem;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.875rem;
-            white-space: nowrap;
-            box-shadow: 0 4px 15px rgba(244, 37, 130, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .btn-generate:hover {
-            opacity: 0.95;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0, 162, 255, 0.4);
-            color: #ffffff !important;
-        }
-
-        .code-box {
-            font-family: monospace;
-            font-weight: 700;
-            font-size: 1.05rem;
-            color: var(--speed-blue);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0.4rem 0.75rem;
-            border-radius: 8px;
-            background-color: #06080d;
-            width: auto;
-            max-width: 200px;
-        }
-
         .vehicle-collapse-trigger {
             cursor: pointer;
             user-select: none;
@@ -342,7 +299,6 @@
         }
 
         html.light-theme .btn-speed-gradient,
-        html.light-theme .btn-generate,
         html.light-theme .badge.bg-speed-pink,
         html.light-theme .bg-speed-pink.text-white {
             color: #ffffff !important;
@@ -470,17 +426,6 @@
         html.light-theme .vehicle-type-placeholder {
             background-color: #f1f5f9 !important;
             border-color: #cbd5e1 !important;
-        }
-
-        html.light-theme .tracking-code-container {
-            background-color: #ffffff !important;
-            border-color: #e2e8f0 !important;
-        }
-
-        html.light-theme .code-box {
-            background-color: #f1f5f9 !important;
-            border-color: #cbd5e1 !important;
-            color: #0284c7 !important;
         }
 
         html.light-theme #previewVehiclesContainer .card {
@@ -640,6 +585,7 @@
 
                 <form action="{{ route('services.store') }}" method="POST" id="serviceRegistrationForm">
                     @csrf
+                    <input type="hidden" id="trackingCodeInput" name="tracking_code" value="{{ old('tracking_code') }}">
 
                     <div class="row g-4">
 
@@ -796,7 +742,7 @@
                                             <div class="col-md-8 col-xl-5">
                                                 <label class="form-label small text-secondary fw-semibold">Mechanic Assigned <span class="text-speed-pink">*</span></label>
                                                 <select name="vehicles[0][mechanic_assigned]" class="form-select form-select-dark mechanic-select" required>
-                                                    <option value="" disabled selected>Select technician</option>
+                                                    <option value="" disabled selected>Select Mechanic</option>
                                                     @if(isset($technicians) && count($technicians) > 0)
                                                         @foreach($technicians as $tech)
                                                             <option value="{{ $tech->name }}">{{ $tech->name }}</option>
@@ -957,14 +903,6 @@
 
                                 </div>
 
-                            </div>
-
-                            <!-- Tracking Code Bar -->
-                            <div class="tracking-code-container mb-4">
-                                <button type="button" class="btn-generate" id="generateCodeBtn">
-                                    <i class="bi bi-arrow-repeat me-1"></i> Generate Tracking Code
-                                </button>
-                                <input type="text" id="trackingCodeInput" name="tracking_code" readonly value="{{ old('tracking_code') }}" placeholder="" class="code-box" />
                             </div>
 
                         </div>
@@ -1226,7 +1164,6 @@
         const vehiclesContainer = document.getElementById('vehiclesContainer');
         const customerNameInput = document.getElementById('customer_name');
         const customerPhoneInput = document.getElementById('customer_phone');
-        const generateCodeBtn = document.getElementById('generateCodeBtn');
         const trackingCodeInput = document.getElementById('trackingCodeInput');
         const previewCode = document.getElementById('previewCode');
         const serviceRegistrationForm = document.getElementById('serviceRegistrationForm');
@@ -1374,7 +1311,6 @@
                     const optionText = (optionItem.textContent || '').toLowerCase();
                     const input = optionItem.querySelector('.service-option-input');
 
-                    // Option matches directly if vehicle type is 'all' OR matches selectedType specifically
                     const isOptionTypeMatch = optionType === 'all' || 
                                               optionType === '' || 
                                               optionType === selectedType || 
@@ -1539,7 +1475,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary border-opacity-25">
                             <div>
                                 <h6 class="fw-bold text-white mb-0 fs-7"><i class="bi bi-car-front text-speed-pink me-1"></i> ${vehTitle}</h6>
-                                <small class="text-secondary" style="font-size: 0.75rem;"><i class="bi bi-person me-1"></i>Tech: ${mechanic}</small>
+                                <small class="text-secondary" style="font-size: 0.75rem;"><i class="bi bi-person me-1"></i>Mechanic: ${mechanic}</small>
                             </div>
                             <span class="badge bg-secondary bg-opacity-25 text-white font-monospace">${plate}</span>
                         </div>
@@ -1580,21 +1516,26 @@
             const card = brandSelect.closest('.vehicle-card');
             const modelSelect = card.querySelector('.model-select');
             const yearSelect = card.querySelector('.year-select');
+            const typeSelect = card.querySelector('.type-select');
 
             if (!modelSelect) return;
 
             const brand = brandSelect.value;
             modelSelect.innerHTML = '<option value="" disabled selected>Select Model</option>';
 
-            // Reset Year Dropdown until a model is selected
             if (yearSelect) {
                 yearSelect.innerHTML = '<option value="" disabled selected>Select Model First</option>';
                 yearSelect.disabled = true;
             }
 
+            if (typeSelect) {
+                typeSelect.value = '';
+                typeSelect.disabled = false;
+                filterOptionsByVehicleType(card);
+            }
+
             let models = [];
 
-            // Retrieve from DB data variable if available (supports both grouped and flat collection)
             if (window.VEHICLE_MODELS) {
                 if (Array.isArray(window.VEHICLE_MODELS) && window.VEHICLE_MODELS.length > 0) {
                     models = window.VEHICLE_MODELS.filter(m => m.brand === brand);
@@ -1603,7 +1544,6 @@
                 }
             }
 
-            // Fallback to DEFAULT_MODELS if empty
             if ((!models || models.length === 0) && DEFAULT_MODELS[brand]) {
                 models = DEFAULT_MODELS[brand];
             }
@@ -1650,13 +1590,11 @@
 
         if (customerPhoneInput) {
             customerPhoneInput.addEventListener('input', function() {
-                // Strip all non-digit characters and limit to 11 digits
                 let digits = this.value.replace(/\D/g, '');
                 if (digits.length > 11) {
                     digits = digits.substring(0, 11);
                 }
 
-                // Format live as 09XX XXX XXXX
                 let formatted = digits;
                 if (digits.length > 4 && digits.length <= 7) {
                     formatted = `${digits.substring(0, 4)} ${digits.substring(4)}`;
@@ -1669,20 +1607,7 @@
             });
         }
 
-        // --- TRACKING CODE GENERATOR BUTTON WITH VALIDATION ---
-        if (generateCodeBtn) {
-            generateCodeBtn.addEventListener('click', function() {
-                if (!validateVehicleServiceInfo()) {
-                    return;
-                }
-
-                const newCode = generateTrackingCode();
-                if (trackingCodeInput) trackingCodeInput.value = newCode;
-                if (previewCode) previewCode.textContent = newCode;
-            });
-        }
-
-        // --- FORM SUBMIT INTERCEPTOR TO VALIDATE AND ENABLE DISABLED FIELDS ---
+        // --- FORM SUBMIT INTERCEPTOR TO VALIDATE AND AUTO-GENERATE TRACKING CODE ---
         if (serviceRegistrationForm) {
             serviceRegistrationForm.addEventListener('submit', function(e) {
                 if (!validateVehicleServiceInfo()) {
@@ -1690,12 +1615,10 @@
                     return false;
                 }
 
-                // Auto-generate tracking code if empty
-                if (trackingCodeInput && !trackingCodeInput.value.trim()) {
-                    const newCode = generateTrackingCode();
-                    trackingCodeInput.value = newCode;
-                    if (previewCode) previewCode.textContent = newCode;
-                }
+                // Automatically generate tracking code on save order submission
+                const newCode = generateTrackingCode();
+                if (trackingCodeInput) trackingCodeInput.value = newCode;
+                if (previewCode) previewCode.textContent = newCode;
 
                 // Enable all disabled selects inside vehicle cards so HTML posts their values
                 document.querySelectorAll('.vehicle-card select:disabled').forEach(s => {
@@ -1808,17 +1731,22 @@
                 });
             }
 
-            // AUTO-SELECT VEHICLE TYPE & POPULATE ACCURATE YEARS WHEN MODEL IS SELECTED
             if (modelSelect) {
                 modelSelect.addEventListener('change', function() {
                     const selectedOpt = modelSelect.options[modelSelect.selectedIndex];
                     const autoType = selectedOpt ? selectedOpt.getAttribute('data-type') : null;
 
-                    if (autoType && typeSelect) {
-                        setVehicleTypeSelect(typeSelect, autoType);
+                    if (selectedOpt && selectedOpt.value) {
+                        if (autoType && typeSelect) {
+                            setVehicleTypeSelect(typeSelect, autoType);
+                            typeSelect.disabled = true;
+                        } else if (typeSelect) {
+                            typeSelect.disabled = false;
+                        }
+                    } else if (typeSelect) {
+                        typeSelect.disabled = false;
                     }
 
-                    // Dynamically update Year dropdown based on model range from vehicle_models schema
                     if (yearSelect && selectedOpt) {
                         const yStart = parseInt(selectedOpt.getAttribute('data-year-start')) || 1990;
                         const yEnd = parseInt(selectedOpt.getAttribute('data-year-end')) || new Date().getFullYear();
@@ -1863,7 +1791,6 @@
                 });
             }
 
-            // Sync parent service checkbox when toggling checkbox directly
             card.querySelectorAll('.service-checkbox').forEach(cb => {
                 cb.addEventListener('change', function() {
                     const parentServiceCard = cb.closest('.service-card-item');
@@ -1877,7 +1804,6 @@
                 });
             });
 
-            // Auto-check parent service checkbox when selecting a subservice option
             card.querySelectorAll('.service-option-input').forEach(opt => {
                 opt.addEventListener('change', function() {
                     const parentServiceCard = opt.closest('.service-card-item');
@@ -1908,10 +1834,8 @@
                 const firstCard = document.querySelector('.vehicle-card');
                 if (!firstCard) return;
 
-                // 1. Clone card BEFORE triggering collapse animations on existing cards
                 const newCard = firstCard.cloneNode(true);
 
-                // 2. Collapse all existing vehicles
                 document.querySelectorAll('.vehicle-card').forEach(existingCard => {
                     const collapseBody = existingCard.querySelector('.vehicle-collapse-body');
                     const collapseTrigger = existingCard.querySelector('.vehicle-collapse-trigger');
@@ -1924,7 +1848,6 @@
                     }
                 });
 
-                // 3. Reset form inputs in newly cloned card
                 newCard.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
                     if (input.classList.contains('service-price-input') || input.classList.contains('vehicle-total-cost-input')) {
                         input.value = '0.00';
@@ -1946,6 +1869,9 @@
                         select.disabled = true;
                         select.innerHTML = '<option value="" disabled selected>Select Model First</option>';
                     }
+                    if (select.classList.contains('type-select')) {
+                        select.disabled = false;
+                    }
                 });
 
                 newCard.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(chk => {
@@ -1963,7 +1889,6 @@
                     statusLabel.classList.add('text-secondary');
                 }
 
-                // 4. Clean up newCard collapse state completely so it displays fully open
                 const newCollapseBody = newCard.querySelector('.vehicle-collapse-body');
                 const newCollapseTrigger = newCard.querySelector('.vehicle-collapse-trigger');
                 
@@ -1977,16 +1902,10 @@
                     newCollapseTrigger.setAttribute('aria-expanded', 'true');
                 }
 
-                // 5. Append newCard to DOM
                 vehiclesContainer.appendChild(newCard);
-
-                // 6. Re-index IDs, attributes, and labels
                 reindexVehicleCards();
-
-                // 7. Attach events to new card
                 attachVehicleEvents(newCard);
 
-                // 8. Re-initialize clean Bootstrap Collapse instance on new vehicle card
                 if (newCollapseBody) {
                     const oldBsInstance = bootstrap.Collapse.getInstance(newCollapseBody);
                     if (oldBsInstance) {

@@ -52,39 +52,31 @@ class ManageServiceController extends Controller
      * The service_records table contains the actual customer,
      * vehicle, tracking code, status, and contact information.
      */
+  /**
+     * Update active service progress status, item costs,
+     * and dispatch SMS notification if ready for pick-up.
+     */
     public function updateStatus(Request $request, $id)
     {
-        /*
-         * IMPORTANT:
-         * The actual customer/service transaction is stored
-         * in service_records.
-         */
+        // Fetch the specific record corresponding to the submitted modal
         $service = ServiceRecord::findOrFail($id);
 
         DB::beginTransaction();
 
         try {
             $submittedServices = $request->input('services', []);
+            $submittedVehicles = $request->input('vehicles', []);
             $markAsCompleted = $request->boolean('mark_as_completed');
             $sendSmsRequested = $request->boolean('send_sms');
 
-            $updatedSelectedServices = [];
-            $updatedPricesMap = [];
-            $totalCalculatedCost = 0;
-            $hasCompletedAndReady = false;
+            $allVehiclesSelectedServices = [];
 
             /*
-             * Process submitted service items.
+             * Process submitted service items grouped per vehicle index ($vIdx).
              */
             if (is_array($submittedServices)) {
                 foreach ($submittedServices as $vIdx => $serviceItems) {
 
-                    /*
-                     * Some forms may submit the services directly
-                     * instead of nesting them by vehicle.
-                     *
-                     * Support both structures.
-                     */
                     if (
                         isset($serviceItems['name']) ||
                         isset($serviceItems['status']) ||
@@ -97,126 +89,140 @@ class ManageServiceController extends Controller
                         continue;
                     }
 
+                    $vSelectedServices = [];
+                    $vPricesMap = [];
+                    $vTotalCost = 0;
+
                     foreach ($serviceItems as $sIdx => $sData) {
 
                         if (!is_array($sData)) {
                             continue;
                         }
 
-                        $sName = trim((string) ($sData['name'] ?? ''));
-                        $sStatus = trim(
-                            (string) ($sData['status'] ?? 'Pending Queue')
-                        );
-                        $sNote = trim(
-                            (string) ($sData['note'] ?? '')
-                        );
-                        $sPrice = floatval(
-                            $sData['price'] ?? 0
-                        );
+                        $rawName = $sData['name'] ?? '';
+                        $sName = is_array($rawName) ? '' : trim((string) $rawName);
+
+                        $rawStatus = $sData['status'] ?? 'Pending Queue';
+                        $sStatus = is_array($rawStatus) ? 'Pending Queue' : trim((string) $rawStatus);
+
+                        $rawNote = $sData['note'] ?? '';
+                        $sNote = is_array($rawNote) ? '' : trim((string) $rawNote);
+
+                        $rawPrice = $sData['price'] ?? 0;
+                        $sPrice = is_numeric($rawPrice) ? floatval($rawPrice) : 0;
 
                         if (!empty($sName)) {
 
-                            $updatedSelectedServices[] = [
+                            $itemData = [
                                 'name'   => $sName,
                                 'status' => $sStatus,
                                 'note'   => $sNote,
                             ];
 
-                            $updatedPricesMap[$sName] = $sPrice;
-
-                            $totalCalculatedCost += $sPrice;
-
-                            /*
-                             * Detect pickup-ready status.
-                             */
-                            $stLower = strtolower($sStatus);
-
-                            if (
-                                str_contains(
-                                    $stLower,
-                                    'completed & ready for pick up'
-                                ) ||
-                                str_contains(
-                                    $stLower,
-                                    'ready for pick up'
-                                ) ||
-                                str_contains(
-                                    $stLower,
-                                    'ready for pickup'
-                                )
-                            ) {
-                                $hasCompletedAndReady = true;
-                            }
+                            $vSelectedServices[] = $itemData;
+                            $vPricesMap[$sName] = $sPrice;
+                            $vTotalCost += $sPrice;
                         }
                     }
+
+                    /*
+                     * Compute per-vehicle status: Queued | In Progress | Completed
+                     */
+                    $vStatuses = array_map(function ($item) {
+                        $st = $item['status'] ?? '';
+                        return strtolower(is_array($st) ? '' : (string) $st);
+                    }, $vSelectedServices);
+
+                    $vIsPending = !empty($vStatuses) && array_reduce($vStatuses, function ($carry, $item) {
+                        return $carry && (str_contains($item, 'pending') || str_contains($item, 'queue'));
+                    }, true);
+
+                    $vIsCompleted = !empty($vStatuses) && array_reduce($vStatuses, function ($carry, $item) {
+                        return $carry && (str_contains($item, 'completed') || str_contains($item, 'ready'));
+                    }, true);
+
+                    if ($markAsCompleted || $vIsCompleted) {
+                        $vStatus = 'Completed';
+                    } elseif ($vIsPending) {
+                        $vStatus = 'Queued';
+                    } else {
+                        $vStatus = 'In Progress';
+                    }
+
+                    /*
+                     * Extract per-vehicle price adjustment note
+                     */
+                    $vNote = null;
+                    if (is_array($submittedVehicles) && isset($submittedVehicles[$vIdx])) {
+                        $rawVNote = $submittedVehicles[$vIdx]['price_adjustment_note'] ?? null;
+                        if (is_array($rawVNote)) {
+                            $vNote = implode(' | ', array_filter(array_map('strval', $rawVNote)));
+                        } elseif (is_string($rawVNote) || is_numeric($rawVNote)) {
+                            $vNote = trim((string) $rawVNote);
+                        }
+                    }
+
+                    if ($vNote === null && $request->has('price_adjustment_note')) {
+                        $rawDirectNote = $request->input('price_adjustment_note');
+                        if (is_array($rawDirectNote)) {
+                            $vNote = implode(' | ', array_filter(array_map('strval', $rawDirectNote)));
+                        } elseif (is_string($rawDirectNote) || is_numeric($rawDirectNote)) {
+                            $vNote = trim((string) $rawDirectNote);
+                        }
+                    }
+
+                    $allVehiclesSelectedServices[$vIdx] = [
+                        'services' => $vSelectedServices,
+                        'prices'   => $vPricesMap,
+                        'total'    => $vTotalCost,
+                        'status'   => $vStatus,
+                        'note'     => $vNote !== null ? (string) $vNote : null,
+                    ];
                 }
             }
 
             /*
-             * Save status and pricing information
-             * to service_records.
+             * Update the TARGET ServiceRecord ($service) directly using its submitted form payload
              */
-            $updatePayload = [
-                'selected_services' => json_encode(
-                    $updatedSelectedServices
-                ),
+            $targetData = $allVehiclesSelectedServices[0] ?? null;
 
-                'selected_services_prices' => json_encode(
-                    $updatedPricesMap
-                ),
-
-                'total_cost' => $totalCalculatedCost,
-            ];
-
-            /*
-             * If the form explicitly marks the service
-             * as completed, update the main record status.
-             */
-            if ($markAsCompleted) {
-                $updatePayload['status'] = 'Completed';
+            if ($targetData) {
+                $updatePayload = [
+                    'selected_services'        => json_encode($targetData['services']),
+                    'selected_services_prices' => json_encode($targetData['prices']),
+                    'total_cost'               => $targetData['total'],
+                    'status'                   => (string) $targetData['status'],
+                ];
+                if ($targetData['note'] !== null) {
+                    $updatePayload['price_adjustment_note'] = (string) $targetData['note'];
+                }
+                
+                $service->update($updatePayload);
             }
 
             /*
-             * Preserve the existing price adjustment note.
-             *
-             * Depending on the Blade structure, this may be
-             * submitted inside the first service/vehicle item.
+             * Synchronize child vehicle models if a vehicles relationship exists on $service
              */
-            $submittedVehicles = $request->input('vehicles', []);
-
-            if (
-                is_array($submittedVehicles) &&
-                isset($submittedVehicles[0]['price_adjustment_note'])
-            ) {
-                $updatePayload['price_adjustment_note'] =
-                    $submittedVehicles[0]['price_adjustment_note'];
+            if (method_exists($service, 'vehicles') && $service->vehicles()->count() > 0) {
+                $vehiclesList = $service->vehicles()->orderBy('id', 'asc')->get();
+                foreach ($vehiclesList as $vIdx => $vModel) {
+                    if (isset($allVehiclesSelectedServices[$vIdx])) {
+                        $vData = $allVehiclesSelectedServices[$vIdx];
+                        $vPayload = [
+                            'selected_services'        => json_encode($vData['services']),
+                            'selected_services_prices' => json_encode($vData['prices']),
+                            'total_cost'               => $vData['total'],
+                            'status'                   => (string) $vData['status'],
+                        ];
+                        if ($vData['note'] !== null) {
+                            $vPayload['price_adjustment_note'] = (string) $vData['note'];
+                        }
+                        $vModel->update($vPayload);
+                    }
+                }
             }
 
-            /*
-             * If price_adjustment_note is submitted directly,
-             * also support that structure.
-             */
-            if ($request->has('price_adjustment_note')) {
-                $updatePayload['price_adjustment_note'] =
-                    $request->input('price_adjustment_note');
-            }
-
-            /*
-             * Update the actual service record.
-             */
-            $service->update($updatePayload);
-
-            /*
-             * Refresh the model after updating it.
-             */
             $service->refresh();
-
-            /*
-             * Commit the service update first.
-             *
-             * SMS failure must NOT undo the completed
-             * service record update.
-             */
             DB::commit();
 
             /*
