@@ -6,23 +6,23 @@
     <style>
         @page {
             size: letter portrait;
-            margin: 12mm 15mm;
+            margin: 10mm 12mm;
         }
         body { 
             font-family: 'DejaVu Sans', sans-serif; 
-            font-size: 9.5px; 
+            font-size: 12px; 
             color: #0f172a; 
             margin: 0;
             padding: 0;
             background-color: #ffffff;
-            line-height: 1.35;
+            line-height: 1.45;
         }
 
-        /* DomPDF Safe Container - NO width: 100% so padding doesn't overflow page */
+        /* DomPDF Safe Container - Fills Page Cleanly */
         .receipt-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 16px 18px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 28px 32px;
             background-color: #ffffff;
         }
 
@@ -35,17 +35,17 @@
 
         /* Header Layout */
         .header-table { 
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1.5px solid #e2e8f0;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
         }
 
         .brand-title { 
-            font-size: 18px; 
+            font-size: 28px; 
             font-weight: 900; 
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
             font-style: italic;
         }
 
@@ -53,7 +53,7 @@
         .brand-blue { color: #00a2ff; }
 
         .brand-subtitle { 
-            font-size: 8.5px; 
+            font-size: 11px; 
             color: #64748b; 
             font-weight: 600;
         }
@@ -62,17 +62,17 @@
             display: inline-block;
             background-color: #15803d;
             color: #ffffff;
-            font-size: 8.5px;
+            font-size: 11px;
             font-weight: 800;
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 4px 14px;
+            border-radius: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
         }
 
         .tracking-text {
-            font-size: 8.5px;
+            font-size: 11px;
             color: #64748b;
         }
 
@@ -81,8 +81,8 @@
             font-weight: bold;
             color: #0f172a;
             background-color: #f1f5f9;
-            padding: 1px 5px;
-            border-radius: 3px;
+            padding: 3px 8px;
+            border-radius: 4px;
             border: 1px solid #cbd5e1;
         }
 
@@ -90,74 +90,74 @@
         .info-block-table {
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            border-radius: 6px;
+            margin-bottom: 18px;
         }
 
         .info-block-table td {
-            padding: 8px 12px;
+            padding: 16px 20px;
             vertical-align: top;
         }
 
         .block-label {
-            font-size: 7.5px;
+            font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
             color: #64748b;
-            margin-bottom: 2px;
+            margin-bottom: 6px;
             display: block;
         }
 
         .block-value {
-            font-size: 10px;
+            font-size: 15px;
             font-weight: 800;
             color: #0f172a;
         }
 
         .block-subvalue {
-            font-size: 8.5px;
+            font-size: 12px;
             color: #475569;
             font-family: 'DejaVu Sans Mono', monospace;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         /* Vehicle Details Card */
         .vehicle-card {
             border: 1px solid #e2e8f0;
-            border-radius: 5px;
+            border-radius: 6px;
             background-color: #f8fafc;
-            padding: 8px 12px;
-            margin-bottom: 10px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
         }
 
         .vehicle-title {
-            font-size: 9px;
+            font-size: 13px;
             font-weight: 800;
             color: #0f172a;
             border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 4px;
-            margin-bottom: 6px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .vehicle-table td {
             vertical-align: top;
-            padding: 2px 0;
+            padding: 4px 0;
             word-wrap: break-word;
         }
 
         .veh-label {
-            font-size: 7px;
+            font-size: 9.5px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.5px;
             color: #64748b;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
             display: block;
         }
 
         .veh-value {
-            font-size: 9px;
+            font-size: 13.5px;
             font-weight: 800;
             color: #0f172a;
         }
@@ -166,69 +166,69 @@
         .dates-table {
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            border-radius: 6px;
+            margin-bottom: 18px;
         }
 
         .dates-table td {
-            padding: 6px 12px;
-            font-size: 8px;
+            padding: 12px 20px;
+            font-size: 11.5px;
             color: #475569;
         }
 
         /* Price Adjustment Note Box */
         .note-card {
             border: 1px solid #e2e8f0;
-            border-radius: 5px;
+            border-radius: 6px;
             background-color: #f8fafc;
-            padding: 8px 12px;
-            margin-bottom: 10px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
         }
 
         .note-label {
-            font-size: 7.5px;
+            font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
             color: #64748b;
-            margin-bottom: 2px;
+            margin-bottom: 6px;
             display: block;
         }
 
         .note-value {
-            font-size: 8.5px;
+            font-size: 12px;
             font-weight: 600;
             color: #0f172a;
         }
 
         /* Services Table */
         .services-table { 
-            margin-bottom: 10px; 
+            margin-bottom: 20px; 
         }
 
         .services-table th { 
             background-color: #f8fafc; 
             color: #0f172a; 
-            padding: 6px 8px; 
-            font-size: 8px; 
+            padding: 12px 16px; 
+            font-size: 11px; 
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.5px;
             border: 1px solid #cbd5e1;
             text-align: left;
         }
 
         .services-table td { 
             border: 1px solid #cbd5e1; 
-            padding: 6px 8px; 
-            font-size: 9px; 
+            padding: 12px 16px; 
+            font-size: 12.5px; 
             color: #0f172a;
         }
 
         .services-table tfoot td {
             background-color: #ffffff;
             border: 1px solid #cbd5e1;
-            padding: 8px;
+            padding: 16px;
         }
 
         /* Utilities & Typography */
@@ -240,13 +240,13 @@
 
         /* Footer Note */
         .footer-note { 
-            margin-top: 12px; 
+            margin-top: 24px; 
             text-align: center; 
-            font-size: 8px; 
+            font-size: 11px; 
             color: #64748b; 
             border-top: 1px dashed #cbd5e1; 
-            padding-top: 8px; 
-            letter-spacing: 0.2px;
+            padding-top: 16px; 
+            letter-spacing: 0.3px;
         }
     </style>
 </head>
@@ -387,9 +387,9 @@
         <table class="services-table">
             <thead>
                 <tr>
-                    <th width="35px" class="text-center">#</th>
+                    <th width="40px" class="text-center">#</th>
                     <th>Completed Service Description</th>
-                    <th width="110px" class="text-end">Status</th>
+                    <th width="120px" class="text-end">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -411,8 +411,8 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="2" class="text-end fw-bold" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px;">Total Cost Paid:</td>
-                    <td class="text-end fw-bold font-mono" style="font-size: 13px; color: #0f172a;">
+                    <td colspan="2" class="text-end fw-bold" style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.4px;">Total Cost Paid:</td>
+                    <td class="text-end fw-bold font-mono" style="font-size: 18px; color: #0f172a;">
                         &#8369;{{ number_format((float)($service->total_cost ?? 0), 2) }}
                     </td>
                 </tr>
