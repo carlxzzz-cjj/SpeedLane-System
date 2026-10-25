@@ -49,20 +49,23 @@ class AuthController extends Controller
     /**
      * Process Admin Login Credentials
      */
-    public function login(Request $request)
-    {
-        // 1. Validate Login Inputs
-        $credentials = $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|string',
-        ]);
+   public function login(Request $request)
+{
+    // 1. Validate Login Inputs
+    $request->validate([
+        'username' => 'required|string',
+        'password' => 'required|string',
+    ]);
 
-        // 2. Authenticate User against Database
-        if (Auth::attempt(['email' => $request->username, 'password' => $request->password])) {
-            $request->session()->regenerate();
+    // 2. Detect whether input is an email or username
+    $loginType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-            return redirect()->intended(route('admin.dashboard'));
-        }
+    // 3. Authenticate User against Database
+    if (Auth::attempt([$loginType => $request->username, 'password' => $request->password])) {
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('admin.dashboard'));
+    }
 
         // 3. Return Error on Incorrect Credentials
         return back()->withInput()->withErrors([

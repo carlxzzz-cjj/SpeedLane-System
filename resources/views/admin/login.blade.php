@@ -589,24 +589,24 @@
                                 <form action="{{ route('admin.login.submit') }}" method="POST">
                                     @csrf
                                     
-                                    <!-- Username Field -->
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-semibold text-secondary">Email</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text input-group-text-dark"><i class="bi bi-person text-speed-blue"></i></span>
-                                            <input type="text" 
-                                                   id="loginUsername"
-                                                   name="username" 
-                                                   class="form-control form-control-dark @error('username') is-invalid @enderror" 
-                                                   placeholder="Enter username" 
-                                                   value="{{ old('username') }}" 
-                                                   required>
-                                        </div>
+                                   <!-- Username or Email Field -->
+<div class="mb-3">
+    <label class="form-label small fw-semibold text-secondary">Username</label>
+    <div class="input-group">
+        <span class="input-group-text input-group-text-dark"><i class="bi bi-person text-speed-blue"></i></span>
+        <input type="text" 
+               id="loginUsername"
+               name="username" 
+               class="form-control form-control-dark @error('username') is-invalid @enderror" 
+               placeholder="Enter username" 
+               value="{{ old('username') }}" 
+               required>
+    </div>
 
-                                        @error('username')
-                                            <small class="text-danger d-block mt-1">{{ $message }}</small>
-                                        @enderror
-                                    </div>
+    @error('username')
+        <small class="text-danger d-block mt-1">{{ $message }}</small>
+    @enderror
+</div>
 
                                     <!-- Password Field with Forgot Password Link & See Password Toggle -->
                                     <div class="mb-4">
