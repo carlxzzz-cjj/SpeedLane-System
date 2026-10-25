@@ -621,7 +621,7 @@
                             <span class="fw-bold text-white small">{{ $item->service_type ?? 'General Service' }}</span>
                         </div>
                         <div class="col-md-4">
-                            <span class="text-secondary extra-small d-block">Assigned Technician</span>
+                            <span class="text-secondary extra-small d-block">Assigned Mechanic</span>
                             <span class="fw-bold text-white small">{{ $item->technician ?? $item->mechanic_assigned ?? 'Unassigned' }}</span>
                         </div>
                         <div class="col-md-4">
@@ -783,7 +783,7 @@
                                                 @if($isCurrent && !empty($sNote))
                                                     <div class="mt-2 p-2.5 rounded-3 border border-info border-opacity-30 text-white shadow-sm tech-note-box" style="background-color: rgba(0, 162, 255, 0.08);">
                                                         <div class="d-flex align-items-center gap-1.5 fw-bold text-speed-blue mb-1 extra-small">
-                                                            <i class="bi bi-chat-left-text-fill"></i> Technician Progress Note
+                                                            <i class="bi bi-chat-left-text-fill"></i> Mechanic Progress Note
                                                         </div>
                                                         <p class="mb-0 text-light" style="font-size: 0.85rem; line-height: 1.45;">
                                                             "{{ $sNote }}"

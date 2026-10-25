@@ -50,6 +50,8 @@
             color: #e2e8f0;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
+            display: flex !important;
+            flex-direction: column !important;
             background-image: 
                 radial-gradient(circle at 15% 20%, rgba(244, 37, 130, 0.12) 0%, transparent 40%),
                 radial-gradient(circle at 85% 80%, rgba(0, 162, 255, 0.12) 0%, transparent 40%),
@@ -475,7 +477,7 @@
     <div class="ambient-orb ambient-orb-2"></div>
 
     <!-- Top Navigation -->
-    <div class="navbar-speed py-3 px-4 mb-4">
+    <div class="navbar-speed py-3 px-4">
         <div class="container d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3">
                 <a href="/" class="back-btn text-decoration-none d-flex align-items-center justify-content-center rounded-circle" style="width: 38px; height: 38px;" title="Back to Home">
@@ -502,7 +504,7 @@
     </div>
 
     <!-- Main Enterprise Split-Container -->
-    <div class="container pb-5 my-auto">
+    <div class="container my-auto py-4">
         <div class="row justify-content-center align-items-center">
             <div class="col-12 col-xl-10">
                 
