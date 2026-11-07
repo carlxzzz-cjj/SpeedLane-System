@@ -208,6 +208,11 @@
             border-left: none !important;
         }
 
+        /* Auto-capitalization styling for name input fields */
+        .name-capitalize-input {
+            text-transform: capitalize;
+        }
+
         /* Service Registration Specific Styles */
         .service-card-item {
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -453,7 +458,8 @@
 
         html.light-theme .btn-close-white {
             filter: invert(1) grayscale(100%) brightness(50%);
-       }
+        }
+
         body {
             zoom: 80%;
         }
@@ -483,7 +489,7 @@
                 </div>
             </a>
 
-               <div class="d-flex align-items-center gap-3 ms-auto">
+            <div class="d-flex align-items-center gap-3 ms-auto">
                 @if(auth()->check())
                     @if(method_exists(auth()->user(), 'isSuperAdmin') && auth()->user()->isSuperAdmin())
                         <span class="badge badge-super-admin px-3 py-2 rounded-pill d-flex align-items-center gap-1">
@@ -600,11 +606,28 @@
                                 </div>
 
                                 <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label small text-secondary fw-semibold">Customer Name <span class="text-speed-pink">*</span></label>
-                                        <input type="text" name="customer_name" id="customer_name" class="form-control form-control-dark" placeholder="e.g., Juan Dela Cruz" value="{{ old('customer_name') }}" required>
+                                    <!-- First Name (Expanded Width) -->
+                                    <div class="col-md-4">
+                                        <label class="form-label small text-secondary fw-semibold">First Name <span class="text-speed-pink">*</span></label>
+                                        <input type="text" name="first_name" id="first_name" class="form-control form-control-dark name-capitalize-input" placeholder="e.g., Juan" value="{{ old('first_name') }}" required>
                                     </div>
-                                    <div class="col-md-6">
+                                    <!-- Middle Name -->
+                                    <div class="col-md-4">
+                                        <label class="form-label small text-secondary fw-semibold">Middle Name</label>
+                                        <input type="text" name="middle_name" id="middle_name" class="form-control form-control-dark name-capitalize-input" placeholder="e.g., Santos" value="{{ old('middle_name') }}">
+                                    </div>
+                                    <!-- Last Name -->
+                                    <div class="col-md-4">
+                                        <label class="form-label small text-secondary fw-semibold">Last Name <span class="text-speed-pink">*</span></label>
+                                        <input type="text" name="last_name" id="last_name" class="form-control form-control-dark name-capitalize-input" placeholder="e.g., Dela Cruz" value="{{ old('last_name') }}" required>
+                                    </div>
+                                    <!-- Suffix (Placed Beside Phone Number) -->
+                                    <div class="col-md-3 col-lg-2">
+                                        <label class="form-label small text-secondary fw-semibold">Suffix</label>
+                                        <input type="text" name="suffix" id="suffix" class="form-control form-control-dark name-capitalize-input" placeholder="e.g., Jr." value="{{ old('suffix') }}">
+                                    </div>
+                                    <!-- Phone Number (Compact & Sized Appropriately for 11 Digits) -->
+                                    <div class="col-md-5 col-lg-4">
                                         <label class="form-label small text-secondary fw-semibold">Phone Number <span class="text-speed-pink">*</span></label>
                                         <input type="text" name="contact_number" id="customer_phone" class="form-control form-control-dark" placeholder="e.g., 0912 345 6789" value="{{ old('contact_number') }}" maxlength="13" required>
                                     </div>
@@ -652,6 +675,17 @@
                                         
                                         <!-- Vehicle Form Fields -->
                                         <div class="row g-3 mb-4">
+
+                                            <!-- Existing Plate Warning Box -->
+                                            <div class="col-12 plate-warning-alert d-none">
+                                                <div class="alert alert-warning border-warning bg-warning bg-opacity-10 text-warning rounded-3 p-2.5 mb-0 small d-flex align-items-center gap-2" role="alert">
+                                                    <i class="bi bi-exclamation-triangle-fill fs-6 flex-shrink-0"></i>
+                                                    <div>
+                                                        <strong>Existing Record Found:</strong> This plate number is already registered in the database, but some details (Customer Name, Brand, Model, Type, or Year) do not match the existing record.
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <!-- Plate Number -->
                                             <div class="col-md-6 col-xl-4">
                                                 <label class="form-label small text-secondary fw-semibold">Plate Number / CS No. <span class="text-speed-pink">*</span></label>
@@ -1162,21 +1196,130 @@
     document.addEventListener('DOMContentLoaded', function () {
         const addVehicleBtn = document.getElementById('addVehicleBtn');
         const vehiclesContainer = document.getElementById('vehiclesContainer');
-        const customerNameInput = document.getElementById('customer_name');
+        
+        // Composite Name Fields
+        const firstNameInput  = document.getElementById('first_name');
+        const middleNameInput = document.getElementById('middle_name');
+        const lastNameInput   = document.getElementById('last_name');
+        const suffixInput     = document.getElementById('suffix');
+        
         const customerPhoneInput = document.getElementById('customer_phone');
         const trackingCodeInput = document.getElementById('trackingCodeInput');
         const previewCode = document.getElementById('previewCode');
         const serviceRegistrationForm = document.getElementById('serviceRegistrationForm');
 
+        // Letters-Only & Auto-Capitalization Input Handler
+        function handleNameInput(e) {
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            let val = this.value;
+
+            // Strip out any digits/numbers completely (allow letters, spaces, dots, hyphens)
+            val = val.replace(/[0-9]/g, '');
+
+            // Capitalize first character of every word (space-delimited)
+            val = val.replace(/(^|\s)\S/g, function (letter) {
+                return letter.toUpperCase();
+            });
+
+            this.value = val;
+            this.setSelectionRange(start, end);
+        }
+
+        [firstNameInput, middleNameInput, lastNameInput, suffixInput].forEach(input => {
+            if (input) {
+                // Apply immediately on load if value exists
+                if (input.value) {
+                    input.value = input.value.replace(/[0-9]/g, '').replace(/(^|\s)\S/g, l => l.toUpperCase());
+                }
+                input.addEventListener('input', handleNameInput);
+            }
+        });
+
+        // Helper to construct full name dynamically
+        function getFullCustomerName() {
+            const fname  = (firstNameInput?.value || '').trim();
+            const mname  = (middleNameInput?.value || '').trim();
+            const lname  = (lastNameInput?.value || '').trim();
+            const sfx    = (suffixInput?.value || '').trim();
+            return [fname, mname, lname, sfx].filter(Boolean).join(' ');
+        }
+
+        // --- CHECK EXISTING PLATE NUMBER RECORD & TOGGLE WARNING ---
+        function checkPlateNumberRecord(card) {
+            const plateInput = card.querySelector('.plate-input');
+            const warningAlert = card.querySelector('.plate-warning-alert');
+
+            if (!plateInput || !warningAlert) return;
+
+            const plateNumber = plateInput.value.trim().toUpperCase();
+
+            if (plateNumber.length < 2) {
+                warningAlert.classList.add('d-none');
+                delete card.dataset.existingRecord;
+                return;
+            }
+
+            fetch(`{{ route('admin.check-plate-number') }}?plate_number=${encodeURIComponent(plateNumber)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        card.dataset.existingRecord = JSON.stringify(data);
+                        evaluatePlateWarning(card);
+                    } else {
+                        delete card.dataset.existingRecord;
+                        warningAlert.classList.add('d-none');
+                    }
+                })
+                .catch(err => console.error('Plate check error:', err));
+        }
+
+        // Compare current details against existing database record and show/hide warning
+        function evaluatePlateWarning(card) {
+            const warningAlert = card.querySelector('.plate-warning-alert');
+            if (!warningAlert || !card.dataset.existingRecord) return false;
+
+            const existing = JSON.parse(card.dataset.existingRecord);
+
+            const currentCustomer = getFullCustomerName().toLowerCase();
+            const currentBrand    = (card.querySelector('.brand-select')?.value || '').trim().toLowerCase();
+            const currentModel    = (card.querySelector('.model-select')?.value || '').trim().toLowerCase();
+            const currentType     = (card.querySelector('.type-select')?.value || '').trim().toLowerCase();
+            const currentYear     = (card.querySelector('.year-select')?.value || '').trim().toLowerCase();
+
+            const recCustomer = (existing.customer_name || '').trim().toLowerCase();
+            const recBrand    = (existing.vehicle_make || '').trim().toLowerCase();
+            const recModel    = (existing.vehicle_model || '').trim().toLowerCase();
+            const recType     = (existing.vehicle_type || '').trim().toLowerCase();
+            const recYear     = (existing.vehicle_year || '').trim().toLowerCase();
+
+            // Check if ALL 5 details match
+            const isMatch = (currentCustomer === recCustomer) &&
+                            (currentBrand === recBrand) &&
+                            (currentModel === recModel) &&
+                            (currentType === recType) &&
+                            (currentYear === recYear);
+
+            if (isMatch) {
+                warningAlert.classList.add('d-none');
+                return false;
+            } else {
+                warningAlert.classList.remove('d-none');
+                return true; // Returns true indicating a warning is visible/active
+            }
+        }
+
         // --- VALIDATE THAT VEHICLE & SERVICE INFORMATION IS COMPLETED ---
         function validateVehicleServiceInfo() {
-            const custName = (customerNameInput?.value || '').trim();
+            const fName = (firstNameInput?.value || '').trim();
+            const lName = (lastNameInput?.value || '').trim();
             const custPhone = (customerPhoneInput?.value || '').trim();
             const phoneDigits = custPhone.replace(/\D/g, '');
 
-            if (!custName || !custPhone) {
-                alert('Please fill out the Customer Name and Phone Number first.');
-                if (!custName && customerNameInput) customerNameInput.focus();
+            if (!fName || !lName || !custPhone) {
+                alert('Please fill out First Name, Last Name, and Phone Number.');
+                if (!fName && firstNameInput) firstNameInput.focus();
+                else if (!lName && lastNameInput) lastNameInput.focus();
                 else if (customerPhoneInput) customerPhoneInput.focus();
                 return false;
             }
@@ -1234,7 +1377,7 @@
         function generateTrackingCode() {
             const year = new Date().getFullYear().toString().slice(-2);
 
-            const rawName = (customerNameInput?.value || '').trim().replace(/[^a-zA-Z]/g, '').toUpperCase();
+            const rawName = getFullCustomerName().replace(/[^a-zA-Z]/g, '').toUpperCase();
             const nameLetters = rawName.length >= 2 ? rawName.substring(0, 2) : (rawName + 'XX').substring(0, 2);
 
             const firstVehicleCard = document.querySelector('.vehicle-card');
@@ -1576,7 +1719,7 @@
 
         // --- CUSTOMER INFORMATION PREVIEW & LIVE 09XX XXX XXXX FORMATTING ---
         function updateCustomerPreview() {
-            const custName = customerNameInput?.value.trim() || '---';
+            const custName = getFullCustomerName() || '---';
             const custPhone = customerPhoneInput?.value.trim() || '---';
             
             const previewCustomer = document.getElementById('previewCustomer');
@@ -1586,7 +1729,16 @@
             if (previewPhone) previewPhone.textContent = custPhone;
         }
 
-        if (customerNameInput) customerNameInput.addEventListener('input', updateCustomerPreview);
+        [firstNameInput, middleNameInput, lastNameInput, suffixInput].forEach(input => {
+            if (input) {
+                input.addEventListener('input', function() {
+                    updateCustomerPreview();
+                    document.querySelectorAll('.vehicle-card').forEach(vCard => {
+                        evaluatePlateWarning(vCard);
+                    });
+                });
+            }
+        });
 
         if (customerPhoneInput) {
             customerPhoneInput.addEventListener('input', function() {
@@ -1610,9 +1762,35 @@
         // --- FORM SUBMIT INTERCEPTOR TO VALIDATE AND AUTO-GENERATE TRACKING CODE ---
         if (serviceRegistrationForm) {
             serviceRegistrationForm.addEventListener('submit', function(e) {
+                // First validate all basic required vehicle and service details
                 if (!validateVehicleServiceInfo()) {
                     e.preventDefault();
                     return false;
+                }
+
+                // Re-evaluate plate warnings right before save submit and track if any mismatched records exist
+                let hasPlateMismatchWarning = false;
+                document.querySelectorAll('.vehicle-card').forEach(vCard => {
+                    const isMismatched = evaluatePlateWarning(vCard);
+                    if (isMismatched) {
+                        hasPlateMismatchWarning = true;
+
+                        // Auto-expand vehicle collapse if warning is present
+                        const collapseBody = vCard.querySelector('.vehicle-collapse-body');
+                        if (collapseBody && !collapseBody.classList.contains('show')) {
+                            const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseBody);
+                            bsCollapse.show();
+                        }
+                    }
+                });
+
+                // Trigger popup confirmation alert if mismatched plate details exist
+                if (hasPlateMismatchWarning) {
+                    const confirmSave = confirm("WARNING: One or more registered plate numbers already exist in the database with mismatched vehicle or customer details.\n\nAre you sure you want to proceed and save this service order anyway?");
+                    if (!confirmSave) {
+                        e.preventDefault();
+                        return false;
+                    }
                 }
 
                 // Automatically generate tracking code on save order submission
@@ -1720,6 +1898,7 @@
                 typeSelect.addEventListener('change', function() {
                     filterOptionsByVehicleType(card);
                     updateVehicleCardHeader(card);
+                    evaluatePlateWarning(card);
                 });
             }
 
@@ -1728,6 +1907,7 @@
                     updateModelDropdown(brandSelect);
                     updateVehicleCardHeader(card);
                     calculateGrandTotal();
+                    evaluatePlateWarning(card);
                 });
             }
 
@@ -1763,6 +1943,13 @@
 
                     updateVehicleCardHeader(card);
                     calculateGrandTotal();
+                    evaluatePlateWarning(card);
+                });
+            }
+
+            if (yearSelect) {
+                yearSelect.addEventListener('change', function() {
+                    evaluatePlateWarning(card);
                 });
             }
 
@@ -1770,6 +1957,11 @@
                 plateInput.addEventListener('input', function() {
                     updateVehicleCardHeader(card);
                     calculateGrandTotal();
+                    checkPlateNumberRecord(card);
+                });
+
+                plateInput.addEventListener('blur', function() {
+                    checkPlateNumberRecord(card);
                 });
             }
 
@@ -1858,6 +2050,11 @@
 
                 const newPlateInput = newCard.querySelector('.plate-input');
                 if (newPlateInput) newPlateInput.value = '';
+
+                // Hide plate warning alert on cloned card
+                const warningAlert = newCard.querySelector('.plate-warning-alert');
+                if (warningAlert) warningAlert.classList.add('d-none');
+                delete newCard.dataset.existingRecord;
 
                 newCard.querySelectorAll('select').forEach(select => {
                     select.selectedIndex = 0;

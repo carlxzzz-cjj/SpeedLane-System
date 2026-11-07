@@ -1212,11 +1212,13 @@
                                                         </div>
 
                                                         @foreach($formattedVehicles as $vIdx => $vData)
-                                                            <div class="card-dark-nested rounded-3 p-3 mb-3" data-initial-adjustment="{{ floatval($vData['price_adjustment'] ?? 0) }}">
+                                                            <div class="card-dark-nested rounded-3 p-3 mb-3 vehicle-block" data-initial-adjustment="{{ floatval($vData['price_adjustment'] ?? 0) }}">
                                                                 <div class="fw-bold text-white mb-2 d-flex justify-content-between align-items-center">
                                                                     <span><i class="bi bi-car-front text-speed-blue me-1"></i> Vehicle: {{ implode(' ', array_filter([$vData['vehicle_make'], $vData['vehicle_model']])) }}</span>
                                                                     <span class="badge badge-plate">{{ $vData['plate_number'] }}</span>
                                                                 </div>
+
+                                                                @php $initialVehicleSum = 0; @endphp
 
                                                                 @foreach($vData['service_items'] as $sIdx => $item)
                                                                     @php
@@ -1278,6 +1280,7 @@
                                                                             $srvPrice = floatval($rawSrvPrice);
                                                                         }
                                                                         $formattedInitialPrice = number_format((float)$srvPrice, 2, '.', '');
+                                                                        $initialVehicleSum += floatval($srvPrice);
                                                                     @endphp
 
                                                                     <div class="card p-3 mb-2 card-dark-item rounded-3 service-item-card">
@@ -1352,15 +1355,105 @@
                                                                     </div>
                                                                 @endforeach
 
-                                                                <!-- Price Adjustment Note per Vehicle (Registration Note) -->
-                                                                <div class="mt-2">
-                                                                    <label class="form-label small text-secondary mb-1 d-flex align-items-center gap-1">
-                                                                        <span><i class="bi bi-pencil-square me-1"></i>Price Adjustment Note</span>
-                                                                        <span class="registration-note-badge note-required-badge badge d-none" style="font-size: 0.68rem;">
-                                                                            Required (Price Adjusted)
+                                                                <!-- Structured Price Adjustment Note Section -->
+                                                                @php
+                                                                    $existingNoteText = trim($vData['price_adjustment_note'] ?? '');
+                                                                    $existingLines = explode("\n", $existingNoteText);
+                                                                    $parsedBreakdowns = [];
+
+                                                                    foreach ($existingLines as $line) {
+                                                                        $line = trim($line);
+                                                                        if (empty($line) || str_contains(strtoupper($line), 'TOTAL')) continue;
+                                                                        if (str_contains($line, '-')) {
+                                                                            $parts = explode('-', $line);
+                                                                            $pricePart = array_pop($parts);
+                                                                            $reasonPart = implode('-', $parts);
+                                                                            $cleanPrice = preg_replace('/[^0-9.-]/', '', $pricePart);
+                                                                            if (!empty(trim($reasonPart)) || is_numeric($cleanPrice)) {
+                                                                                $parsedBreakdowns[] = [
+                                                                                    'reason' => trim($reasonPart),
+                                                                                    'price'  => floatval($cleanPrice)
+                                                                                ];
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    if (empty($parsedBreakdowns) && !empty($existingNoteText)) {
+                                                                        $parsedBreakdowns[] = [
+                                                                            'reason' => $existingNoteText,
+                                                                            'price'  => floatval($vData['price_adjustment'] ?? 0)
+                                                                        ];
+                                                                    }
+
+                                                                    // Ensure line #1 defaults to Initial Price if not set
+                                                                    if (empty($parsedBreakdowns)) {
+                                                                        $parsedBreakdowns[] = [
+                                                                            'reason' => 'Original Price',
+                                                                            'price'  => $initialVehicleSum
+                                                                        ];
+                                                                    }
+                                                                @endphp
+
+                                                                <div class="mt-3 p-3 card-dark-item rounded-3 border border-secondary border-opacity-25 price-adj-container">
+                                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                        <label class="form-label small fw-bold text-white mb-0 d-flex align-items-center gap-1">
+                                                                            <i class="bi bi-receipt-cutoff text-speed-pink me-1"></i>Price Adjustment Note Breakdown
+                                                                            <span class="registration-note-badge note-required-badge badge d-none" style="font-size: 0.68rem;">
+                                                                                Required (Price Adjusted)
+                                                                            </span>
+                                                                        </label>
+                                                                        <span class="badge bg-secondary bg-opacity-25 text-secondary adj-match-badge" style="font-size: 0.7rem;">
+                                                                            Match Status: N/A
                                                                         </span>
-                                                                    </label>
-                                                                    <input type="text" name="vehicles[{{ $vIdx }}][price_adjustment_note]" class="form-control form-control-sm form-control-dark registration-note-input" value="{{ $vData['price_adjustment_note'] }}" placeholder="e.g., Applied 10% loyalty discount or added extra cleaning fee...">
+                                                                    </div>
+
+                                                                    <!-- Container for Dynamic Line Items -->
+                                                                    <div class="adj-items-list mb-2">
+                                                                        @foreach($parsedBreakdowns as $bIdx => $bItem)
+                                                                            <div class="row g-2 mb-2 align-items-center adj-line-item">
+                                                                                <div class="col-md-7">
+                                                                                    <input type="text" 
+                                                                                           class="form-control form-control-sm form-control-dark adj-reason-input" 
+                                                                                           placeholder="Reason or Equipment Used (e.g., Initial Price, Discount...)" 
+                                                                                           value="{{ $bItem['reason'] }}" 
+                                                                                           readonly>
+                                                                                </div>
+                                                                                <div class="col-md-4">
+                                                                                    <div class="input-group input-group-sm">
+                                                                                        <span class="input-group-text input-group-text-dark fw-bold text-speed-pink">₱</span>
+                                                                                        <input type="number" 
+                                                                                               step="0.01" 
+                                                                                               class="form-control form-control-sm form-control-dark text-end fw-bold text-speed-blue adj-price-input" 
+                                                                                               placeholder="0.00" 
+                                                                                               value="{{ $bItem['price'] }}" 
+                                                                                               readonly>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-1 text-end">
+                                                                                    <button type="button" class="btn btn-outline-danger btn-sm p-1 d-flex align-items-center justify-content-center w-100 remove-adj-line-btn" title="Remove Line" disabled>
+                                                                                        <i class="bi bi-trash"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+                                                                        @endforeach
+                                                                    </div>
+
+                                                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-25">
+                                                                        <button type="button" class="btn btn-outline-info btn-sm rounded-3 add-adj-line-btn" style="font-size: 0.75rem;" disabled>
+                                                                            <i class="bi bi-plus-circle me-1"></i>Add Line Item
+                                                                        </button>
+                                                                        <div class="text-end">
+                                                                            <span class="text-secondary small me-2" style="font-size: 0.78rem;">Total Adjustment Breakdown:</span>
+                                                                            <span class="fw-bold text-speed-pink font-monospace adj-breakdown-sum">₱0.00</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Compiled hidden field submitted to database -->
+                                                                    <input type="hidden" name="vehicles[{{ $vIdx }}][price_adjustment_note]" class="registration-note-input" value="{{ $vData['price_adjustment_note'] }}">
+
+                                                                    <small class="text-secondary d-block mt-2 reg-note-hint" style="font-size: 0.72rem;">
+                                                                        <i class="bi bi-lock-fill me-1"></i>Editable only when status is "Completed & Ready for Pick Up" and final cost is edited.
+                                                                    </small>
                                                                 </div>
                                                             </div>
                                                         @endforeach
@@ -1400,7 +1493,7 @@
                                                     </div>
                                                     <div class="modal-footer border-top-0 pt-0">
                                                         <button type="button" class="btn btn-outline-secondary btn-sm px-3 rounded-3 border-secondary border-opacity-50" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-speed-gradient btn-sm px-4 fw-bold rounded-3">
+                                                        <button type="submit" class="btn btn-speed-gradient btn-sm px-4 fw-bold rounded-3 submit-modal-btn">
                                                             <i class="bi bi-check2-circle me-1"></i> Save Changes
                                                         </button>
                                                     </div>
@@ -1595,88 +1688,178 @@
                 }
             }
 
+            // Recalculates vehicle price adjustment breakdown total and syncs hidden note field
+            function syncVehiclePriceAdjustment(vBlock) {
+                if (!vBlock) return;
+
+                let sumServicesCurrent = 0;
+                let sumServicesInitial = 0;
+                let isCompletedStageActive = false;
+
+                const cards = vBlock.querySelectorAll('.service-item-card');
+                cards.forEach(card => {
+                    const costInput = card.querySelector('.service-cost-input');
+                    if (costInput) {
+                        const val = parseFloat(costInput.value) || 0;
+                        const initVal = parseFloat(costInput.dataset.initialPrice) || 0;
+                        sumServicesCurrent += val;
+                        sumServicesInitial += initVal;
+                    }
+
+                    const stageSelect = card.querySelector('.status-stage-select');
+                    const lockedStatus = card.querySelector('.locked-status-value');
+                    let statusVal = (lockedStatus && lockedStatus.value) ? lockedStatus.value : (stageSelect ? stageSelect.value : '');
+                    if (statusVal) {
+                        const stLower = statusVal.trim().toLowerCase();
+                        if (stLower.includes('completed') || stLower.includes('ready')) {
+                            isCompletedStageActive = true;
+                        }
+                    }
+                });
+
+                const priceDiff = sumServicesCurrent - sumServicesInitial;
+                const hasPriceAdjustment = Math.abs(priceDiff) > 0.001;
+                const canEditNote = isCompletedStageActive && hasPriceAdjustment;
+
+                // Sync line items inputs disabled / readonly state
+                const addBtn = vBlock.querySelector('.add-adj-line-btn');
+                const removeBtns = vBlock.querySelectorAll('.remove-adj-line-btn');
+                const reasonInputs = vBlock.querySelectorAll('.adj-reason-input');
+                const priceInputs = vBlock.querySelectorAll('.adj-price-input');
+                const regNoteBadge = vBlock.querySelector('.registration-note-badge');
+                const regNoteHint = vBlock.querySelector('.reg-note-hint');
+
+                if (addBtn) addBtn.disabled = !canEditNote;
+                removeBtns.forEach(btn => btn.disabled = !canEditNote);
+                reasonInputs.forEach(inp => {
+                    if (canEditNote) inp.removeAttribute('readonly');
+                    else inp.setAttribute('readonly', 'readonly');
+                });
+                priceInputs.forEach(inp => {
+                    if (canEditNote) inp.removeAttribute('readonly');
+                    else inp.setAttribute('readonly', 'readonly');
+                });
+
+                if (canEditNote) {
+                    if (regNoteBadge) {
+                        regNoteBadge.textContent = 'Required (Price Adjusted)';
+                        regNoteBadge.classList.remove('d-none');
+                    }
+                    if (regNoteHint) {
+                        regNoteHint.innerHTML = `<i class="bi bi-unlock-fill text-success me-1"></i>Unlocked — Type reason and amount per line.`;
+                        regNoteHint.className = 'text-success d-block mt-2 reg-note-hint';
+                    }
+                } else {
+                    if (regNoteBadge) regNoteBadge.classList.add('d-none');
+                    if (regNoteHint) {
+                        regNoteHint.innerHTML = `<i class="bi bi-lock-fill me-1"></i>Editable only when status is "Completed & Ready for Pick Up" and final cost is edited.`;
+                        regNoteHint.className = 'text-secondary d-block mt-2 reg-note-hint';
+                    }
+                }
+
+                // Sum up line items prices (handles positives and negatives)
+                let breakdownSum = 0;
+                let lineStrings = [];
+
+                const lineItems = vBlock.querySelectorAll('.adj-line-item');
+                lineItems.forEach(item => {
+                    const rInput = item.querySelector('.adj-reason-input');
+                    const pInput = item.querySelector('.adj-price-input');
+
+                    const rVal = rInput ? rInput.value.trim() : '';
+                    const pVal = pInput ? parseFloat(pInput.value) || 0 : 0;
+
+                    if (rVal !== '' || pVal !== 0) {
+                        breakdownSum += pVal;
+                        lineStrings.push(`${rVal || 'Price Adjustment'} - ${pVal.toFixed(0)}`);
+                    }
+                });
+
+                // Add Total summary line to text if breakdown exists
+                if (lineStrings.length > 0) {
+                    lineStrings.push(`TOTAL - ${breakdownSum.toFixed(0)}`);
+                }
+
+                const compiledNote = lineStrings.join('\n');
+                const hiddenNoteInput = vBlock.querySelector('.registration-note-input');
+                if (hiddenNoteInput) {
+                    hiddenNoteInput.value = compiledNote;
+                }
+
+                const sumDisplay = vBlock.querySelector('.adj-breakdown-sum');
+                if (sumDisplay) {
+                    const sign = breakdownSum < 0 ? '-' : '';
+                    sumDisplay.textContent = sign + '₱' + Math.abs(breakdownSum).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
+
+                // Match verification with vehicle final cost sum
+                const matchBadge = vBlock.querySelector('.adj-match-badge');
+                let isMatching = true;
+
+                if (canEditNote) {
+                    if (Math.abs(breakdownSum - sumServicesCurrent) < 0.01) {
+                        if (matchBadge) {
+                            matchBadge.className = 'badge bg-success text-white adj-match-badge';
+                            matchBadge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Total Matches Vehicle Cost';
+                        }
+                    } else {
+                        isMatching = false;
+                        if (matchBadge) {
+                            matchBadge.className = 'badge bg-danger text-white adj-match-badge';
+                            matchBadge.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i>Mismatch (Expected ₱${sumServicesCurrent.toFixed(2)})`;
+                        }
+                    }
+                } else {
+                    if (matchBadge) {
+                        matchBadge.className = 'badge bg-secondary bg-opacity-25 text-secondary adj-match-badge';
+                        matchBadge.innerHTML = 'Match Status: N/A';
+                    }
+                }
+
+                return { canEditNote, isMatching };
+            }
+
             // Function to recalculate modal Overall Estimated Cost, Progress Status, Registration Note, and toggle SMS Notification option
             function syncModalSummary(modal) {
                 if (!modal) return;
 
                 let totalCost = 0;
                 let allStatuses = [];
+                let allModalsValid = true;
 
-                const vehicleBlocks = modal.querySelectorAll('.card-dark-nested');
+                const vehicleBlocks = modal.querySelectorAll('.vehicle-block');
                 vehicleBlocks.forEach(vBlock => {
-                    let allVehicleServicesCompleted = true;
-                    let hasPriceAdjustment = false;
-
-                    const initAdj = parseFloat(vBlock.getAttribute('data-initial-adjustment') || '0');
-                    if (!isNaN(initAdj) && Math.abs(initAdj) > 0.001) {
-                        hasPriceAdjustment = true;
-                    }
-
                     const cards = vBlock.querySelectorAll('.service-item-card');
 
-                    if (cards.length === 0) {
-                        allVehicleServicesCompleted = false;
-                    }
-
                     cards.forEach(card => {
-                        // Calculate cost
                         const costInput = card.querySelector('.service-cost-input');
                         if (costInput) {
                             const val = parseFloat(costInput.value);
                             if (!isNaN(val)) {
                                 totalCost += val;
                             }
-
-                            const initialVal = parseFloat(costInput.dataset.initialPrice);
-                            if (!isNaN(val) && !isNaN(initialVal) && Math.abs(val - initialVal) > 0.001) {
-                                hasPriceAdjustment = true;
-                            }
                         }
 
-                        // Get status stage (from locked hidden input if disabled, or select value)
                         const stageSelect = card.querySelector('.status-stage-select');
                         const lockedStatus = card.querySelector('.locked-status-value');
-                        let statusVal = '';
-                        if (lockedStatus && lockedStatus.value) {
-                            statusVal = lockedStatus.value;
-                        } else if (stageSelect && stageSelect.value) {
-                            statusVal = stageSelect.value;
-                        }
+                        let statusVal = (lockedStatus && lockedStatus.value) ? lockedStatus.value : (stageSelect ? stageSelect.value : '');
 
                         if (statusVal) {
-                            const stLower = statusVal.trim().toLowerCase();
-                            allStatuses.push(stLower);
-                            const isItemDone = stLower.includes('completed') || stLower.includes('ready');
-                            if (!isItemDone) {
-                                allVehicleServicesCompleted = false;
-                            }
-                        } else {
-                            allVehicleServicesCompleted = false;
+                            allStatuses.push(statusVal.trim().toLowerCase());
                         }
                     });
 
-                    // Handle Price Adjustment Note Requirement
-                    const regNoteInput = vBlock.querySelector('.registration-note-input');
-                    const regNoteBadge = vBlock.querySelector('.registration-note-badge');
-
-                    if (regNoteInput) {
-                        regNoteInput.removeAttribute('readonly');
-                        regNoteInput.classList.remove('bg-transparent');
-
-                        if (hasPriceAdjustment) {
-                            regNoteInput.setAttribute('required', 'required');
-                            if (regNoteBadge) {
-                                regNoteBadge.textContent = 'Required (Price Adjusted)';
-                                regNoteBadge.classList.remove('d-none');
-                            }
-                        } else {
-                            regNoteInput.removeAttribute('required');
-                            if (regNoteBadge) {
-                                regNoteBadge.classList.add('d-none');
-                            }
-                        }
+                    const res = syncVehiclePriceAdjustment(vBlock);
+                    if (res.canEditNote && !res.isMatching) {
+                        allModalsValid = false;
                     }
                 });
+
+                // Prevent submission if price breakdown total doesn't match adjustment
+                const submitBtn = modal.querySelector('.submit-modal-btn');
+                if (submitBtn) {
+                    submitBtn.disabled = !allModalsValid;
+                }
 
                 // Update Overall Cost
                 const costDisplay = modal.querySelector('.modal-overall-cost-display');
@@ -1701,27 +1884,66 @@
                         statusBadge.innerHTML = '<i class="bi bi-gear-wide-connected me-1"></i> In Progress';
                     }
                 }
-
-                // Show/Hide SMS Notification Option dynamically when "Completed & Ready for Pick Up" is selected
-                const smsContainer = modal.querySelector('.sms-option-container');
-                if (smsContainer) {
-                    const hasCompletedAndReadyStage = allStatuses.some(st => 
-                        st.includes('completed & ready for pick up') || 
-                        st.includes('ready for pick up') || 
-                        st.includes('ready for pickup')
-                    );
-
-                    if (hasCompletedAndReadyStage) {
-                        smsContainer.classList.remove('d-none');
-                    } else {
-                        smsContainer.classList.add('d-none');
-                        const smsSwitch = smsContainer.querySelector('.send-sms-switch-input');
-                        if (smsSwitch) {
-                            smsSwitch.checked = false;
-                        }
-                    }
-                }
             }
+
+            // Handle Dynamic Price Adjustment Line Item Add/Remove Events
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.add-adj-line-btn')) {
+                    const btn = e.target.closest('.add-adj-line-btn');
+                    const vBlock = btn.closest('.vehicle-block');
+                    const listContainer = vBlock.querySelector('.adj-items-list');
+
+                    const newLine = document.createElement('div');
+                    newLine.className = 'row g-2 mb-2 align-items-center adj-line-item';
+                    newLine.innerHTML = `
+                        <div class="col-md-7">
+                            <input type="text" 
+                                   class="form-control form-control-sm form-control-dark adj-reason-input" 
+                                   placeholder="Reason or Equipment Used (e.g., Extended labor, Discount...)">
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text input-group-text-dark fw-bold text-speed-pink">₱</span>
+                                <input type="number" 
+                                       step="0.01" 
+                                       class="form-control form-control-sm form-control-dark text-end fw-bold text-speed-blue adj-price-input" 
+                                       placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="col-md-1 text-end">
+                            <button type="button" class="btn btn-outline-danger btn-sm p-1 d-flex align-items-center justify-content-center w-100 remove-adj-line-btn" title="Remove Line">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    listContainer.appendChild(newLine);
+                    const modal = btn.closest('.modal');
+                    syncModalSummary(modal);
+                }
+
+                if (e.target.closest('.remove-adj-line-btn')) {
+                    const btn = e.target.closest('.remove-adj-line-btn');
+                    const lineItem = btn.closest('.adj-line-item');
+                    const vBlock = btn.closest('.vehicle-block');
+                    const modal = btn.closest('.modal');
+
+                    const listContainer = vBlock.querySelector('.adj-items-list');
+                    if (listContainer.children.length > 1) {
+                        lineItem.remove();
+                    } else {
+                        lineItem.querySelectorAll('input').forEach(i => i.value = '');
+                    }
+                    syncModalSummary(modal);
+                }
+            });
+
+            document.addEventListener('input', function(e) {
+                if (e.target.classList.contains('adj-reason-input') || e.target.classList.contains('adj-price-input')) {
+                    const modal = e.target.closest('.modal');
+                    syncModalSummary(modal);
+                }
+            });
 
             // Initialize all update modals state & attach listeners
             document.querySelectorAll('.update-service-modal').forEach(modal => {
@@ -1886,7 +2108,7 @@
                                             ${servicesHTML}
                                         </div>
                                         ${(v.price_adjustment_note || adjVal !== 0) ? `
-                                            <div class="small text-info alert-info-custom p-2 rounded-2 mt-2 border">
+                                            <div class="small text-info alert-info-custom p-2 rounded-2 mt-2 border" style="white-space: pre-wrap;">
                                                 <i class="bi bi-info-circle me-1"></i><strong>Note:</strong> ${noteLabel}${adjText}
                                             </div>
                                         ` : ''}

@@ -37,6 +37,37 @@ class ServiceController extends Controller
     }
 
     /**
+     * Check if a plate number already exists in the database and return latest record details.
+     */
+    public function checkPlateNumber(Request $request)
+    {
+        $plateNumber = strtoupper(trim($request->query('plate_number', '')));
+
+        if (empty($plateNumber)) {
+            return response()->json(['exists' => false]);
+        }
+
+        $record = ServiceRecord::where('plate_number', $plateNumber)->latest()->first();
+
+        if ($record) {
+            return response()->json([
+                'exists'        => true,
+                'first_name'    => $record->first_name ?? '',
+                'middle_name'   => $record->middle_name ?? '',
+                'last_name'     => $record->last_name ?? '',
+                'suffix'        => $record->suffix ?? '',
+                'customer_name' => $record->customer_name ?? '',
+                'vehicle_make'  => $record->vehicle_make ?? '',
+                'vehicle_model' => $record->vehicle_model ?? '',
+                'vehicle_type'  => $record->vehicle_type ?? '',
+                'vehicle_year'  => (string) ($record->vehicle_year ?? ''),
+            ]);
+        }
+
+        return response()->json(['exists' => false]);
+    }
+
+    /**
      * Display service registration form.
      */
     public function create()
@@ -71,10 +102,13 @@ class ServiceController extends Controller
     /**
      * Store service registration record.
      */
-  public function store(Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
-            'customer_name'                     => 'required|string|max:255',
+            'first_name'                        => 'required|string|max:255',
+            'middle_name'                       => 'nullable|string|max:255',
+            'last_name'                         => 'required|string|max:255',
+            'suffix'                            => 'nullable|string|max:50',
             'contact_number'                    => 'nullable|string|max:50',
             'customer_phone'                    => 'nullable|string|max:50',
             'tracking_code'                     => 'nullable|string|max:50',
@@ -220,7 +254,10 @@ class ServiceController extends Controller
                 }
 
                 $record->tracking_code            = $trackingCode;
-                $record->customer_name            = $validated['customer_name'];
+                $record->first_name               = $validated['first_name'];
+                $record->middle_name              = $validated['middle_name'] ?? null;
+                $record->last_name                = $validated['last_name'];
+                $record->suffix                   = $validated['suffix'] ?? null;
                 $record->contact_number           = $contactPhone;
                 $record->vehicle_make             = $brandName;
                 $record->vehicle_model            = $vehicleData['vehicle_model'] ?? '';
@@ -377,24 +414,24 @@ class ServiceController extends Controller
         return back()->with('success', $message);
     }
 
-
     public function destroy($id)
-{
-    try {
-        $record = ServiceRecord::findOrFail($id);
+    {
+        try {
+            $record = ServiceRecord::findOrFail($id);
 
-        // Delete associated vehicles if applicable
-        if (method_exists($record, 'vehicles')) {
-            $record->vehicles()->delete();
+            // Delete associated vehicles if applicable
+            if (method_exists($record, 'vehicles')) {
+                $record->vehicles()->delete();
+            }
+
+            $record->delete();
+
+            return back()->with('success', 'Queued service record deleted successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to delete record: ' . $e->getMessage());
         }
-
-        $record->delete();
-
-        return back()->with('success', 'Queued service record deleted successfully!');
-    } catch (\Exception $e) {
-        return back()->with('error', 'Failed to delete record: ' . $e->getMessage());
     }
-}
+
     /**
      * Add additional service item and update receipt total.
      */

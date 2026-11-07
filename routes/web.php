@@ -80,15 +80,18 @@ Route::middleware('auth')->group(function () {
     // Register Staff Accounts
     Route::post('/admin/create-staff', [AuthController::class, 'register'])->name('admin.register.store');
 
+    // Check Plate Number AJAX Route
+    Route::get('/admin/check-plate-number', [ServiceController::class, 'checkPlateNumber'])->name('admin.check-plate-number');
+
     // Vehicle Service Registration
     Route::get('/admin/register-service', [ServiceController::class, 'create'])->name('admin.register-service');
     Route::post('/admin/register-service', [ServiceController::class, 'store'])->name('services.store');
 
     // Update Status Page & Additional Services
     Route::get('/admin/update', [ServiceController::class, 'index'])->name('admin.update');
-Route::put('/admin/update/{id}', [ServiceController::class, 'updateStatus'])
-    ->name('services.update-status');
-        Route::patch('/admin/update/{id}', [ServiceController::class, 'updateStatus'])->name('services.updateStatus');
+    Route::put('/admin/update/{id}', [ServiceController::class, 'updateStatus'])
+        ->name('services.update-status');
+    Route::patch('/admin/update/{id}', [ServiceController::class, 'updateStatus'])->name('services.updateStatus');
 
     Route::post('/admin/update/{id}/add-service', [ServiceController::class, 'addAdditional'])->name('admin.add-additional');
     Route::post('/admin/update/{id}/add-service-alt', [ServiceController::class, 'addAdditional'])->name('services.addAdditional');
@@ -112,7 +115,7 @@ Route::put('/admin/update/{id}', [ServiceController::class, 'updateStatus'])
     Route::get('/admin/transactions/{id}/pdf', [TransactionController::class, 'downloadPdf'])->name('admin.transactions.pdf');
     
     // Route for deleting queued customer records on the Update Status page
-Route::delete('/admin/update/{id}', [ServiceController::class, 'destroy'])->name('admin.update.destroy');
+    Route::delete('/admin/update/{id}', [ServiceController::class, 'destroy'])->name('admin.update.destroy');
 
     /*
     |--------------------------------------------------------------------------

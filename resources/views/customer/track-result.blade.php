@@ -602,6 +602,8 @@
                     if (empty(trim($fullVehicleTitle))) {
                         $fullVehicleTitle = $getVal($item, ['vehicle_name', 'vehicle', 'car_name'], 'Vehicle');
                     }
+
+                    $priceAdjNote = trim($item->price_adjustment_note ?? $item->note ?? '');
                 @endphp
                 
                 <div class="card speed-card border-0 shadow-sm rounded-4 p-4 mb-4">
@@ -637,10 +639,12 @@
                                 @endif
                             </span>
                         </div>
-                        @if(!empty($item->price_adjustment_note ?? $item->note))
+                        @if(!empty($priceAdjNote))
                             <div class="col-12">
-                                <span class="text-secondary extra-small d-block">Price Adjustment Note</span>
-                                <span class="fw-bold text-white small">{{ $item->price_adjustment_note ?? $item->note }}</span>
+                                <span class="text-secondary extra-small d-block mb-1">
+                                    <i class="bi bi-receipt-cutoff me-1 text-speed-pink"></i>Price Adjustment Note
+                                </span>
+                                <div class="p-3 rounded-3 border border-secondary border-opacity-25 inner-dark-box text-white small" style="background-color: #06080d; white-space: pre-line; line-height: 1.6;">{{ $priceAdjNote }}</div>
                             </div>
                         @endif
                     </div>
@@ -785,7 +789,7 @@
                                                         <div class="d-flex align-items-center gap-1.5 fw-bold text-speed-blue mb-1 extra-small">
                                                             <i class="bi bi-chat-left-text-fill"></i> Mechanic Progress Note
                                                         </div>
-                                                        <p class="mb-0 text-light" style="font-size: 0.85rem; line-height: 1.45;">
+                                                        <p class="mb-0 text-light" style="font-size: 0.85rem; line-height: 1.45; white-space: pre-line;">
                                                             "{{ $sNote }}"
                                                         </p>
                                                     </div>

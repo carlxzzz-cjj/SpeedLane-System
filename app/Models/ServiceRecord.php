@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class ServiceRecord extends Model
 {
@@ -13,7 +14,10 @@ class ServiceRecord extends Model
 
     protected $fillable = [
         'tracking_code',
-        'customer_name',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'suffix',
         'contact_number',
         'vehicle_make',
         'vehicle_model',
@@ -33,6 +37,22 @@ class ServiceRecord extends Model
         'selected_services_prices' => 'array',
         'total_cost'               => 'decimal:2',
     ];
+
+    /**
+     * Virtual customer_name Accessor.
+     * Keeps all existing views/reports using $record->customer_name working seamlessly!
+     */
+    public function customerName(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => trim(implode(' ', array_filter([
+                $this->attributes['first_name'] ?? '',
+                $this->attributes['middle_name'] ?? '',
+                $this->attributes['last_name'] ?? '',
+                $this->attributes['suffix'] ?? '',
+            ])))
+        );
+    }
 
     /**
      * Get a formatted vehicle description (e.g., "2022 Toyota Vios").
